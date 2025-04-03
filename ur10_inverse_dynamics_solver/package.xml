@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>ur10_inverse_dynamics_solver</name>
-  <version>0.1.0</version>
+  <version>0.1.1</version>
   <description>A C++ library implementing the inverse dynamics solver for the UR10 real robot.</description>
   <maintainer email="eferrentino@unisa.it">Enrico Ferrentino</maintainer>
   <author email="vipetrone@unisa.it">Vincenzo Petrone</author>
