@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>kdl_inverse_dynamics_solver</name>
+  <version>0.1.0</version>
+  <description>A KDL-based library implementing an inverse dynamics solver for simulated robots.</description>
+  <maintainer email="eferrentino@unisa.it">Enrico Ferrentino</maintainer>
+  <author email="vipetrone@unisa.it">Vincenzo Petrone</author>
+  <license>BSD</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>inverse_dynamics_solver</depend>
+  <depend>kdl_parser</depend>
+  <depend>pluginlib</depend>
+
+  <exec_depend>franka_description</exec_depend>
+  <exec_depend>ur_description</exec_depend>
+
+  <test_depend>ament_cmake_gtest</test_depend>
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+  <test_depend>rclcpp</test_depend>
+  <test_depend>ros_testing</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

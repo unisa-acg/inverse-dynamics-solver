@@ -1,0 +1,43 @@
+# [TAG] Summarize changes in around 50 characters or less
+#
+# - [TAG] in case the commit includes several changes
+# - [TAG] and these fall into several categories you should omit the top
+#         TAG in the first line
+# - [TAG] and use bullet points to list them, each preceded by the
+#         corresponding tag.
+#
+# The following is a list of the values that may be used for the TAG:
+# * ADD adding new feature
+# * FIX a bug
+# * DOC documentation only
+# * REF refactoring that doesn't include any changes in features
+# * FMT formatting only (spacing...)
+# * MAK repository related changes (e.g., changes in the ignore list)
+# * TST related to test code only
+#
+#
+# More detailed explanatory text, if necessary. Wrap it to about 72
+# characters or so. In some contexts, the first line is treated as the
+# subject of the commit and the rest of the text as the body. The
+# blank line separating the summary from the body is critical (unless
+# you omit the body entirely); various tools like `log`, `shortlog`
+# and `rebase` can get confused if you run the two together.
+#
+# Explain the problem that this commit is solving. Focus on why you
+# are making this change as opposed to how (the code explains that).
+# Are there side effects or other unintuitive consequences of this
+# change? Here's the place to explain them.
+#
+# Further paragraphs come after blank lines.
+#
+#  - Bullet points are okay, too
+#
+#  - Typically a hyphen or asterisk is used for the bullet, preceded
+#    by a single space, with blank lines in between, but conventions
+#    vary here
+#
+# If this commit solves or is related to an issue present on the issue tracker
+# refer to them as below.
+#
+# Resolves: #123
+# See also: #456, #789

@@ -1,0 +1,17 @@
+/*
+ * get_MassMatrix.h
+ *
+ *  Created on: 15 apr 2019
+ *      Author: oliva
+ */
+
+#include <eigen3/Eigen/Core>
+
+#ifndef SOURCE_DIRECTORY__VISION_TORQUE_EXAMPLES_FCI_GENERATE_CARTESIAN_POSE_MOTION_INCLUDE_GET_MASSMATRIX_H_
+#define SOURCE_DIRECTORY__VISION_TORQUE_EXAMPLES_FCI_GENERATE_CARTESIAN_POSE_MOTION_INCLUDE_GET_MASSMATRIX_H_
+
+
+Eigen::MatrixXd get_MassMatrix( Eigen::VectorXd q);
+Eigen::MatrixXf get_MassMatrix_partial( Eigen::VectorXf q);
+
+#endif /* SOURCE_DIRECTORY__VISION_TORQUE_EXAMPLES_FCI_GENERATE_CARTESIAN_POSE_MOTION_INCLUDE_GET_MASSMATRIX_H_ */

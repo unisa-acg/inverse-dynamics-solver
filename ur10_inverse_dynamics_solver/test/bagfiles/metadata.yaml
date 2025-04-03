@@ -1,0 +1,29 @@
+rosbag2_bagfile_information:
+  compression_format: ''
+  compression_mode: ''
+  custom_data: {}
+  duration:
+    nanoseconds: 0
+  files:
+  - duration:
+      nanoseconds: 0
+    message_count: 1
+    path: ros2.db3
+    starting_time:
+      nanoseconds_since_epoch: 1689184412981349966
+  message_count: 1
+  relative_file_paths:
+  - ros2.db3
+  ros_distro: rosbags
+  starting_time:
+    nanoseconds_since_epoch: 1689184412981349966
+  storage_identifier: sqlite3
+  topics_with_message_count:
+  - message_count: 1
+    topic_metadata:
+      name: /joint_space_trajectory
+      offered_qos_profiles: ''
+      serialization_format: cdr
+      type: trajectory_msgs/msg/JointTrajectory
+      type_description_hash: RIHS01_179b33eba59d676f6d967ac71fe35e7ca2f64b2f3928f4a018cec115e213796e
+  version: 8

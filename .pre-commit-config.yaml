@@ -1,0 +1,97 @@
+# To use:
+#
+#     pre-commit run -a
+#
+# Or:
+#
+#     pre-commit install  # (runs every time you commit in git)
+#
+# To update this file:
+#
+#     pre-commit autoupdate
+#
+# See https://github.com/pre-commit/pre-commit
+
+# Adapted from https://github.com/ros-planning/moveit2/blob/main/.pre-commit-config.yaml
+
+# These files are excluded from all the hooks since they have been developed by external entities
+exclude: franka_inria_inverse_dynamics_solver/src/(?!franka_inria_inverse_dynamics_solver\.cpp$).*|franka_inria_inverse_dynamics_solver/include/franka_inria_inverse_dynamics_solver/(?!franka_inria_inverse_dynamics_solver\.h$).*
+
+repos:
+  # Standard hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-added-large-files
+        files: ".*stl$|.*dae$|.*mesh$"
+        args: ['--maxkb=2000']
+      - id: check-added-large-files
+        files: ".*bag$|.*db3$"
+        args: ['--maxkb=15656']
+      - id: check-added-large-files
+        exclude: ".*stl$|.*dae$|.*mesh$|.*bag$|.*db3$"
+      - id: check-case-conflict
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: check-toml
+      - id: check-vcs-permalinks
+      - id: check-yaml
+        exclude: ".pre-commit-config.yaml"
+        args: ["--unsafe"]
+      - id: debug-statements
+      - id: destroyed-symlinks
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+      - id: pretty-format-json
+      - id: trailing-whitespace
+
+  - repo: https://github.com/jumanjihouse/pre-commit-hooks
+    rev: 3.0.0
+    hooks:
+      - id: check-mailmap
+      - id: shellcheck
+
+  - repo: https://github.com/markdownlint/markdownlint
+    rev: v0.12.0
+    hooks:
+      - id: markdownlint
+        args: ["--style", ".mdstyle.rb"]
+
+  - repo: https://github.com/psf/black
+    rev: 25.1.0
+    hooks:
+      - id: black
+
+  - repo: https://github.com/cheshirekow/cmake-format-precommit
+    rev: v0.6.13
+    hooks:
+      - id: cmake-format
+      - id: cmake-lint
+        args: ["--suppress-decorations"]
+
+  - repo: https://github.com/tier4/pre-commit-hooks-ros
+    rev: v0.10.0
+    hooks:
+      - id: prettier-xacro
+      - id: prettier-launch-xml
+      - id: prettier-package-xml
+      - id: ros-include-guard
+      - id: sort-package-xml
+
+  - repo: local
+    hooks:
+      - id: clang-format
+        name: clang-format
+        description: Format files with ClangFormat.
+        entry: clang-format
+        language: system
+        files: \.(c|cc|cxx|cpp|frag|glsl|h|hpp|hxx|ih|ispc|ipp|java|js|proto|vert)$
+        args: ["-fallback-style=none", "-i"]
+
+  - repo: https://github.com/sco1/pre-commit-matlab
+    rev: v1.2.0
+    hooks:
+      - id: matlab-reflow-comments
+        args: [--line-length=100]

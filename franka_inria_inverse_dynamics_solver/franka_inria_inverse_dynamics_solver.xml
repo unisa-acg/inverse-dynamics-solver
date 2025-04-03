@@ -1,0 +1,9 @@
+<library path="franka_inria_inverse_dynamics_solver">
+  <class base_class_type="inverse_dynamics_solver::InverseDynamicsSolver"
+         type="franka_inria_inverse_dynamics_solver::InverseDynamicsSolverFrankaInria"
+         name="franka_inria_inverse_dynamics_solver/InverseDynamicsSolverFrankaInria">
+    <description>
+      This is a plugin implementing an inverse dynamics solver for the Franka Emika Panda (FER) real robot using the dynamic model estimated by INRIA.
+    </description>
+  </class>
+</library>

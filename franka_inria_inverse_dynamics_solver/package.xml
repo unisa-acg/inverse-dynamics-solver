@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>franka_inria_inverse_dynamics_solver</name>
+  <version>0.1.0</version>
+  <description>A C++ library implementing the inverse dynamics solver for the Franka Emika Panda (FER) real robot.</description>
+  <maintainer email="eferrentino@unisa.it">Enrico Ferrentino</maintainer>
+  <author email="vipetrone@unisa.it">Vincenzo Petrone</author>
+  <license>BSD</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>eigen</depend>
+  <depend>inverse_dynamics_solver</depend>
+  <depend>pluginlib</depend>
+
+  <exec_depend>franka_description</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
