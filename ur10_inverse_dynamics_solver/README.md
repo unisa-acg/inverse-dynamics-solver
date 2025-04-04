@@ -2,7 +2,10 @@
 
 ## Contents
 
-This dynamics solver for the real UR10 robot is based on a model identified at current level.
+This dynamics solver for the real UR10 robot is based on a model identified at current level by the following paper:
+
+> V. Petrone, E. Ferrentino and P. Chiacchio, "The Dynamic Model of the UR10 Robot and Its ROS2 Integration," in IEEE Transactions on Industrial Informatics, doi: 10.1109/TII.2025.3534415.
+
 The library [InverseDynamicsSolverUR10](./include/ur10_inverse_dynamics_solver/ur10_inverse_dynamics_solver.h) depends on the following files, automatically generated with MATLAB:
 
 * [getCoriolisCurrents](./include/ur10_inverse_dynamics_solver/getCoriolisCurrents.h): given the 6X1 vector of positions and the 6X1 vector of velocities, both in joint space, it computes the 6x1 vector of currents related to Coriolis effects, expressed in `A`;
@@ -113,3 +116,21 @@ However, you can launch its executable with
 ```
 
 For more details about this tool, please see [this guide](https://docs.openvins.com/dev-ros1-to-ros2.html).
+
+## Citation
+
+If you find this work useful, please cite it as
+
+```bibtex
+@article{Petrone_2025,
+    title={The Dynamic Model of the UR10 Robot and Its ROS2 Integration},
+    ISSN={1941-0050},
+    url={http://dx.doi.org/10.1109/tii.2025.3534415},
+    DOI={10.1109/tii.2025.3534415},
+    journal={IEEE Transactions on Industrial Informatics},
+    publisher={Institute of Electrical and Electronics Engineers (IEEE)},
+    author={Petrone, Vincenzo and Ferrentino, Enrico and Chiacchio, Pasquale},
+    year={2025},
+    pages={1–11}
+}
+```

@@ -53,3 +53,24 @@ ros2 launch franka_inria_inverse_dynamics_solver evaluate_solver_franka.launch.p
 ### Visualize the results
 
 Please refer to [the parent class documentation](../inverse_dynamics_solver/README.md#visualize-the-results) to visualize the results, i.e. the evaluation of joint torque signals on `input_bag`, stored in `output_bag`.
+
+## Citation
+
+If you find this work useful, please cite it as
+
+```bibtex
+@article{Gaz_2019,
+    title={Dynamic Identification of the Franka Emika Panda Robot With Retrieval of Feasible Parameters Using Penalty-Based Optimization},
+    volume={4},
+    ISSN={2377-3774},
+    url={http://dx.doi.org/10.1109/lra.2019.2931248},
+    DOI={10.1109/lra.2019.2931248},
+    number={4},
+    journal={IEEE Robotics and Automation Letters},
+    publisher={Institute of Electrical and Electronics Engineers (IEEE)},
+    author={Gaz, Claudio and Cognetti, Marco and Oliva, Alexander and Robuffo Giordano, Paolo and De Luca, Alessandro},
+    year={2019},
+    month=oct,
+    pages={4147–4154}
+}
+```
