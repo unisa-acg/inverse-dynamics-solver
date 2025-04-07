@@ -96,7 +96,7 @@ if(BUILD_TESTING)
     ${THIS_TEST_PACKAGE_INCLUDE_DEPENDS}
     inverse_dynamics_solver
   )
-  add_ros_test(launch/test_ur10_inverse_dynamics_solver.launch.py)
+  add_ros_test(test/test_ur10_inverse_dynamics_solver.py)
 
   target_link_libraries(${TEST_NAME} ur10_inverse_dynamics_solver)
 
