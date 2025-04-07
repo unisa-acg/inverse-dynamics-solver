@@ -84,7 +84,7 @@ if(BUILD_TESTING)
     pluginlib
     inverse_dynamics_solver
   )
-  add_ros_test(launch/test_kdl_inverse_dynamics_solver.launch.py)
+  add_ros_test(test/test_kdl_inverse_dynamics_solver.py)
 
   target_link_libraries(${TEST_NAME} kdl_inverse_dynamics_solver)
 

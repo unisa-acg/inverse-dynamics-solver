@@ -41,4 +41,9 @@ pip install -r requirements.txt
 
 The dependencies are installed in the virtual environment called [`venv`](./venv/): to deactivate it, simply run `deactivate` in your terminal.
 
+## Reproducible results
+
+Our results are reproducible via the demos provided in the packages above, or by running the CodeOcean capsule: the latter option does not require installing any dependency on your computer.
+The capsule is reachable at [https://doi.org/10.24433/CO.2265930.v1](https://doi.org/10.24433/CO.2265930.v1).
+
 &copy; *2025 Automatic Control Group (DIEM, University of Salerno)*

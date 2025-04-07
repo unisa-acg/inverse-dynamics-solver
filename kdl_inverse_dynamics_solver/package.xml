@@ -4,6 +4,7 @@
   <name>kdl_inverse_dynamics_solver</name>
   <version>0.1.1</version>
   <description>A KDL-based library implementing an inverse dynamics solver for simulated robots.</description>
+  <url>https://github.com/unisa-acg/inverse-dynamics-solver.git</url>
   <maintainer email="eferrentino@unisa.it">Enrico Ferrentino</maintainer>
   <author email="vipetrone@unisa.it">Vincenzo Petrone</author>
   <license>BSD</license>

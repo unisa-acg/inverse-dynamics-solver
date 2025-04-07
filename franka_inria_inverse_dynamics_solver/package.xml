@@ -4,6 +4,7 @@
   <name>franka_inria_inverse_dynamics_solver</name>
   <version>0.1.1</version>
   <description>A C++ library implementing the inverse dynamics solver for the Franka Emika Panda (FER) real robot.</description>
+  <url>https://github.com/unisa-acg/inverse-dynamics-solver.git</url>
   <maintainer email="eferrentino@unisa.it">Enrico Ferrentino</maintainer>
   <author email="vipetrone@unisa.it">Vincenzo Petrone</author>
   <license>BSD</license>
