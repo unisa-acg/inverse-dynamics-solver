@@ -17,6 +17,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/serialization.hpp>
 #include <rosbag2_cpp/reader.hpp>
+#include <rosbag2_storage/storage_options.hpp>
 #include <trajectory_msgs/msg/joint_trajectory.hpp>
 
 // PluginLib
@@ -134,7 +135,10 @@ TEST_F(InverseDynamicsSolverUR10Test, TestDynamicParameters)
   rclcpp::Serialization<trajectory_msgs::msg::JointTrajectory> serialization;
   RCLCPP_INFO(node->get_logger(), "Opening '%s'", bag_filename.c_str());
   rosbag2_cpp::Reader reader;
-  reader.open(bag_filename);
+  rosbag2_storage::StorageOptions storage_options;
+  storage_options.uri = bag_filename;
+  storage_options.storage_id = "sqlite3";
+  reader.open(storage_options);
 
   // For each trajectory in the rosbag file, evaluate the dynamics solver
   while (reader.has_next())
