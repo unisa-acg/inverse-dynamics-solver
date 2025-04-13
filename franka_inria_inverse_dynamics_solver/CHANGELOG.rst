@@ -2,8 +2,8 @@
 Changelog for package franka_inria_inverse_dynamics_solver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.0 (2025-04-13)
+------------------
 * [REF] Rename .h files to .hpp files
 * Merge pull request `#2 <https://github.com/unisa-acg/inverse-dynamics-solver/issues/2>`_ from unisa-acg/humble
   Set repo URL, rename test launch files, document CO reproducibility

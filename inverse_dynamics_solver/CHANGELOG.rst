@@ -2,8 +2,8 @@
 Changelog for package inverse_dynamics_solver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.0 (2025-04-13)
+------------------
 * [FIX] Update missing dependencies in demo to include plugins to read bag files with sqlite3
 * [REF] Rename .h files to .hpp files
 * Merge pull request `#2 <https://github.com/unisa-acg/inverse-dynamics-solver/issues/2>`_ from unisa-acg/humble

@@ -2,8 +2,8 @@
 Changelog for package ur10_inverse_dynamics_solver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.0 (2025-04-13)
+------------------
 * [REF] Rename .h files to .hpp files
 * Merge pull request `#3 <https://github.com/unisa-acg/inverse-dynamics-solver/issues/3>`_ from unisa-acg/humble
   Fix error in opening bag file due to unset storage options
