@@ -1,5 +1,5 @@
 /*
- * get_CoriolisMatrix.h
+ * get_CoriolisMatrix.hpp
  *
  *  Created on: 15 apr 2019
  *      Author: oliva

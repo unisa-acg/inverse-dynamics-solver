@@ -27,8 +27,8 @@
 #include <gtest/gtest.h>
 
 // Inverse Dynamics Solver
-#include <inverse_dynamics_solver/inverse_dynamics_solver.h>
-#include "ur10_inverse_dynamics_solver/ur10_inverse_dynamics_solver.h"
+#include <inverse_dynamics_solver/inverse_dynamics_solver.hpp>
+#include "ur10_inverse_dynamics_solver/ur10_inverse_dynamics_solver.hpp"
 
 // This class shares parameters and data across all tests
 class SharedData

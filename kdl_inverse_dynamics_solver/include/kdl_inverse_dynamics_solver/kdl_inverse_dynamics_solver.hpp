@@ -3,7 +3,7 @@
  * This module has been developed by the Automatic Control Group
  * of the University of Salerno, Italy.
  *
- * Title:   kdl_inverse_dynamics_solver.h
+ * Title:   kdl_inverse_dynamics_solver.hpp
  * Author:  Enrico Ferrentino, Vincenzo Petrone
  * Org.:    UNISA
  * Date:    Dec 3, 2019
@@ -17,7 +17,7 @@
 #pragma once
 
 #include <kdl/chaindynparam.hpp>
-#include <inverse_dynamics_solver/inverse_dynamics_solver.h>
+#include <inverse_dynamics_solver/inverse_dynamics_solver.hpp>
 
 namespace kdl_inverse_dynamics_solver
 {

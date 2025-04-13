@@ -3,7 +3,7 @@
  * This module has been developed by the Automatic Control Group
  * of the University of Salerno, Italy.
  *
- * Title:   inverse_dynamics_solver.h
+ * Title:   inverse_dynamics_solver.hpp
  * Author:  Enrico Ferrentino, Vincenzo Petrone
  * Org.:    UNISA
  * Date:    Dec 3, 2019

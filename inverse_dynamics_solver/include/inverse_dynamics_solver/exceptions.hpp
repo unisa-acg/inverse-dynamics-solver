@@ -3,7 +3,7 @@
  * This module has been developed by the Automatic Control Group
  * of the University of Salerno, Italy.
  *
- * Title:   exceptions.h
+ * Title:   exceptions.hpp
  * Author:  Vincenzo Petrone
  * Org.:    UNISA
  * Date:    May 2, 2024

@@ -1,4 +1,4 @@
-#include "get_CoriolisMatrix.h"
+#include "get_CoriolisMatrix.hpp"
 
 Eigen::MatrixXf get_CoriolisMatrix_fake(Eigen::VectorXf q, Eigen::VectorXf dq)
 {

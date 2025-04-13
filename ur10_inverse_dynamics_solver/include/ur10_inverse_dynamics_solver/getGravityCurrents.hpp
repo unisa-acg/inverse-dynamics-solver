@@ -3,7 +3,7 @@
  * This module has been developed by the Automatic Control Group
  * of the University of Salerno, Italy.
  *
- * Title:   getGravityCurrents.h
+ * Title:   getGravityCurrents.hpp
  * Author:  Antonio Annunziata, Vincenzo Petrone
  * Org.:    UNISA
  * Date:    Jul 7, 2023
