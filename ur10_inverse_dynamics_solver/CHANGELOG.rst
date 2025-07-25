@@ -2,6 +2,11 @@
 Changelog for package ur10_inverse_dynamics_solver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [REF] Remove unnecessary specification of rosbag2 reader plugin, uses default
+* Contributors: Vincenzo Petrone
+
 1.0.0 (2025-04-13)
 ------------------
 * [REF] Rename .h files to .hpp files

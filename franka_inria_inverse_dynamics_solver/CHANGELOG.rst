@@ -2,6 +2,9 @@
 Changelog for package franka_inria_inverse_dynamics_solver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.0.0 (2025-04-13)
 ------------------
 * [REF] Rename .h files to .hpp files
