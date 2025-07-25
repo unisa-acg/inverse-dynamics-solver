@@ -1,4 +1,4 @@
-#include "franka_inria_inverse_dynamics_solver/get_FrictionTorque.h"
+#include "franka_inria_inverse_dynamics_solver/get_FrictionTorque.hpp"
 
 Eigen::VectorXd get_friction(Eigen::VectorXd dq)
 {

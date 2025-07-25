@@ -1,4 +1,4 @@
-#include "franka_inria_inverse_dynamics_solver/get_GravityVector.h"
+#include "franka_inria_inverse_dynamics_solver/get_GravityVector.hpp"
 
 using namespace std;
 

@@ -17,7 +17,6 @@
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/serialization.hpp>
 #include <rosbag2_cpp/reader.hpp>
-#include <rosbag2_storage/storage_options.hpp>
 #include <trajectory_msgs/msg/joint_trajectory.hpp>
 
 // PluginLib
@@ -27,8 +26,8 @@
 #include <gtest/gtest.h>
 
 // Inverse Dynamics Solver
-#include <inverse_dynamics_solver/inverse_dynamics_solver.h>
-#include "ur10_inverse_dynamics_solver/ur10_inverse_dynamics_solver.h"
+#include <inverse_dynamics_solver/inverse_dynamics_solver.hpp>
+#include "ur10_inverse_dynamics_solver/ur10_inverse_dynamics_solver.hpp"
 
 // This class shares parameters and data across all tests
 class SharedData
@@ -135,10 +134,7 @@ TEST_F(InverseDynamicsSolverUR10Test, TestDynamicParameters)
   rclcpp::Serialization<trajectory_msgs::msg::JointTrajectory> serialization;
   RCLCPP_INFO(node->get_logger(), "Opening '%s'", bag_filename.c_str());
   rosbag2_cpp::Reader reader;
-  rosbag2_storage::StorageOptions storage_options;
-  storage_options.uri = bag_filename;
-  storage_options.storage_id = "sqlite3";
-  reader.open(storage_options);
+  reader.open(bag_filename);
 
   // For each trajectory in the rosbag file, evaluate the dynamics solver
   while (reader.has_next())

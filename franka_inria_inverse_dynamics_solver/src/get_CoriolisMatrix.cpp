@@ -1,4 +1,4 @@
-#include "franka_inria_inverse_dynamics_solver/get_CoriolisMatrix.h"
+#include "franka_inria_inverse_dynamics_solver/get_CoriolisMatrix.hpp"
 
 
 Eigen::MatrixXd get_CoriolisMatrix(Eigen::VectorXd q, Eigen::VectorXd dq)

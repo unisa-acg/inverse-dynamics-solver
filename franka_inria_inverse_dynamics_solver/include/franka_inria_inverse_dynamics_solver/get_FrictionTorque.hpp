@@ -1,5 +1,5 @@
 /*
- * get_FrictionTorque.h
+ * get_FrictionTorque.hpp
  *
  *  Created on: 16 apr 2019
  *      Author: oliva

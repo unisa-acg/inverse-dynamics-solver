@@ -36,7 +36,7 @@ def read_ros2_bag(bag_file, topic):
     """Reads messages from a ROS 2 bag file."""
     reader = SequentialReader()
     reader.open(
-        StorageOptions(uri=bag_file, storage_id="sqlite3"),
+        StorageOptions(uri=bag_file),
         ConverterOptions(
             input_serialization_format="cdr",
             output_serialization_format="cdr",

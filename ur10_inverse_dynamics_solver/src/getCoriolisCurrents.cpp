@@ -25,7 +25,7 @@
 
 // Include Files
 #include <cmath>
-#include "ur10_inverse_dynamics_solver/getCoriolisCurrents.h"
+#include "ur10_inverse_dynamics_solver/getCoriolisCurrents.hpp"
 
 // Function Definitions
 //

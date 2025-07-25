@@ -14,11 +14,11 @@
  */
 
 // Inverse dynamics solver
-#include "franka_inria_inverse_dynamics_solver/get_MassMatrix.h"
-#include "franka_inria_inverse_dynamics_solver/get_CoriolisMatrix.h"
-#include "franka_inria_inverse_dynamics_solver/get_GravityVector.h"
-#include "franka_inria_inverse_dynamics_solver/get_FrictionTorque.h"
-#include "franka_inria_inverse_dynamics_solver/franka_inria_inverse_dynamics_solver.h"
+#include "franka_inria_inverse_dynamics_solver/get_MassMatrix.hpp"
+#include "franka_inria_inverse_dynamics_solver/get_CoriolisMatrix.hpp"
+#include "franka_inria_inverse_dynamics_solver/get_GravityVector.hpp"
+#include "franka_inria_inverse_dynamics_solver/get_FrictionTorque.hpp"
+#include "franka_inria_inverse_dynamics_solver/franka_inria_inverse_dynamics_solver.hpp"
 
 using namespace franka_inria_inverse_dynamics_solver;
 
