@@ -2,8 +2,8 @@
 Changelog for package inverse_dynamics_solver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.1 (2025-07-25)
+------------------
 * [REF] Remove unnecessary specification of rosbag2 reader plugin, uses default
 * Contributors: Vincenzo Petrone
 
