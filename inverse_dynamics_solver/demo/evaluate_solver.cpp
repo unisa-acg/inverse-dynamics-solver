@@ -20,7 +20,6 @@
 #include <rclcpp/serialization.hpp>
 #include <rosbag2_cpp/reader.hpp>
 #include <rosbag2_cpp/writer.hpp>
-#include <rosbag2_storage/storage_options.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <pluginlib/class_loader.hpp>
 #include <eigen3/Eigen/Core>
@@ -61,10 +60,7 @@ public:
     // Initialize the rosbag reader
     rclcpp::Serialization<sensor_msgs::msg::JointState> serialization;
     rosbag2_cpp::Reader reader;
-    rosbag2_storage::StorageOptions storage_options;
-    storage_options.uri = input_bag;
-    storage_options.storage_id = "sqlite3";
-    reader.open(storage_options);
+    reader.open(input_bag);
 
     // Initialize the rosbag writer
     rosbag2_cpp::Writer writer;

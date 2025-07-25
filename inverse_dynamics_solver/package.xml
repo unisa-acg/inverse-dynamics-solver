@@ -20,6 +20,11 @@
   <depend>sensor_msgs</depend>
   <depend>urdf</depend>
 
+  <exec_depend>python-argparse</exec_depend>
+  <exec_depend>python3-matplotlib</exec_depend>
+  <exec_depend>python3-numpy</exec_depend>
+  <exec_depend>python3-tabulate</exec_depend>
+
   <export>
     <build_type>ament_cmake</build_type>
   </export>
