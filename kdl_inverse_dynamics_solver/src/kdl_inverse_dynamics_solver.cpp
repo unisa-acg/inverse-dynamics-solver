@@ -20,8 +20,8 @@
 #include <pluginlib/class_list_macros.hpp>
 
 // Inverse Dynamics Solver
-#include <inverse_dynamics_solver/exceptions.h>
-#include "kdl_inverse_dynamics_solver/kdl_inverse_dynamics_solver.h"
+#include <inverse_dynamics_solver/exceptions.hpp>
+#include "kdl_inverse_dynamics_solver/kdl_inverse_dynamics_solver.hpp"
 
 using namespace kdl_inverse_dynamics_solver;
 

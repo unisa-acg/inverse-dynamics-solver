@@ -6,12 +6,12 @@ This dynamics solver for the real UR10 robot is based on a model identified at c
 
 > V. Petrone, E. Ferrentino and P. Chiacchio, "The Dynamic Model of the UR10 Robot and Its ROS2 Integration," in IEEE Transactions on Industrial Informatics, doi: 10.1109/TII.2025.3534415.
 
-The library [InverseDynamicsSolverUR10](./include/ur10_inverse_dynamics_solver/ur10_inverse_dynamics_solver.h) depends on the following files, automatically generated with MATLAB:
+The library [InverseDynamicsSolverUR10](./include/ur10_inverse_dynamics_solver/ur10_inverse_dynamics_solver.hpp) depends on the following files, automatically generated with MATLAB:
 
-* [getCoriolisCurrents](./include/ur10_inverse_dynamics_solver/getCoriolisCurrents.h): given the 6X1 vector of positions and the 6X1 vector of velocities, both in joint space, it computes the 6x1 vector of currents related to Coriolis effects, expressed in `A`;
-* [getCurrents](./include/ur10_inverse_dynamics_solver/getCurrents.h): given the 6X1 vector of positions, the 6X1 vector of velocities and the 6X1 vector of accelerations, all in joint space, it computes the 6x1 vector of currents without the friction effect, expressed in `A`.
-* [getGravityCurrents](./include/ur10_inverse_dynamics_solver/getGravityCurrents.h): given the 6x1 vector of positions in joint space, it computes the 6x1 vector of currents due to gravity, expressed in `A`;
-* [getInertiaCurrents](./include/ur10_inverse_dynamics_solver/getInertiaCurrents.h): given the 6x1 vector of positions in joint space, it computes the 6x6 inertia matrix, expressed in `A*s^2`;
+* [getCoriolisCurrents](./include/ur10_inverse_dynamics_solver/getCoriolisCurrents.hpp): given the 6X1 vector of positions and the 6X1 vector of velocities, both in joint space, it computes the 6x1 vector of currents related to Coriolis effects, expressed in `A`;
+* [getCurrents](./include/ur10_inverse_dynamics_solver/getCurrents.hpp): given the 6X1 vector of positions, the 6X1 vector of velocities and the 6X1 vector of accelerations, all in joint space, it computes the 6x1 vector of currents without the friction effect, expressed in `A`.
+* [getGravityCurrents](./include/ur10_inverse_dynamics_solver/getGravityCurrents.hpp): given the 6x1 vector of positions in joint space, it computes the 6x1 vector of currents due to gravity, expressed in `A`;
+* [getInertiaCurrents](./include/ur10_inverse_dynamics_solver/getInertiaCurrents.hpp): given the 6x1 vector of positions in joint space, it computes the 6x6 inertia matrix, expressed in `A*s^2`;
 
 The dynamics solver implements the [inverse_dynamics_solver::InverseDynamicsSolver](../inverse_dynamics_solver/README.md) class.
 Since methods that output torques are expected by the parent, this plugin uses the previously discussed current-based methods, along with the motor gains, to implement the parent class' methods.

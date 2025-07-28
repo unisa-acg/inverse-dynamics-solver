@@ -25,7 +25,7 @@
 
 // Include Files
 #include <cmath>
-#include "ur10_inverse_dynamics_solver/getInertiaCurrents.h"
+#include "ur10_inverse_dynamics_solver/getInertiaCurrents.hpp"
 
 // Function Definitions
 //

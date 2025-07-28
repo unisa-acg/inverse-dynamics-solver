@@ -13,11 +13,11 @@ Given a dynamic model in the form `H(q) * ddq + C(q,dq) * dq + f(dq) + g(q) = ta
 * **getDynamicParameters(q, dq)** returns the tuple (`H(q)`, `C(q,dq)`, `g(q)`);
 * **getTorques(q, dq, ddq)** returns `H(q) * ddq + C(q,dq) * dq + g(q)`.
 
-Please check the [InverseDynamicsSolver](./include/inverse_dynamics_solver/inverse_dynamics_solver.h) class for more information.
+Please check the [InverseDynamicsSolver](./include/inverse_dynamics_solver/inverse_dynamics_solver.hpp) class for more information.
 
 ## Usage
 
-The solver must be initialized before usage, via the [`initialize()`](./include/inverse_dynamics_solver/inverse_dynamics_solver.h#L0047) method.
+The solver must be initialized before usage, via the [`initialize()`](./include/inverse_dynamics_solver/inverse_dynamics_solver.hpp#L0047) method.
 This method accepts a `NodeParametersInterface` through which the [configuration parameters](#configuration) must be passed under the correct namespace, together with the `robot_description` (in string format) the dynamics shall be solved for.
 Please refer to the method documentation for more information.
 
@@ -25,7 +25,7 @@ Please refer to the method documentation for more information.
 
 The solver can be (optionally) configured with parameters, to pass via the node parameters interface.
 The necessity and effectiveness of these parameters depend on the specific implementation.
-For the time being, only the [KDL based solver](../kdl_inverse_dynamics_solver/include/kdl_inverse_dynamics_solver/kdl_inverse_dynamics_solver.h) is affected by this configuration.
+For the time being, only the [KDL based solver](../kdl_inverse_dynamics_solver/include/kdl_inverse_dynamics_solver/kdl_inverse_dynamics_solver.hpp) is affected by this configuration.
 Thus, please refer to [the related documentation](../kdl_inverse_dynamics_solver/README.md#configuration) for an example on how these parameters are configured.
 
 ## Demo

@@ -15,7 +15,7 @@
 # Adapted from https://github.com/ros-planning/moveit2/blob/main/.pre-commit-config.yaml
 
 # These files are excluded from all the hooks since they have been developed by external entities
-exclude: franka_inria_inverse_dynamics_solver/src/(?!franka_inria_inverse_dynamics_solver\.cpp$).*|franka_inria_inverse_dynamics_solver/include/franka_inria_inverse_dynamics_solver/(?!franka_inria_inverse_dynamics_solver\.h$).*
+exclude: franka_inria_inverse_dynamics_solver/src/(?!franka_inria_inverse_dynamics_solver\.cpp$).*|franka_inria_inverse_dynamics_solver/include/franka_inria_inverse_dynamics_solver/(?!franka_inria_inverse_dynamics_solver\.hpp$).*
 
 repos:
   # Standard hooks

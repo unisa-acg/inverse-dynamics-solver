@@ -1,4 +1,4 @@
-#include "franka_inria_inverse_dynamics_solver/get_MassMatrix.h"
+#include "franka_inria_inverse_dynamics_solver/get_MassMatrix.hpp"
 
 using namespace std;
 

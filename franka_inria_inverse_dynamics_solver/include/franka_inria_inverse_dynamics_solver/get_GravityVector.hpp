@@ -1,5 +1,5 @@
 /*
- * get_GravityVector.h
+ * get_GravityVector.hpp
  *
  *  Created on: 15 apr 2019
  *      Author: oliva

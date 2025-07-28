@@ -25,7 +25,7 @@
 
 // Include Files
 #include <cmath>
-#include "ur10_inverse_dynamics_solver/getGravityCurrents.h"
+#include "ur10_inverse_dynamics_solver/getGravityCurrents.hpp"
 
 // Function Definitions
 //

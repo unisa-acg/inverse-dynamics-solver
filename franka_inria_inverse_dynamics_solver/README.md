@@ -6,15 +6,15 @@ This dynamics solver for the real Franka Emika (FER) robot is based on a model i
 > C. Gaz, M. Cognetti, A. Oliva, P. Robuffo Giordano, and A. De Luca, "Dynamic Identification of the Franka Emika Panda Robot With Retrieval of Feasible Parameters Using Penalty-Based Optimization," IEEE Robotics and Automation Letters, vol. 4, no. 4, pp. 4147-4154, Oct. 2019, doi: 10.1109/lra.2019.2931248.
 
 The group at INRIA provided the library for the computation of the dynamic parameters, composed by four header files (one per function) and several source files with different implementations.
-On top of these, the library [InverseDynamicsSolverFrankaInria](./include/franka_inria_inverse_dynamics_solver/franka_inria_inverse_dynamics_solver.h) has been developed, to include the following files:
+On top of these, the library [InverseDynamicsSolverFrankaInria](./include/franka_inria_inverse_dynamics_solver/franka_inria_inverse_dynamics_solver.hpp) has been developed, to include the following files:
 
-* [`get_CoriolisMatrix.h`](./include/franka_inria_inverse_dynamics_solver/get_CoriolisMatrix.h): given the 7X1 vector of positions and the 7X1 vector of velocities, both in joint space, it computes the 7x7 matrix of torques related to centrifugal and Coriolis effects;
+* [`get_CoriolisMatrix.hpp`](./include/franka_inria_inverse_dynamics_solver/get_CoriolisMatrix.hpp): given the 7X1 vector of positions and the 7X1 vector of velocities, both in joint space, it computes the 7x7 matrix of torques related to centrifugal and Coriolis effects;
     * [`get_CoriolisMatrix_old.cpp`](./src/get_CoriolisMatrix_old.cpp): computes the Coriolis matrix by using temporary variables to store intermediate results of the computation;
         * This function is not actually needed by [the library implementation](./src/franka_inria_inverse_dynamics_solver.cpp), and is kept for legacy purposes only;
     * [`get_CoriolisMatrix.cpp`](./src/get_CoriolisMatrix.cpp): computes the Coriolis matrix directly, without using intermediate variables;
-* [`get_FrictionTorque.h`](./include/franka_inria_inverse_dynamics_solver/get_FrictionTorque.h): given the 7X1 vector of velocities, it computes the 7x1 vector of torques due to friction;
-* [`get_GravityVector.h`](./include/franka_inria_inverse_dynamics_solver/get_GravityVector.h): given the 7x1 vector of positions in joint space, it computes the 7x1 vector of torques due to gravity;
-* [`get_MassMatrix.h`](./include/franka_inria_inverse_dynamics_solver/get_MassMatrix.h): given the 7x1 vector of positions in joint space, it computes the 7x7 inertia matrix.
+* [`get_FrictionTorque.hpp`](./include/franka_inria_inverse_dynamics_solver/get_FrictionTorque.hpp): given the 7X1 vector of velocities, it computes the 7x1 vector of torques due to friction;
+* [`get_GravityVector.hpp`](./include/franka_inria_inverse_dynamics_solver/get_GravityVector.hpp): given the 7x1 vector of positions in joint space, it computes the 7x1 vector of torques due to gravity;
+* [`get_MassMatrix.hpp`](./include/franka_inria_inverse_dynamics_solver/get_MassMatrix.hpp): given the 7x1 vector of positions in joint space, it computes the 7x7 inertia matrix.
     * [`get_MassMatrix.cpp`](./src/get_MassMatrix.cpp): computes the inertia matrix by using temporary variables to store intermediate results of the computation;
         * This function is not actually needed by [the library implementation](./src/franka_inria_inverse_dynamics_solver.cpp), and is kept for legacy purposes only;
     * [`get_MassMatrix_parziale.cpp`](./src/get_MassMatrix_parziale.cpp): computes the inertia matrix directly, without using intermediate variables.

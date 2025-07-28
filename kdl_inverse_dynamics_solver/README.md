@@ -6,7 +6,7 @@ This is an implementation of [`InverseDynamicsSolver`](../inverse_dynamics_solve
 
 It uses the [KDL parser](https://github.com/ros/kdl_parser/tree/humble) to read a robot description from a parameter spawned by [xacro](https://github.com/ros/xacro/tree/ros2).
 So, in order to use this library, this parameter must be passed via launch files.
-Please refer to the [test section](#how-to-test), specifically to the [test launch file](./launch/test_kdl_inverse_dynamics_solver.launch.py), for an example, and to [the official guide](https://docs.ros.org/en/humble/Tutorials/Intermediate/Launch/Launch-Main.html) to know how to pass parameters.
+Please refer to the [test section](#how-to-test), specifically to the [test launch file](./test/test_kdl_inverse_dynamics_solver.py), for an example, and to [the official guide](https://docs.ros.org/en/humble/Tutorials/Intermediate/Launch/Launch-Main.html) to know how to pass parameters.
 
 ## How to build
 
@@ -94,7 +94,7 @@ The solver can be configured with the following parameters, to be passed via the
 * `gravity`: a 3x1 vector of real numbers describing the gravity effect in `root` frame
     * defaults to `[0, 0, -9.81]`
 
-The [test launch file](./launch/test_kdl_inverse_dynamics_solver.launch.py) provides an example on how the solver is initialized and configured.
+The [test launch file](./test/test_kdl_inverse_dynamics_solver.py) provides an example on how the solver is initialized and configured.
 In the following snippet, the user is choosing the solver's `root`, `tip`, and `gravity` parameters, and is passing the URDF `robot_description` to the node initializing the solver.
 
 ```python

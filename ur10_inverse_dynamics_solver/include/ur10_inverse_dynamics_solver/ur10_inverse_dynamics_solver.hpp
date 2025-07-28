@@ -3,41 +3,41 @@
  * This module has been developed by the Automatic Control Group
  * of the University of Salerno, Italy.
  *
- * Title:   franka_inria_inverse_dynamics_solver.h
- * Author:  Vincenzo Petrone
+ * Title:   ur10_inverse_dynamics_solver.hpp
+ * Author:  Antonio Annunziata, Vincenzo Petrone
  * Org.:    UNISA
- * Date:    Feb 10, 2025
+ * Date:    Jun 23, 2023
  *
  * This is an implementation of the InverseDynamicsSolver interface
- * from inverse_dynamics_solver, using the Franka Emika's Panda (FER)
- * dynamic model, estimated in
- *
- * C. Gaz, M. Cognetti, A. Oliva, P. Robuffo Giordano, A. De Luca,
- * "Dynamic identification of the Franka Emika Panda robot with
- * retrieval of feasible parameters using penalty-based optimization",
- * IEEE Robotics and Automation Letters, 2019.
- *
- * The MATLAB code is available at
- * https://github.com/marcocognetti/FrankaEmikaPandaDynModel
+ * from inverse_dynamics_solver, using regressive form of the UR10
+ * dynamic model estimated on MATLAB.
  *
  * -------------------------------------------------------------------
  */
 
 #pragma once
 
-#include <inverse_dynamics_solver/inverse_dynamics_solver.h>
+#include <inverse_dynamics_solver/inverse_dynamics_solver.hpp>
 
-namespace franka_inria_inverse_dynamics_solver
+namespace ur10_inverse_dynamics_solver
 {
 
-static const unsigned short int NUMBER_OF_JOINTS = 7;
-typedef Eigen::Matrix<double, NUMBER_OF_JOINTS, 1> Vector7d;
-typedef Eigen::Matrix<double, NUMBER_OF_JOINTS, NUMBER_OF_JOINTS> Matrix7d;
+// Motor gains
+static const double K1 = 13.5841;
+static const double K2 = 14.2959;
+static const double K3 = 11.3716;
+static const double K4 = 11.2408;
+static const double K5 = 11.7681;
+static const double K6 = 11.7682;
 
-class InverseDynamicsSolverFrankaInria : public inverse_dynamics_solver::InverseDynamicsSolver
+static const unsigned short int NUMBER_OF_JOINTS = 6;
+typedef Eigen::Matrix<double, NUMBER_OF_JOINTS, 1> Vector6d;
+typedef Eigen::Matrix<double, NUMBER_OF_JOINTS, NUMBER_OF_JOINTS> Matrix6d;
+
+class InverseDynamicsSolverUR10 : public inverse_dynamics_solver::InverseDynamicsSolver
 {
 public:
-  InverseDynamicsSolverFrankaInria() {}
+  InverseDynamicsSolverUR10() {}
 
   /**
    * @brief Refer to the superclass documentation
@@ -72,6 +72,23 @@ public:
    */
   Eigen::VectorXd getTorques(const Eigen::VectorXd& joint_positions, const Eigen::VectorXd& joint_velocities,
                              const Eigen::VectorXd& joint_accelerations) const override;
+
+private:
+  /**
+   * @brief This method returns the numerical computation of the friction current vector
+   *
+   * @param[in] joint_velocities joint velocities in [rad/s]
+   *
+   * @return Returns a 6-by-1 vector with joint currents due to friction (expressed in [A])
+   */
+  Eigen::VectorXd getFrictionCurrents_(const Eigen::VectorXd& joint_velocities) const;
+
+  /**
+   * @brief This method returns the matrix K of motor drive gains, such that tau = K*i
+   *
+   * @return Returns a 6-by-6 diagonal matrix containing joint motor drive gains (expressed in [Nm/A]).
+   */
+  Eigen::MatrixXd getDriveGainsMatrix_() const;
 };
 
-}  // namespace franka_inria_inverse_dynamics_solver
+}  // namespace ur10_inverse_dynamics_solver

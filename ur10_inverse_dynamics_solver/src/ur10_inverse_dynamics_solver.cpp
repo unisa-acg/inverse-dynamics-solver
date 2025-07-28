@@ -14,11 +14,11 @@
  */
 
 // Inverse dynamics solver
-#include "ur10_inverse_dynamics_solver/getInertiaCurrents.h"
-#include "ur10_inverse_dynamics_solver/getCoriolisCurrents.h"
-#include "ur10_inverse_dynamics_solver/getGravityCurrents.h"
-#include "ur10_inverse_dynamics_solver/getCurrents.h"
-#include "ur10_inverse_dynamics_solver/ur10_inverse_dynamics_solver.h"
+#include "ur10_inverse_dynamics_solver/getInertiaCurrents.hpp"
+#include "ur10_inverse_dynamics_solver/getCoriolisCurrents.hpp"
+#include "ur10_inverse_dynamics_solver/getGravityCurrents.hpp"
+#include "ur10_inverse_dynamics_solver/getCurrents.hpp"
+#include "ur10_inverse_dynamics_solver/ur10_inverse_dynamics_solver.hpp"
 
 using namespace ur10_inverse_dynamics_solver;
 
