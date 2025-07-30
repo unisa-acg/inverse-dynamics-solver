@@ -90,33 +90,6 @@ The expected output should contain the following line:
 100% tests passed, 0 tests failed out of 1
 ```
 
-### Further details
-
-The reference bag file [validation_trajectory.db3](./test/bagfiles/validation_trajectory.db3) was originally computed for ROS Noetic.
-It was converted for ROS2 Humble with the `rosbags-convert` tool.
-Given the `<ros1_bag_file>`, the following command has been launched to generate the ROS2 bag file:
-
-```bash
-rosbags-convert --src <ros1_bag_file>.bag --dst validation_trajectory/ --src-typestore ros1_noetic --dst-typestore ros2_humble
-```
-
-The output is then generated in the `validation_trajectory/` local folder, containing the new bag file and [metadata.yaml](./test/bagfiles/metadata.yaml).
-
-**Note 1:** If you don't have `rosbags-convert` in your system, you can install it with
-
-```bash
-pip3 install rosbags>=0.9.11
-```
-
-**Note 2:** It is possible that `rosbags-convert` is not in your Python path by default.
-However, you can launch its executable with
-
-```bash
-~/.local/bin/rosbags-convert --help
-```
-
-For more details about this tool, please see [this guide](https://docs.openvins.com/dev-ros1-to-ros2.html).
-
 ## Citation
 
 If you find this work useful, please cite it as
