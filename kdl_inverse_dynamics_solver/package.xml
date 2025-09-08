@@ -11,6 +11,8 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
+  <depend>rclcpp</depend>
+  <depend>Eigen3</depend>
   <depend>inverse_dynamics_solver</depend>
   <depend>kdl_parser</depend>
   <depend>pluginlib</depend>

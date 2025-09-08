@@ -17,6 +17,8 @@ endif()
 find_package(ament_cmake REQUIRED)
 
 set(THIS_PACKAGE_INCLUDE_DEPENDS
+    Eigen3
+    rclcpp
     kdl_parser
     pluginlib
     inverse_dynamics_solver

@@ -31,8 +31,29 @@ foreach(dependency IN
   find_package(${dependency} REQUIRED)
 endforeach()
 
-# Include directories (ensure header-only library is found)
-include_directories(include)
+# Header-only libraries must be represented as interface targets to correctly export their
+# dependencies for dependents
+add_library(${PROJECT_NAME}_lib INTERFACE)
+
+ament_target_dependencies(${PROJECT_NAME}_lib
+                        INTERFACE
+                        rclcpp 
+                        Eigen3
+)
+
+# Install the library
+install(DIRECTORY include/
+        DESTINATION include
+)
+
+install(TARGETS ${PROJECT_NAME}_lib
+        EXPORT export_${PROJECT_NAME}_lib
+        INCLUDES
+        DESTINATION include
+)
+
+# Export targets
+ament_export_targets(export_${PROJECT_NAME}_lib HAS_LIBRARY_TARGET)
 
 # Export include directories
 ament_export_include_directories(include)
@@ -48,10 +69,9 @@ add_executable(evaluate_solver
 # Link against necessary libraries (no linking required for header-only libraries)
 ament_target_dependencies(evaluate_solver ${THIS_PACKAGE_INCLUDE_DEPENDS})
 
-# Install the library
-install(DIRECTORY include/
-        DESTINATION include
-)
+target_include_directories(evaluate_solver PRIVATE
+                           $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+                           $<INSTALL_INTERFACE:include>)
 
 # Install the executable
 install(TARGETS evaluate_solver

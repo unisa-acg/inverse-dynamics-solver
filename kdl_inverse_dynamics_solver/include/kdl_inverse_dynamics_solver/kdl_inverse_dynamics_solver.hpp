@@ -16,6 +16,10 @@
 
 #pragma once
 
+#include <string>
+#include <eigen3/Eigen/Core>
+#include <rclcpp/node_interfaces/node_parameters_interface.hpp>
+
 #include <kdl/chaindynparam.hpp>
 #include <inverse_dynamics_solver/inverse_dynamics_solver.hpp>
 
