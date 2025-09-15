@@ -19,27 +19,10 @@ source install/setup.bash
 
 ## Demo
 
-You can evaluate the solver using the [demo](../inverse_dynamics_solver/demo/evaluate_solver.cpp), currently configured in two launch files for the [Panda](./launch/evaluate_solver_kdl_panda.launch.py) and [UR10](./launch/evaluate_solver_kdl_ur10.launch.py) robots.
+You can evaluate the solver using the [demo](../inverse_dynamics_solver/demo/evaluate_solver.cpp), currently configured in a launch file for the [UR10](./launch/evaluate_solver_kdl_ur10.launch.py) robot.
 The demo reads a bag file containing a sequence of `sensor_msgs/msg/JointState` messages and, for each state, computes the corresponding torques according to the `InverseDynamicsSolverKDL` solver, which are saved in another bag file.
 
-### Run the demos
-
-#### Panda
-
-To launch the Panda demo, run the following:
-
-```bash
-ros2 launch kdl_inverse_dynamics_solver evaluate_solver_kdl_panda.launch.py
-```
-
-By default, the demo reads the [`panda_exciting_trajectory.db3`](./bagfiles/panda_exciting_trajectory.db3) bag file, and produces the output under the `panda_exciting_trajectory_torques` folder (created under the current working directory), with the computed torques written on the `/torques` topic.
-You can change this configuration with
-
-```bash
-ros2 launch kdl_inverse_dynamics_solver evaluate_solver_kdl_panda.launch.py input_bag:=<my_bag_file> output_bag:=<my_output_folder> topic:=<my_output_topic>
-```
-
-#### UR10
+### Run the demo
 
 To launch the UR10 demo, run the following:
 

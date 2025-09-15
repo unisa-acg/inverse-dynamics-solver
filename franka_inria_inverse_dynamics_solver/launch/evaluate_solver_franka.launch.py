@@ -7,41 +7,11 @@ from launch.actions import (
 )
 from launch.launch_context import LaunchContext
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import (
-    Command,
-    FindExecutable,
-    LaunchConfiguration,
-    PathJoinSubstitution,
-)
-from launch_ros.parameter_descriptions import ParameterValue
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.substitutions import FindPackageShare
 
 
 def launch_setup(context: LaunchContext, *args, **kwargs):
-    # Panda kinematic description
-    ROBOT_NAME = "fer"
-    robot_description = Command(
-        [
-            FindExecutable(name="xacro"),
-            " ",
-            PathJoinSubstitution(
-                [
-                    FindPackageShare("franka_description"),
-                    "robots",
-                    ROBOT_NAME,
-                    ROBOT_NAME + ".urdf.xacro",
-                ]
-            ),
-            " ",
-            "hand:=false",
-        ]
-    ).perform(context)
-
-    # We convert the robot description to a YAML-compatible format: without this
-    # instruction, special characters in the robot description XML string might
-    # compromise passing it as a parameter
-    robot_description = dump(robot_description)
-
     # Launch configuration variables for command-line arguments
     input_bag = LaunchConfiguration("input_bag")
     output_bag = LaunchConfiguration("output_bag")
@@ -73,9 +43,6 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
                 "output_bag": output_bag,
                 "topic": topic,
                 "plugin_name": "franka_inria_inverse_dynamics_solver/InverseDynamicsSolverFrankaInria",
-                "robot_description": robot_description,
-                "root": ROBOT_NAME + "_link0",
-                "tip": ROBOT_NAME + "_link8",
             }.items(),
         )
     ]

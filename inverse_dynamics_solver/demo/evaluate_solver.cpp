@@ -37,7 +37,7 @@ public:
   {
     // Read parameters
     std::string plugin_name = this->get_parameter("plugin_name").as_string();
-    robot_description_ = this->get_parameter("robot_description").as_string();
+    robot_description_ = this->get_parameter_or<std::string>("robot_description", "");
     root_link_name_ = this->get_parameter_or<std::string>("ids.root", "");
     tip_link_name_ = this->get_parameter_or<std::string>("ids.tip", "");
 
@@ -47,7 +47,15 @@ public:
     solver_->initialize(this->get_node_parameters_interface(), "ids");
 
     // Parse URDF and get ordered joint names
-    computeOrderedJointNames_();
+    if (!robot_description_.empty())
+    {
+      computeOrderedJointNames_();
+    }
+    else
+    {
+      RCLCPP_WARN(this->get_logger(),
+                  "Empty robot description. Assuming joint states contain ordered joint names and no extra joints in the kinematic chain.");
+    }
   }
 
   void processBag() const
@@ -79,7 +87,10 @@ public:
       if (joint_state)
       {
         // Reorder joint state to match the kinematic chain
-        reorderJointState_(*joint_state);
+        if (!robot_description_.empty())
+        {
+          reorderJointState_(*joint_state);
+        }
         joint_states.push_back(*joint_state);
         timestamps.push_back(joint_state->header.stamp);
       }

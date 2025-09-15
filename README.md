@@ -22,7 +22,7 @@ The library is inherited by three concrete classes, i.e.,
 
 ## Dependencies
 
-This code requires the installation of Ubuntu 22.04 and [ROS2 Humble Hawksbill](https://docs.ros.org/en/humble/index.html).
+This code requires the installation of [ROS2](https://github.com/ros2).
 
 ### System dependencies
 
@@ -31,19 +31,6 @@ To install the packages needed by this repo as system-wide dependencies, run the
 ```bash
 rosdep install --from-paths . -i
 ```
-
-### Python dependencies
-
-To install all Python dependencies, run the following commands from the repository's root folder:
-
-```bash
-sudo apt install python3-venv -y
-python3 -m venv venv --system-site-packages
-source venv/bin/activate
-pip install -r requirements.txt
-```
-
-The dependencies are installed in the virtual environment called [`venv`](./venv/): to deactivate it, simply run `deactivate` in your terminal.
 
 ## Reproducible results
 

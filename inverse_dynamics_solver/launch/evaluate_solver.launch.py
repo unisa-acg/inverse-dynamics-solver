@@ -59,7 +59,9 @@ def generate_launch_description():
         "plugin_name", description="The name of the IDS plugin to use"
     )
     robot_description = DeclareLaunchArgument(
-        "robot_description", description="The robot description in URDF"
+        "robot_description",
+        default_value="",
+        description="The robot description in URDF",
     )
     root = DeclareLaunchArgument(
         "root", default_value="", description="The kinematic chain root"
