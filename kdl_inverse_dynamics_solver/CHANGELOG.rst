@@ -2,6 +2,13 @@
 Changelog for package kdl_inverse_dynamics_solver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [DOC] Update links to match Jazzy distro
+* [REF] Remove Franka's demos because Franka's description is not available in Jazzy
+  - [DOC] Update documentation accordingly
+* Contributors: Enrico Ferrentino, Vincenzo Petrone
+
 1.0.1 (2025-07-25)
 ------------------
 
