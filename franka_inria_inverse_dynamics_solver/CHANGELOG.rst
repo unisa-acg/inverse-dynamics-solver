@@ -2,8 +2,8 @@
 Changelog for package franka_inria_inverse_dynamics_solver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.0 (2025-09-16)
+------------------
 * [REF] Remove Franka's demos because Franka's description is not available in Jazzy
   - [DOC] Update documentation accordingly
 * Contributors: Enrico Ferrentino, Vincenzo Petrone
