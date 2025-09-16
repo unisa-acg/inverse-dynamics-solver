@@ -2,6 +2,11 @@
 Changelog for package ur10_inverse_dynamics_solver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [DOC] Remove superfluous instructions in documentation about ros bag files conversion
+* Contributors: Vincenzo Petrone
+
 1.0.1 (2025-07-25)
 ------------------
 * [REF] Remove unnecessary specification of rosbag2 reader plugin, uses default
