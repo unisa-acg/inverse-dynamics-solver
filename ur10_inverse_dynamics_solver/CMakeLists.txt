@@ -17,7 +17,9 @@ endif()
 find_package(ament_cmake REQUIRED)
 
 set(THIS_PACKAGE_INCLUDE_DEPENDS
-    inverse_dynamics_solver pluginlib
+    Eigen3
+    pluginlib
+    inverse_dynamics_solver
 )
 
 foreach(dependency IN
@@ -42,7 +44,12 @@ target_include_directories(
   ur10_inverse_dynamics_solver
   PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>
 )
-ament_target_dependencies(ur10_inverse_dynamics_solver ${THIS_PACKAGE_INCLUDE_DEPENDS})
+target_link_libraries(
+  ur10_inverse_dynamics_solver
+  PUBLIC Eigen3::Eigen
+         pluginlib::pluginlib
+         inverse_dynamics_solver::inverse_dynamics_solver_lib
+)
 
 # create plugin
 pluginlib_export_plugin_description_file(inverse_dynamics_solver ur10_inverse_dynamics_solver.xml)
@@ -91,14 +98,17 @@ if(BUILD_TESTING)
       ${PROJECT_NAME}_test
   )
   ament_add_gtest_executable(${TEST_NAME} test/test_ur10_inverse_dynamics_solver.cpp)
-  ament_target_dependencies(
+  target_link_libraries(
     ${TEST_NAME}
-    ${THIS_TEST_PACKAGE_INCLUDE_DEPENDS}
-    inverse_dynamics_solver
+    rclcpp::rclcpp
+    rosbag2_cpp::rosbag2_cpp
+    ${trajectory_msgs_TARGETS}
+    inverse_dynamics_solver::inverse_dynamics_solver_lib
+    ur10_inverse_dynamics_solver
   )
   add_ros_test(test/test_ur10_inverse_dynamics_solver.py)
 
-  target_link_libraries(${TEST_NAME} ur10_inverse_dynamics_solver)
+  target_link_libraries(${TEST_NAME})
 
   # install test files
   install(DIRECTORY test/bagfiles

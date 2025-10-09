@@ -34,11 +34,13 @@ endforeach()
 # Header-only libraries must be represented as interface targets to correctly export their
 # dependencies for dependents
 add_library(${PROJECT_NAME}_lib INTERFACE)
-
-ament_target_dependencies(${PROJECT_NAME}_lib
-                        INTERFACE
-                        rclcpp 
-                        Eigen3
+target_link_libraries(
+  ${PROJECT_NAME}_lib
+  INTERFACE rclcpp::rclcpp Eigen3::Eigen
+)
+target_include_directories(
+  ${PROJECT_NAME}_lib
+  INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>
 )
 
 # Install the library
@@ -66,12 +68,18 @@ add_executable(evaluate_solver
                demo/evaluate_solver.cpp
 )
 
-# Link against necessary libraries (no linking required for header-only libraries)
-ament_target_dependencies(evaluate_solver ${THIS_PACKAGE_INCLUDE_DEPENDS})
-
-target_include_directories(evaluate_solver PRIVATE
-                           $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-                           $<INSTALL_INTERFACE:include>)
+# Link against necessary libraries
+target_link_libraries(
+  evaluate_solver
+  PUBLIC rclcpp::rclcpp
+         rosbag2_cpp::rosbag2_cpp
+         ${sensor_msgs_TARGETS}
+         urdf::urdf
+)
+target_include_directories(
+  evaluate_solver
+  PRIVATE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>
+)
 
 # Install the executable
 install(TARGETS evaluate_solver

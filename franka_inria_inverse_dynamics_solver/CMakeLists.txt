@@ -44,7 +44,12 @@ target_include_directories(
   franka_inria_inverse_dynamics_solver
   PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>
 )
-ament_target_dependencies(franka_inria_inverse_dynamics_solver ${THIS_PACKAGE_INCLUDE_DEPENDS})
+target_link_libraries(
+  franka_inria_inverse_dynamics_solver
+  PUBLIC Eigen3::Eigen
+         pluginlib::pluginlib
+         inverse_dynamics_solver::inverse_dynamics_solver_lib
+)
 
 # create plugin
 pluginlib_export_plugin_description_file(

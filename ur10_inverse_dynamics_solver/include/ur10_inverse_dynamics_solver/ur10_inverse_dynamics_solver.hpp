@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <eigen3/Eigen/Core>
 #include <inverse_dynamics_solver/inverse_dynamics_solver.hpp>
 
 namespace ur10_inverse_dynamics_solver

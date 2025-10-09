@@ -42,7 +42,14 @@ target_include_directories(
   kdl_inverse_dynamics_solver
   PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>
 )
-ament_target_dependencies(kdl_inverse_dynamics_solver ${THIS_PACKAGE_INCLUDE_DEPENDS})
+target_link_libraries(
+  kdl_inverse_dynamics_solver
+  PUBLIC Eigen3::Eigen
+         rclcpp::rclcpp
+         kdl_parser::kdl_parser
+         pluginlib::pluginlib
+         inverse_dynamics_solver::inverse_dynamics_solver_lib
+)
 
 # create plugin
 pluginlib_export_plugin_description_file(inverse_dynamics_solver kdl_inverse_dynamics_solver.xml)
@@ -80,15 +87,14 @@ if(BUILD_TESTING)
       ${PROJECT_NAME}_test
   )
   ament_add_gtest_executable(${TEST_NAME} test/test_kdl_inverse_dynamics_solver.cpp)
-  ament_target_dependencies(
+  target_link_libraries(
     ${TEST_NAME}
-    rclcpp
-    pluginlib
-    inverse_dynamics_solver
+    rclcpp::rclcpp
+    pluginlib::pluginlib
+    inverse_dynamics_solver::inverse_dynamics_solver_lib
+    kdl_inverse_dynamics_solver
   )
   add_ros_test(test/test_kdl_inverse_dynamics_solver.py)
-
-  target_link_libraries(${TEST_NAME} kdl_inverse_dynamics_solver)
 
   install(TARGETS ${TEST_NAME}
           RUNTIME DESTINATION lib/${PROJECT_NAME}

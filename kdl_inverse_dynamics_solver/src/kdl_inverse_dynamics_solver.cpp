@@ -16,9 +16,6 @@
 // KDL
 #include <kdl_parser/kdl_parser.hpp>
 
-// Pluginlib
-#include <pluginlib/class_list_macros.hpp>
-
 // Inverse Dynamics Solver
 #include <inverse_dynamics_solver/exceptions.hpp>
 #include "kdl_inverse_dynamics_solver/kdl_inverse_dynamics_solver.hpp"
@@ -175,4 +172,5 @@ void InverseDynamicsSolverKDL::verifyInitialization_() const
   }
 }
 
+#include <pluginlib/class_list_macros.hpp>
 PLUGINLIB_EXPORT_CLASS(kdl_inverse_dynamics_solver::InverseDynamicsSolverKDL, inverse_dynamics_solver::InverseDynamicsSolver)
