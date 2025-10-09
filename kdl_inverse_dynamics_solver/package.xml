@@ -11,11 +11,11 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>rclcpp</depend>
-  <depend>Eigen3</depend>
+  <depend>eigen</depend>
   <depend>inverse_dynamics_solver</depend>
   <depend>kdl_parser</depend>
   <depend>pluginlib</depend>
+  <depend>rclcpp</depend>
 
   <exec_depend>ur_description</exec_depend>
 
