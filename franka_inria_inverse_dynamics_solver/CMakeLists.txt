@@ -19,6 +19,7 @@ find_package(ament_cmake REQUIRED)
 set(THIS_PACKAGE_INCLUDE_DEPENDS
     Eigen3
     pluginlib
+    rclcpp
     inverse_dynamics_solver
 )
 
@@ -48,6 +49,7 @@ target_link_libraries(
   franka_inria_inverse_dynamics_solver
   PUBLIC Eigen3::Eigen
          pluginlib::pluginlib
+         rclcpp::rclcpp
          inverse_dynamics_solver::inverse_dynamics_solver_lib
 )
 

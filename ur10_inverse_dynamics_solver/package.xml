@@ -14,6 +14,7 @@
   <depend>eigen</depend>
   <depend>inverse_dynamics_solver</depend>
   <depend>pluginlib</depend>
+  <depend>rclcpp</depend>
 
   <exec_depend>ur_description</exec_depend>
 

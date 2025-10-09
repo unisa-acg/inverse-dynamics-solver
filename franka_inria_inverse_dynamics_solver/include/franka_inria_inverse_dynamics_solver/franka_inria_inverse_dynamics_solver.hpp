@@ -70,9 +70,17 @@ public:
 
   /**
    * @brief Refer to the superclass documentation
+   * @throw rclcpp::exceptions::UnimplementedError
+   */
+  Eigen::VectorXd getExternalTorques(const Eigen::VectorXd& joint_positions, const Eigen::Matrix<double, 6, 1>& external_wrench) const override;
+
+  /**
+   * @brief Refer to the superclass documentation
+   * @note \p external_wrench is ignored as external torques can not be computed
    */
   Eigen::VectorXd getTorques(const Eigen::VectorXd& joint_positions, const Eigen::VectorXd& joint_velocities,
-                             const Eigen::VectorXd& joint_accelerations) const override;
+                             const Eigen::VectorXd& joint_accelerations,
+                             const Eigen::Matrix<double, 6, 1>& external_wrench = Eigen::VectorXd::Zero(6)) const override;
 };
 
 }  // namespace franka_inria_inverse_dynamics_solver

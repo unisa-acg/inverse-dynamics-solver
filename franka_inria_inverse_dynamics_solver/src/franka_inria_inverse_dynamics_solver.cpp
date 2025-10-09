@@ -13,6 +13,9 @@
  * -------------------------------------------------------------------
  */
 
+// ROS
+#include <rclcpp/exceptions/exceptions.hpp>
+
 // Inverse dynamics solver
 #include "franka_inria_inverse_dynamics_solver/get_MassMatrix.hpp"
 #include "franka_inria_inverse_dynamics_solver/get_CoriolisMatrix.hpp"
@@ -47,11 +50,17 @@ Eigen::VectorXd InverseDynamicsSolverFrankaInria::getFrictionVector(const Eigen:
   return get_friction(joint_velocities);
 }
 
-Eigen::VectorXd InverseDynamicsSolverFrankaInria::getTorques(const Eigen::VectorXd& joint_positions, const Eigen::VectorXd& joint_velocities,
-                                                             const Eigen::VectorXd& joint_accelerations) const
+Eigen::VectorXd InverseDynamicsSolverFrankaInria::getExternalTorques(const Eigen::VectorXd&, const Eigen::Matrix<double, 6, 1>&) const
 {
-  return inverse_dynamics_solver::InverseDynamicsSolver::getTorques(joint_positions, joint_velocities, joint_accelerations) +
-         getFrictionVector(joint_velocities);
+  throw rclcpp::exceptions::UnimplementedError("`getExternalTorques` is not implemented because this plugin can not compute the Jacobian matrix. "
+                                               "Please use an external robot-agnostic library.");
+}
+
+Eigen::VectorXd InverseDynamicsSolverFrankaInria::getTorques(const Eigen::VectorXd& joint_positions, const Eigen::VectorXd& joint_velocities,
+                                                             const Eigen::VectorXd& joint_accelerations, const Eigen::Matrix<double, 6, 1>&) const
+{
+  return getInertiaMatrix(joint_positions) * joint_accelerations + getCoriolisVector(joint_positions, joint_velocities) +
+         getGravityVector(joint_positions) + getFrictionVector(joint_velocities);
 }
 
 #include <pluginlib/class_list_macros.hpp>

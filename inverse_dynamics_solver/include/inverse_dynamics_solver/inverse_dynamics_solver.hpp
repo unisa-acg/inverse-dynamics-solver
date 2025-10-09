@@ -51,7 +51,7 @@ public:
    *
    * @param[in] joint_positions joint positions
    * @param[in] joint_velocities joint velocities
-   * @return inertia matrix, Coriolis vector, corresponding to C(q,qd)*qd, and gravity vector
+   * @return inertia matrix, Coriolis vector corresponding to C(q,qd)*qd, and gravity vector
    */
   virtual std::tuple<Eigen::MatrixXd, Eigen::VectorXd, Eigen::VectorXd> getDynamicParameters(const Eigen::VectorXd& joint_positions,
                                                                                              const Eigen::VectorXd& joint_velocities) const
@@ -94,18 +94,29 @@ public:
   virtual Eigen::VectorXd getFrictionVector(const Eigen::VectorXd& joint_velocities) const = 0;
 
   /**
-   * @brief Get the vector of torques due to Coriolis effects, inertia and gravity
+   * @brief Get the torques due to exerting external contact wrench
+   *
+   * @param joint_positions joint positions
+   * @param external_wrench external contact wrench in base frame
+   * @return external torques, corresponding to J(q)*external_wrench
+   */
+  virtual Eigen::VectorXd getExternalTorques(const Eigen::VectorXd& joint_positions, const Eigen::Matrix<double, 6, 1>& external_wrench) const = 0;
+
+  /**
+   * @brief Get the vector of torques due to inertia, Coriolis effects, gravity, and external wrench
    *
    * @param[in] joint_positions joint positions
    * @param[in] joint_velocities joint velocities
    * @param[in] joint_accelerations joint accelerations
-   * @return torques vector
+   * @param[in] external_wrench external wrench
+   * @return torques vector, corresponding to M(q)*ddq + C(q,dq)*dq + f(dq) + g(q) + J(q)*h
    */
   virtual Eigen::VectorXd getTorques(const Eigen::VectorXd& joint_positions, const Eigen::VectorXd& joint_velocities,
-                                     const Eigen::VectorXd& joint_accelerations) const
+                                     const Eigen::VectorXd& joint_accelerations,
+                                     const Eigen::Matrix<double, 6, 1>& external_wrench = Eigen::VectorXd::Zero(6)) const
   {
     return getInertiaMatrix(joint_positions) * joint_accelerations + getCoriolisVector(joint_positions, joint_velocities) +
-           getGravityVector(joint_positions);
+           getGravityVector(joint_positions) + getExternalTorques(joint_positions, external_wrench);
   }
 
 protected:

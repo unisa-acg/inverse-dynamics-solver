@@ -4,14 +4,15 @@ This package provides a superclass for a generic inverse dynamics solver.
 
 !["Inverse dynamics solver block scheme"](./doc/media/inverse_dynamics_solver.png "Inverse dynamics solver block scheme")
 
-Given a dynamic model in the form `H(q) * ddq + C(q,dq) * dq + f(dq) + g(q) = tau`, this library can return the following values:
+Given a dynamic model in the form `M(q) * ddq + C(q,dq) * dq + f(dq) + g(q) + J(q) * h = tau`, this library can return the following values:
 
-* **getInertiaMatrix(q)** returns the inertia matrix `H(q)`, as a function of joint positions `q`;
+* **getInertiaMatrix(q)** returns the inertia matrix `M(q)`, as a function of joint positions `q`;
 * **getCoriolisVector(q)** returns the Coriolis and centrifugal effects vector `C(q,dq) * dq`, as a function of joint positions `q` and velocities `dq`;
 * **getGravityVector(q)** returns the gravity vector `g(q)`, as a function of joint positions `q`;
 * **getFrictionVector(dq)** returns the possibly nonlinear friction vector `f(dq)`, as a function of joint velocities `dq`;
+* **getExternalTorques(q, h)** returns the torques due to exerting external contact wrench `h`, by computing the Jacobian `J(q)`, as `J(q) * h`;
 * **getDynamicParameters(q, dq)** returns the tuple (`H(q)`, `C(q,dq)`, `g(q)`);
-* **getTorques(q, dq, ddq)** returns `H(q) * ddq + C(q,dq) * dq + g(q)`.
+* **getTorques(q, dq, ddq)** returns `H(q) * ddq + C(q,dq) * dq + g(q) + J(q)*h`.
 
 Please check the [InverseDynamicsSolver](./include/inverse_dynamics_solver/inverse_dynamics_solver.hpp) class for more information.
 

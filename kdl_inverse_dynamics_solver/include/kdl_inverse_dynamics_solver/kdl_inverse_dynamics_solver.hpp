@@ -18,7 +18,9 @@
 
 #include <string>
 #include <eigen3/Eigen/Core>
+#include <kdl/chain.hpp>
 #include <kdl/chaindynparam.hpp>
+#include <kdl/chainjnttojacsolver.hpp>
 #include <rclcpp/node_interfaces/node_parameters_interface.hpp>
 
 #include <inverse_dynamics_solver/inverse_dynamics_solver.hpp>
@@ -63,6 +65,12 @@ public:
    */
   Eigen::VectorXd getFrictionVector(const Eigen::VectorXd&) const override;
 
+  /**
+   * @brief Refer to the superclass documentation
+   * @throw std::runtime_error if the KDL solver fails to compute Jacobian
+   */
+  Eigen::VectorXd getExternalTorques(const Eigen::VectorXd& joint_positions, const Eigen::Matrix<double, 6, 1>& external_wrench) const override;
+
 private:
   /**
    * @brief Verify that the solver has been correctly initialized
@@ -73,6 +81,7 @@ private:
   unsigned int number_of_joints_;
   KDL::Chain chain_;
   std::shared_ptr<KDL::ChainDynParam> solver_;
+  std::shared_ptr<KDL::ChainJntToJacSolver> jacobian_solver_;
 };
 
 }  // namespace kdl_inverse_dynamics_solver

@@ -14,6 +14,8 @@
  */
 
 // KDL
+#include <kdl/jntarray.hpp>
+#include <kdl/jacobian.hpp>
 #include <kdl_parser/kdl_parser.hpp>
 
 // Inverse Dynamics Solver
@@ -106,6 +108,7 @@ void InverseDynamicsSolverKDL::initialize(rclcpp::node_interfaces::NodeParameter
   // Instantiate the solver
   number_of_joints_ = chain_.getNrOfJoints();
   solver_ = std::make_shared<KDL::ChainDynParam>(chain_, KDL::Vector(gravity[0], gravity[1], gravity[2]));
+  jacobian_solver_ = std::make_shared<KDL::ChainJntToJacSolver>(chain_);
 
   // Track plugin initialization
   initialized_ = true;
@@ -162,6 +165,32 @@ Eigen::VectorXd InverseDynamicsSolverKDL::getFrictionVector(const Eigen::VectorX
   // reading the friction coefficients present in the URDF.
   verifyInitialization_();
   return Eigen::VectorXd::Zero(number_of_joints_);
+}
+
+Eigen::VectorXd InverseDynamicsSolverKDL::getExternalTorques(const Eigen::VectorXd& joint_positions,
+                                                             const Eigen::Matrix<double, 6, 1>& external_wrench) const
+{
+  verifyInitialization_();
+
+  // Skip computing Jacobian if no external wrenches are applied
+  if (external_wrench.isZero())
+  {
+    return Eigen::VectorXd::Zero(number_of_joints_);
+  }
+
+  KDL::JntArray kdl_joint_positions(number_of_joints_);
+  kdl_joint_positions.data = joint_positions;
+
+  KDL::Jacobian jacobian(number_of_joints_);
+
+  if (jacobian_solver_->JntToJac(kdl_joint_positions, jacobian))
+  {
+    return jacobian.data * external_wrench;
+  }
+  else
+  {
+    throw std::runtime_error("Failed to compute Jacobian.");
+  }
 }
 
 void InverseDynamicsSolverKDL::verifyInitialization_() const

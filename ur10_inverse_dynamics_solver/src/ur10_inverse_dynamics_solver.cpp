@@ -59,8 +59,14 @@ Eigen::VectorXd InverseDynamicsSolverUR10::getFrictionVector(const Eigen::Vector
   return getDriveGainsMatrix_() * getFrictionCurrents_(qd);
 }
 
+Eigen::VectorXd InverseDynamicsSolverUR10::getExternalTorques(const Eigen::VectorXd&, const Eigen::Matrix<double, 6, 1>&) const
+{
+  throw rclcpp::exceptions::UnimplementedError("`getExternalTorques` is not implemented because this plugin can not compute the Jacobian matrix. "
+                                               "Please use an external robot-agnostic library.");
+}
+
 Eigen::VectorXd InverseDynamicsSolverUR10::getTorques(const Eigen::VectorXd& joint_positions, const Eigen::VectorXd& joint_velocities,
-                                                      const Eigen::VectorXd& joint_accelerations) const
+                                                      const Eigen::VectorXd& joint_accelerations, const Eigen::Matrix<double, 6, 1>&) const
 {
   double q[NUMBER_OF_JOINTS];
   double qd[NUMBER_OF_JOINTS];
