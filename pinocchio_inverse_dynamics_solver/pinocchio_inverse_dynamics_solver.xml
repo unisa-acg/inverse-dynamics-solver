@@ -1,0 +1,7 @@
+<library path="pinocchio_inverse_dynamics_solver">
+  <class base_class_type="inverse_dynamics_solver::InverseDynamicsSolver"
+         type="pinocchio_inverse_dynamics_solver::InverseDynamicsSolverPinocchio"
+         name="pinocchio_inverse_dynamics_solver/InverseDynamicsSolverPinocchio">
+    <description>This is a plugin implementing an inverse dynamics solver based on KDL.</description>
+  </class>
+</library>
