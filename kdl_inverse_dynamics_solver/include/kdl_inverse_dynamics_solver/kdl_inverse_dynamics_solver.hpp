@@ -62,6 +62,7 @@ public:
 
   /**
    * @brief Refer to the superclass documentation
+   * @note This methods returns a 0-vector as KDL can not compute friction
    */
   Eigen::VectorXd getFrictionVector(const Eigen::VectorXd&) const override;
 

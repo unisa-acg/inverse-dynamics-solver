@@ -13,6 +13,9 @@
  * -------------------------------------------------------------------
  */
 
+// ROS
+#include <rclcpp/parameter.hpp>
+
 // KDL
 #include <kdl/jntarray.hpp>
 #include <kdl/jacobian.hpp>
@@ -183,7 +186,8 @@ Eigen::VectorXd InverseDynamicsSolverKDL::getExternalTorques(const Eigen::Vector
 
   KDL::Jacobian jacobian(number_of_joints_);
 
-  if (jacobian_solver_->JntToJac(kdl_joint_positions, jacobian))
+  // JntToJac returns 0 when no error occurs: https://docs.ros.org/en/indigo/api/orocos_kdl/html/chainjnttojacsolver_8cpp_source.html#l00048
+  if (jacobian_solver_->JntToJac(kdl_joint_positions, jacobian) == 0)
   {
     return jacobian.data * external_wrench;
   }
