@@ -151,16 +151,18 @@ TEST_F(InverseDynamicsSolverKDLTest, TestDynamicParameters)
   // Number of joints
   const unsigned short int N_JOINTS = 6;
 
+  // Joint states the dynamics will be evaluated on
+  Eigen::VectorXd joint_positions(N_JOINTS);
+  Eigen::VectorXd joint_velocities(N_JOINTS);
+  Eigen::VectorXd wrench(6);
+
   // Dynamic components references
   Eigen::MatrixXd inertia_ref(N_JOINTS, N_JOINTS);
   Eigen::VectorXd coriolis_ref(N_JOINTS);
   Eigen::VectorXd gravity_ref(N_JOINTS);
+  Eigen::VectorXd external_torques_ref(N_JOINTS);
 
-  // Joint states the dynamics will be evaluated on
-  Eigen::VectorXd joint_positions(N_JOINTS);
-  Eigen::VectorXd joint_velocities(N_JOINTS);
-
-  // Initializing joint positions
+  // Initialize joint positions
   joint_positions(0) = 1.2947;
   joint_positions(1) = 0.2911;
   joint_positions(2) = -1.2749;
@@ -168,13 +170,21 @@ TEST_F(InverseDynamicsSolverKDLTest, TestDynamicParameters)
   joint_positions(4) = -2.7176;
   joint_positions(5) = 0.7307;
 
-  // Initializing joint velocities
+  // Initialize joint velocities
   joint_velocities(0) = 0.2541;
   joint_velocities(1) = -0.0215;
   joint_velocities(2) = 0.0271;
   joint_velocities(3) = 0.0000;
   joint_velocities(4) = -0.0319;
   joint_velocities(5) = -0.0082;
+
+  // Initialize wrench
+  wrench(0) = 1.11;
+  wrench(1) = 2.22;
+  wrench(2) = 3.33;
+  wrench(3) = 4.44;
+  wrench(4) = 5.55;
+  wrench(5) = 6.66;
 
   // Reference for inertia matrix
   inertia_ref(0, 0) = 7.9568758917431666;
@@ -230,10 +240,19 @@ TEST_F(InverseDynamicsSolverKDLTest, TestDynamicParameters)
   gravity_ref(4) = 0.11308941822386981;
   gravity_ref(5) = 0.0;
 
+  // Reference for external torques
+  external_torques_ref(0) = -0.13628326710890298;
+  external_torques_ref(1) = 4.021043929377706;
+  external_torques_ref(2) = -3.0901211518481966;
+  external_torques_ref(3) = -3.3591062479887945;
+  external_torques_ref(4) = 2.5232118346412191;
+  external_torques_ref(5) = 7.1119822213288773;
+
   // Test the solver
   initializeSolver();
   std::tuple<Eigen::MatrixXd, Eigen::VectorXd, Eigen::VectorXd> dyn_params =
       inverse_dynamics_solver->getDynamicParameters(joint_positions, joint_velocities);
+  Eigen::VectorXd external_torques = inverse_dynamics_solver->getExternalTorques(joint_positions, wrench);
   const double ABS_ERROR = 1e-8;
   for (unsigned int i = 0; i < N_JOINTS; i++)
   {
@@ -244,6 +263,7 @@ TEST_F(InverseDynamicsSolverKDLTest, TestDynamicParameters)
     }
     EXPECT_NEAR(std::get<1>(dyn_params)(i), coriolis_ref(i), ABS_ERROR) << "Element " << i << " of Coriolis vector is beyond tolerance";
     EXPECT_NEAR(std::get<2>(dyn_params)(i), gravity_ref(i), ABS_ERROR) << "Element " << i << " of gravity vector is beyond tolerance";
+    EXPECT_NEAR(external_torques(i), external_torques_ref(i), ABS_ERROR) << "Element " << i << " of external torques is beyond tolerance";
   }
 }
 
