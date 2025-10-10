@@ -61,12 +61,14 @@ void InverseDynamicsSolverKDL::initialize(rclcpp::node_interfaces::NodeParameter
   // Get root name
   rclcpp::Parameter root_param = rclcpp::Parameter();
   std::string root;
-  if (parameters_interface->has_parameter(ns + "root"))
+  bool root_found = parameters_interface->has_parameter(ns + "root");
+  if (root_found)
   {
     parameters_interface->get_parameter(ns + "root", root_param);
     root = root_param.as_string();
+    root_found = !root.empty();
   }
-  else
+  if (!root_found)
   {
     root = robot_tree.getRootSegment()->first;
   }
@@ -74,12 +76,14 @@ void InverseDynamicsSolverKDL::initialize(rclcpp::node_interfaces::NodeParameter
   // Get tip name
   rclcpp::Parameter tip_param = rclcpp::Parameter();
   std::string tip;
-  if (parameters_interface->has_parameter(ns + "tip"))
+  bool tip_found = parameters_interface->has_parameter(ns + "tip");
+  if (tip_found)
   {
     parameters_interface->get_parameter(ns + "tip", tip_param);
     tip = tip_param.as_string();
+    tip_found = !tip.empty();
   }
-  else
+  if (!tip_found)
   {
     throw inverse_dynamics_solver::ParameterUninitializedException("Failed to find parameter 'tip'.");
   }
