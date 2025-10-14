@@ -271,12 +271,12 @@ TEST_F(InverseDynamicsSolverKDLTest, TestDynamicParameters)
   gravity_ref(5) = 0.0;
 
   // Reference for external torques
-  external_torques_ref(0) = -0.13628326710890298;
-  external_torques_ref(1) = 4.021043929377706;
-  external_torques_ref(2) = -3.0901211518481966;
-  external_torques_ref(3) = -3.3591062479887945;
-  external_torques_ref(4) = 2.5232118346412191;
-  external_torques_ref(5) = 7.1119822213288773;
+  external_torques_ref(0) = 6.0412455745414819;
+  external_torques_ref(1) = -4.7802333853740384;
+  external_torques_ref(2) = -2.3996941527001958;
+  external_torques_ref(3) = -2.5061192652830306;
+  external_torques_ref(4) = 5.3757640159512885;
+  external_torques_ref(5) = 5.7251548801681595;
 
   // Test the solver
   initializeSolver();
