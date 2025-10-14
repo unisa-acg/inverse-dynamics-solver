@@ -83,6 +83,10 @@ The expected output should contain the following line:
 100% tests passed, 0 tests failed out of 1
 ```
 
+### Comparison with KDL
+
+This test also assess that the torques computed with `getDynamicComponents` and `getExternalTorques` are equivalent to those computed with [`KDL`](../kdl_inverse_dynamics_solver/README.md#comparison-with-pinocchio).
+
 ## Configuration
 
 The solver can be configured with the following parameters, to be passed via the node parameters interface:

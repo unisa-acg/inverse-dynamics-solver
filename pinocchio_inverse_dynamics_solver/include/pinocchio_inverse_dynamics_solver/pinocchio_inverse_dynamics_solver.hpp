@@ -74,6 +74,8 @@ public:
 
   /**
    * @brief Refer to the superclass documentation
+   * @note Calls pinocchio::computeJointJacobians before pinocchio::getFrameJacobian
+   * @see https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/namespacepinocchio.html#ae13e2fae5dd6f8845ef31b32d9868a0d
    */
   Eigen::VectorXd getExternalTorques(const Eigen::VectorXd& joint_positions, const Eigen::Matrix<double, 6, 1>& external_wrench) const override;
 

@@ -15,18 +15,17 @@
 
 // ROS
 #include <rclcpp/parameter.hpp>
-#include <rclcpp/logging.hpp>
-#include <rclcpp/logger.hpp>
 
 // Pinocchio
-#include <pinocchio/parsers/urdf.hpp>      // Needed for pinocchio::urdf::buildModelFromXML
-#include <pinocchio/algorithm/crba.hpp>    // Composite Rigid Body Algorithm
-#include <pinocchio/algorithm/rnea.hpp>    // Recursive Newton-Euler Algorithm
-#include <pinocchio/algorithm/frames.hpp>  // Needed for pinocchio::{computeFrameJacobian, updateFramePlacements}
-#include <pinocchio/multibody/fwd.hpp>     // Needed for pinocchio::{WORLD, FrameIndex, Frame, JointIndex}
-#include <pinocchio/spatial/fwd.hpp>       // Needed for pinocchio::{Force, SE3}
-#include <pinocchio/container/aligned-vector.hpp>
-#include <pinocchio/algorithm/kinematics.hpp>  // Needed for pinocchio::forwardKinematics
+#include <pinocchio/parsers/urdf.hpp>              // Needed for pinocchio::urdf::buildModelFromXML
+#include <pinocchio/algorithm/crba.hpp>            // Composite Rigid Body Algorithm
+#include <pinocchio/algorithm/rnea.hpp>            // Recursive Newton-Euler Algorithm
+#include <pinocchio/algorithm/jacobian.hpp>        // Needed for pinocchio::computeJointJacobians
+#include <pinocchio/algorithm/frames.hpp>          // Needed for pinocchio::getFrameJacobian
+#include <pinocchio/multibody/fwd.hpp>             // Needed for pinocchio::FrameIndex
+#include <pinocchio/spatial/fwd.hpp>               // Needed for pinocchio::{Force, SE3}
+#include <pinocchio/container/aligned-vector.hpp>  // Needed for pinocchio::container::aligned_vector
+#include <pinocchio/algorithm/kinematics.hpp>      // Needed for pinocchio::forwardKinematics
 
 // Inverse Dynamics Solver
 #include <inverse_dynamics_solver/exceptions.hpp>
@@ -146,7 +145,13 @@ Eigen::VectorXd InverseDynamicsSolverPinocchio::getExternalTorques(const Eigen::
                                                                    const Eigen::Matrix<double, 6, 1>& external_wrench) const
 {
   Eigen::VectorXd zero = Eigen::VectorXd::Zero(number_of_joints_);
-  return getTorques(joint_positions, zero, zero, external_wrench) - getGravityVector(joint_positions);
+  Eigen::VectorXd temp = getTorques(joint_positions, zero, zero, external_wrench) - getGravityVector(joint_positions);
+
+  pinocchio::Data::Matrix6x jacobian(external_wrench.SizeAtCompileTime, model_.nv);
+  pinocchio::computeJointJacobians(model_, *data_, joint_positions);
+  pinocchio::getFrameJacobian(model_, *data_, model_.getFrameId(tip_), pinocchio::LOCAL_WORLD_ALIGNED, jacobian);
+
+  return jacobian.transpose() * external_wrench;
 }
 
 Eigen::VectorXd InverseDynamicsSolverPinocchio::getTorques(const Eigen::VectorXd& joint_positions, const Eigen::VectorXd& joint_velocities,
@@ -155,26 +160,21 @@ Eigen::VectorXd InverseDynamicsSolverPinocchio::getTorques(const Eigen::VectorXd
 {
   verifyInitialization_();
 
-  // Update frame placements according to FK to get the correct position of the EE frame
-  pinocchio::forwardKinematics(model_, *data_, joint_positions, joint_velocities, joint_accelerations);
-  pinocchio::updateFramePlacements(model_, *data_);
-
   // Get the last joint
-  const pinocchio::FrameIndex ee_frame_id = model_.getFrameId(tip_);
+  pinocchio::FrameIndex ee_frame_id = model_.getFrameId(tip_);
 
   // Build the wrench in world frame
   pinocchio::Force f_ee_world(external_wrench.head(3), external_wrench.tail(3));
 
   // M is the homogenous transform matrix: "oMf" stands for "transform from frame 'f' to origin (world)"
-  const pinocchio::SE3 frame_to_world = data_->oMf[ee_frame_id];
+  pinocchio::SE3 frame_to_world = data_->oMf[ee_frame_id];
 
   // Convert the force from the world frame to the last frame
   pinocchio::Force f_frame_local = frame_to_world.actInv(f_ee_world);
 
-  // Pinocchio assumes a Force can be applied to possibly every joint: we set a force on the last joint only
+  // Pinocchio assumes a Force can be applied to possibly every joint: we set a force on the last frame only
   pinocchio::container::aligned_vector<pinocchio::Force> fext(model_.njoints, pinocchio::Force::Zero());
   fext[ee_frame_id] = f_frame_local;
-  RCLCPP_INFO_STREAM(rclcpp::get_logger("ids"), "Local forces on frame " << ee_frame_id << ": " << fext[ee_frame_id].toVector().transpose());
 
   // Get all the forces
   return pinocchio::rnea(model_, *data_, joint_positions, joint_velocities, joint_accelerations, fext);
