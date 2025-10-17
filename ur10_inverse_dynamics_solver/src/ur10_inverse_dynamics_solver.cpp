@@ -20,64 +20,60 @@
 #include "ur10_inverse_dynamics_solver/getCurrents.hpp"
 #include "ur10_inverse_dynamics_solver/ur10_inverse_dynamics_solver.hpp"
 
-using namespace ur10_inverse_dynamics_solver;
+namespace ur10_inverse_dynamics_solver
 
+{
 void InverseDynamicsSolverUR10::initialize(rclcpp::node_interfaces::NodeParametersInterface::ConstSharedPtr, const std::string&, const std::string&)
-{}
+{
+  // Allocate kinematic/dynamic variables once for real-time safeness
+  q_ = (double*)malloc(NUMBER_OF_JOINTS * sizeof(double));
+  qd_ = (double*)malloc(NUMBER_OF_JOINTS * sizeof(double));
+  qdd_ = (double*)malloc(NUMBER_OF_JOINTS * sizeof(double));
+  H_ = (double*)malloc(NUMBER_OF_JOINTS * NUMBER_OF_JOINTS * sizeof(double));
+  c_ = (double*)malloc(NUMBER_OF_JOINTS * sizeof(double));
+  g_ = (double*)malloc(NUMBER_OF_JOINTS * sizeof(double));
+  currents_ = (double*)malloc(NUMBER_OF_JOINTS * sizeof(double));
+}
 
 Eigen::MatrixXd InverseDynamicsSolverUR10::getInertiaMatrix(const Eigen::VectorXd& joint_positions) const
 {
-  double q[NUMBER_OF_JOINTS];
-  double B[NUMBER_OF_JOINTS * NUMBER_OF_JOINTS];
-  Vector6d::Map(q) = joint_positions;
-  getInertiaCurrents(q, B);
-  return getDriveGainsMatrix_() * Matrix6d(B);
+  Vector6d::Map(q_) = joint_positions;
+  getInertiaCurrents(q_, H_);
+  return getDriveGainsMatrix_() * Matrix6d(H_);
 }
 
 Eigen::VectorXd InverseDynamicsSolverUR10::getCoriolisVector(const Eigen::VectorXd& joint_positions, const Eigen::VectorXd& joint_velocities) const
 {
-  double q[NUMBER_OF_JOINTS];
-  double qd[NUMBER_OF_JOINTS];
-  double coriolis_currents[NUMBER_OF_JOINTS];
-  Vector6d::Map(q) = joint_positions;
-  Vector6d::Map(qd) = joint_velocities;
-  getCoriolisCurrents(q, qd, coriolis_currents);
-  return getDriveGainsMatrix_() * Vector6d(coriolis_currents);
+  Vector6d::Map(q_) = joint_positions;
+  Vector6d::Map(qd_) = joint_velocities;
+  getCoriolisCurrents(q_, qd_, c_);
+  return getDriveGainsMatrix_() * Vector6d(c_);
 }
 
 Eigen::VectorXd InverseDynamicsSolverUR10::getGravityVector(const Eigen::VectorXd& joint_positions) const
 {
-  double q[NUMBER_OF_JOINTS];
-  double gravity_currents[NUMBER_OF_JOINTS];
-  Vector6d::Map(q) = joint_positions;
-  getGravityCurrents(q, gravity_currents);
-  return getDriveGainsMatrix_() * Vector6d(gravity_currents);
+  Vector6d::Map(q_) = joint_positions;
+  getGravityCurrents(q_, g_);
+  return getDriveGainsMatrix_() * Vector6d(g_);
 }
 
-Eigen::VectorXd InverseDynamicsSolverUR10::getFrictionVector(const Eigen::VectorXd& qd) const
+Eigen::VectorXd InverseDynamicsSolverUR10::getFrictionVector(const Eigen::VectorXd& joint_velocities) const
 {
-  return getDriveGainsMatrix_() * getFrictionCurrents_(qd);
+  return getDriveGainsMatrix_() * getFrictionCurrents_(joint_velocities);
 }
 
 Eigen::VectorXd InverseDynamicsSolverUR10::getTorques(const Eigen::VectorXd& joint_positions, const Eigen::VectorXd& joint_velocities,
                                                       const Eigen::VectorXd& joint_accelerations) const
 {
-  double q[NUMBER_OF_JOINTS];
-  double qd[NUMBER_OF_JOINTS];
-  double qdd[NUMBER_OF_JOINTS];
-  double currents[NUMBER_OF_JOINTS];
-  Vector6d::Map(q) = joint_positions;
-  Vector6d::Map(qd) = joint_velocities;
-  Vector6d::Map(qdd) = joint_accelerations;
-  getCurrents(q, qd, qdd, currents);
-  return getDriveGainsMatrix_() * Vector6d(currents) + getFrictionVector(joint_velocities);
+  Vector6d::Map(q_) = joint_positions;
+  Vector6d::Map(qd_) = joint_velocities;
+  Vector6d::Map(qdd_) = joint_accelerations;
+  getCurrents(q_, qd_, qdd_, currents_);
+  return getDriveGainsMatrix_() * Vector6d(currents_) + getFrictionVector(joint_velocities);
 }
 
-Eigen::VectorXd InverseDynamicsSolverUR10::getFrictionCurrents_(const Eigen::VectorXd& joint_velocities) const
+Vector6d InverseDynamicsSolverUR10::getFrictionCurrents_(const Vector6d& joint_velocities) const
 {
-  // friction current vector
-  Vector6d friction_current_vector;
-
   // parameters of the sigmoid friction model
   Vector6d f_v;
   Vector6d f_o;
@@ -120,17 +116,17 @@ Eigen::VectorXd InverseDynamicsSolverUR10::getFrictionCurrents_(const Eigen::Vec
   ni(4) = -0.011778095526897;
   ni(5) = -0.012953200294568;
 
-  for (long int i = 0; i < joint_velocities.size(); ++i)  // The 'long int' type is to suppress the [-Wsign-compare] warning
-    friction_current_vector(i) = f_v(i) * joint_velocities(i) + f_o(i) + f_c(i) / (1 + exp(-alpha(i) * (joint_velocities(i) + ni(i))));
-
-  return friction_current_vector;
+  return f_v.cwiseProduct(joint_velocities) + f_o +
+         f_c.cwiseQuotient(Vector6d::Ones() + (-alpha.cwiseProduct(joint_velocities + ni)).array().exp().matrix());
 }
 
-Eigen::MatrixXd InverseDynamicsSolverUR10::getDriveGainsMatrix_() const
+Matrix6d InverseDynamicsSolverUR10::getDriveGainsMatrix_() const
 {
-  std::vector<double> drive_gains_vector{ K1, K2, K3, K4, K5, K6 };
-  return Vector6d(drive_gains_vector.data()).asDiagonal();
+  Vector6d drive_gains_vector;
+  drive_gains_vector << K1, K2, K3, K4, K5, K6;
+  return drive_gains_vector.asDiagonal();
 }
+}  // namespace ur10_inverse_dynamics_solver
 
 #include <pluginlib/class_list_macros.hpp>
 PLUGINLIB_EXPORT_CLASS(ur10_inverse_dynamics_solver::InverseDynamicsSolverUR10, inverse_dynamics_solver::InverseDynamicsSolver)

@@ -82,14 +82,23 @@ private:
    *
    * @return Returns a 6-by-1 vector with joint currents due to friction (expressed in [A])
    */
-  Eigen::VectorXd getFrictionCurrents_(const Eigen::VectorXd& joint_velocities) const;
+  Vector6d getFrictionCurrents_(const Vector6d& joint_velocities) const;
 
   /**
    * @brief This method returns the matrix K of motor drive gains, such that tau = K*i
    *
    * @return Returns a 6-by-6 diagonal matrix containing joint motor drive gains (expressed in [Nm/A]).
    */
-  Eigen::MatrixXd getDriveGainsMatrix_() const;
+  Matrix6d getDriveGainsMatrix_() const;
+
+  // Kinematic/dynamic variables are allocated in the `initialize` method for real-time safeness
+  double* q_;
+  double* qd_;
+  double* qdd_;
+  double* H_;
+  double* c_;
+  double* g_;
+  double* currents_;
 };
 
 }  // namespace ur10_inverse_dynamics_solver

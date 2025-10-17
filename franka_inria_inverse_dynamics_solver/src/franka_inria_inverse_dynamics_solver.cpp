@@ -20,8 +20,9 @@
 #include "franka_inria_inverse_dynamics_solver/get_FrictionTorque.hpp"
 #include "franka_inria_inverse_dynamics_solver/franka_inria_inverse_dynamics_solver.hpp"
 
-using namespace franka_inria_inverse_dynamics_solver;
+namespace franka_inria_inverse_dynamics_solver
 
+{
 void InverseDynamicsSolverFrankaInria::initialize(rclcpp::node_interfaces::NodeParametersInterface::ConstSharedPtr, const std::string&,
                                                   const std::string&)
 {}
@@ -53,6 +54,7 @@ Eigen::VectorXd InverseDynamicsSolverFrankaInria::getTorques(const Eigen::Vector
   return inverse_dynamics_solver::InverseDynamicsSolver::getTorques(joint_positions, joint_velocities, joint_accelerations) +
          getFrictionVector(joint_velocities);
 }
+}  // namespace franka_inria_inverse_dynamics_solver
 
 #include <pluginlib/class_list_macros.hpp>
 PLUGINLIB_EXPORT_CLASS(franka_inria_inverse_dynamics_solver::InverseDynamicsSolverFrankaInria, inverse_dynamics_solver::InverseDynamicsSolver)
