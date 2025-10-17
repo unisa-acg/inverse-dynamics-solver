@@ -200,7 +200,7 @@ TEST_F(InverseDynamicsSolverPinocchioTest, TestTorques)
   const double ABS_ERROR = 1e-8;
   for (unsigned int i = 0; i < N_JOINTS; i++)
   {
-    EXPECT_NEAR(torques(i), computed_torques(i), ABS_ERROR) << "Element " << i << " of computed torques to do not match.";
+    EXPECT_NEAR(torques(i), computed_torques(i), ABS_ERROR) << "Element " << i << " of computed torques do not match.";
   }
 }
 
@@ -264,7 +264,7 @@ TEST_F(InverseDynamicsSolverPinocchioTest, TestExternalTorques)
   const double ABS_ERROR = 1e-8;
   for (unsigned int i = 0; i < N_JOINTS; i++)
   {
-    EXPECT_NEAR(torques(i) + external_torques(i), total_torques(i), ABS_ERROR) << "Element " << i << " of computed torques to do not match.";
+    EXPECT_NEAR(torques(i) + external_torques(i), total_torques(i), ABS_ERROR) << "Element " << i << " of computed torques do not match.";
   }
 }
 
