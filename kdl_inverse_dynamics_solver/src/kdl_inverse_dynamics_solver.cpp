@@ -18,7 +18,6 @@
 
 // KDL
 #include <kdl_parser/kdl_parser.hpp>
-#include <kdl/jacobian.hpp>
 
 // Inverse Dynamics Solver
 #include <inverse_dynamics_solver/exceptions.hpp>
@@ -118,7 +117,8 @@ void InverseDynamicsSolverKDL::initialize(rclcpp::node_interfaces::NodeParameter
   // Allocate kinematic/dynamic variables once for real-time safeness
   kdl_joint_positions_ = std::make_unique<KDL::JntArray>(number_of_joints_);
   kdl_joint_velocities_ = std::make_unique<KDL::JntArray>(number_of_joints_);
-  H_ = std::make_unique<KDL::JntSpaceInertiaMatrix>(number_of_joints_);
+  jacobian_ = std::make_unique<KDL::Jacobian>(number_of_joints_);
+  M_ = std::make_unique<KDL::JntSpaceInertiaMatrix>(number_of_joints_);
   c_ = std::make_unique<KDL::JntArray>(number_of_joints_);
   g_ = std::make_unique<KDL::JntArray>(number_of_joints_);
 }
@@ -129,9 +129,9 @@ Eigen::MatrixXd InverseDynamicsSolverKDL::getInertiaMatrix(const Eigen::VectorXd
 
   kdl_joint_positions_->data = joint_positions;
 
-  solver_->JntToMass(*kdl_joint_positions_, *H_);
+  solver_->JntToMass(*kdl_joint_positions_, *M_);
 
-  return H_->data;
+  return M_->data;
 }
 
 Eigen::VectorXd InverseDynamicsSolverKDL::getCoriolisVector(const Eigen::VectorXd& joint_positions, const Eigen::VectorXd& joint_velocities) const
@@ -177,15 +177,12 @@ Eigen::VectorXd InverseDynamicsSolverKDL::getExternalTorques(const Eigen::Vector
     return Eigen::VectorXd::Zero(number_of_joints_);
   }
 
-  KDL::JntArray kdl_joint_positions(number_of_joints_);
-  kdl_joint_positions.data = joint_positions;
-
-  KDL::Jacobian jacobian(number_of_joints_);
+  kdl_joint_positions_->data = joint_positions;
 
   // JntToJac returns 0 when no error occurs: https://docs.ros.org/en/indigo/api/orocos_kdl/html/chainjnttojacsolver_8cpp_source.html#l00048
-  if (jacobian_solver_->JntToJac(kdl_joint_positions, jacobian) == 0)
+  if (jacobian_solver_->JntToJac(*kdl_joint_positions_, *jacobian_) == 0)
   {
-    return jacobian.data.transpose() * external_wrench;
+    return jacobian_->data.transpose() * external_wrench;
   }
   else
   {

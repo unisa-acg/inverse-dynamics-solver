@@ -103,7 +103,7 @@ private:
   double* q_;
   double* qd_;
   double* qdd_;
-  double* H_;
+  double* M_;
   double* c_;
   double* g_;
   double* currents_;

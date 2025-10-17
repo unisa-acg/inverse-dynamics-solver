@@ -29,7 +29,7 @@ void InverseDynamicsSolverUR10::initialize(rclcpp::node_interfaces::NodeParamete
   q_ = (double*)malloc(NUMBER_OF_JOINTS * sizeof(double));
   qd_ = (double*)malloc(NUMBER_OF_JOINTS * sizeof(double));
   qdd_ = (double*)malloc(NUMBER_OF_JOINTS * sizeof(double));
-  H_ = (double*)malloc(NUMBER_OF_JOINTS * NUMBER_OF_JOINTS * sizeof(double));
+  M_ = (double*)malloc(NUMBER_OF_JOINTS * NUMBER_OF_JOINTS * sizeof(double));
   c_ = (double*)malloc(NUMBER_OF_JOINTS * sizeof(double));
   g_ = (double*)malloc(NUMBER_OF_JOINTS * sizeof(double));
   currents_ = (double*)malloc(NUMBER_OF_JOINTS * sizeof(double));
@@ -38,8 +38,8 @@ void InverseDynamicsSolverUR10::initialize(rclcpp::node_interfaces::NodeParamete
 Eigen::MatrixXd InverseDynamicsSolverUR10::getInertiaMatrix(const Eigen::VectorXd& joint_positions) const
 {
   Vector6d::Map(q_) = joint_positions;
-  getInertiaCurrents(q_, H_);
-  return getDriveGainsMatrix_() * Matrix6d(H_);
+  getInertiaCurrents(q_, M_);
+  return getDriveGainsMatrix_() * Matrix6d(M_);
 }
 
 Eigen::VectorXd InverseDynamicsSolverUR10::getCoriolisVector(const Eigen::VectorXd& joint_positions, const Eigen::VectorXd& joint_velocities) const
