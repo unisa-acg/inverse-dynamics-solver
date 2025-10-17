@@ -103,6 +103,10 @@ void InverseDynamicsSolverPinocchio::initialize(rclcpp::node_interfaces::NodePar
 
   // Track plugin initialization
   initialized_ = true;
+
+  // Allocate kinematic/dynamic variables once for real-time safeness
+  jacobian_.resize(jacobian_.RowsAtCompileTime, model_.nv);
+  zero_.resize(number_of_joints_);
 }
 
 Eigen::MatrixXd InverseDynamicsSolverPinocchio::getInertiaMatrix(const Eigen::VectorXd& joint_positions) const
@@ -138,20 +142,16 @@ Eigen::VectorXd InverseDynamicsSolverPinocchio::getFrictionVector(const Eigen::V
   // associated with joint frictions. In the future, this function could be implemented by
   // reading the friction coefficients present in the URDF.
   verifyInitialization_();
-  return Eigen::VectorXd::Zero(number_of_joints_);
+  return zero_;
 }
 
 Eigen::VectorXd InverseDynamicsSolverPinocchio::getExternalTorques(const Eigen::VectorXd& joint_positions,
                                                                    const Eigen::Matrix<double, 6, 1>& external_wrench) const
 {
-  Eigen::VectorXd zero = Eigen::VectorXd::Zero(number_of_joints_);
-  Eigen::VectorXd temp = getTorques(joint_positions, zero, zero, external_wrench) - getGravityVector(joint_positions);
-
-  pinocchio::Data::Matrix6x jacobian(external_wrench.SizeAtCompileTime, model_.nv);
+  verifyInitialization_();
   pinocchio::computeJointJacobians(model_, *data_, joint_positions);
-  pinocchio::getFrameJacobian(model_, *data_, model_.getFrameId(tip_), pinocchio::LOCAL_WORLD_ALIGNED, jacobian);
-
-  return jacobian.transpose() * external_wrench;
+  pinocchio::getFrameJacobian(model_, *data_, model_.getFrameId(tip_), pinocchio::LOCAL_WORLD_ALIGNED, jacobian_);
+  return jacobian_.transpose() * external_wrench;
 }
 
 Eigen::VectorXd InverseDynamicsSolverPinocchio::getTorques(const Eigen::VectorXd& joint_positions, const Eigen::VectorXd& joint_velocities,
@@ -176,7 +176,7 @@ Eigen::VectorXd InverseDynamicsSolverPinocchio::getTorques(const Eigen::VectorXd
   pinocchio::container::aligned_vector<pinocchio::Force> fext(model_.njoints, pinocchio::Force::Zero());
   fext[ee_frame_id] = f_frame_local;
 
-  // Get all the forces
+  // Get all the torques
   return pinocchio::rnea(model_, *data_, joint_positions, joint_velocities, joint_accelerations, fext);
 }
 

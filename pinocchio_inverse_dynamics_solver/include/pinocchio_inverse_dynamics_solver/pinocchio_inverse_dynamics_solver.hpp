@@ -99,6 +99,10 @@ private:
   pinocchio::Model model_;
   unsigned int number_of_joints_;
   bool initialized_ = false;
+
+  // This variables avoid dynamic allocation and ensure real-time safeness
+  pinocchio::Data::Matrix6x jacobian_;
+  Eigen::VectorXd zero_;
 };
 
 }  // namespace pinocchio_inverse_dynamics_solver
