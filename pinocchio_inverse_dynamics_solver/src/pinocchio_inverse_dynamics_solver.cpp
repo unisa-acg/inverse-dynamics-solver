@@ -105,8 +105,8 @@ void InverseDynamicsSolverPinocchio::initialize(rclcpp::node_interfaces::NodePar
   initialized_ = true;
 
   // Allocate kinematic/dynamic variables once for real-time safeness
-  jacobian_.resize(jacobian_.RowsAtCompileTime, model_.nv);
-  zero_.resize(number_of_joints_);
+  jacobian_ = pinocchio::Data::Matrix6x(jacobian_.RowsAtCompileTime, model_.nv);
+  zero_ = Eigen::VectorXd::Zero(number_of_joints_);
 }
 
 Eigen::MatrixXd InverseDynamicsSolverPinocchio::getInertiaMatrix(const Eigen::VectorXd& joint_positions) const
