@@ -121,6 +121,7 @@ void InverseDynamicsSolverKDL::initialize(rclcpp::node_interfaces::NodeParameter
   M_ = std::make_unique<KDL::JntSpaceInertiaMatrix>(number_of_joints_);
   c_ = std::make_unique<KDL::JntArray>(number_of_joints_);
   g_ = std::make_unique<KDL::JntArray>(number_of_joints_);
+  zero_.resize(number_of_joints_);
 }
 
 Eigen::MatrixXd InverseDynamicsSolverKDL::getInertiaMatrix(const Eigen::VectorXd& joint_positions) const
@@ -163,7 +164,7 @@ Eigen::VectorXd InverseDynamicsSolverKDL::getFrictionVector(const Eigen::VectorX
   // associated with joint frictions. In the future, this function could be implemented by
   // reading the friction coefficients present in the URDF.
   verifyInitialization_();
-  return Eigen::VectorXd::Zero(number_of_joints_);
+  return zero_;
 }
 
 Eigen::VectorXd InverseDynamicsSolverKDL::getExternalTorques(const Eigen::VectorXd& joint_positions,
