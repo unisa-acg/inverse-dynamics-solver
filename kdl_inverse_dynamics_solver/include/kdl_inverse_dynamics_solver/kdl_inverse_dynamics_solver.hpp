@@ -84,6 +84,7 @@ private:
   std::unique_ptr<KDL::JntSpaceInertiaMatrix> H_;
   std::unique_ptr<KDL::JntArray> c_;
   std::unique_ptr<KDL::JntArray> g_;
+  Eigen::VectorXd zero_;
 };
 
 }  // namespace kdl_inverse_dynamics_solver
