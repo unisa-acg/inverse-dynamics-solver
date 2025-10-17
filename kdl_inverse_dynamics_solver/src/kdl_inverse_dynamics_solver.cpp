@@ -175,7 +175,7 @@ Eigen::VectorXd InverseDynamicsSolverKDL::getExternalTorques(const Eigen::Vector
   // Skip computing Jacobian if no external wrenches are applied
   if (external_wrench.isZero())
   {
-    return Eigen::VectorXd::Zero(number_of_joints_);
+    return zero_;
   }
 
   kdl_joint_positions_->data = joint_positions;
