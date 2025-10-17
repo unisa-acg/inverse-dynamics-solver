@@ -1,0 +1,7 @@
+<library path="inverse_dynamics_interface_kdl">
+  <class base_class_type="inverse_dynamics_interface::InverseDynamicsInterface"
+         type="inverse_dynamics_interface_kdl::InverseDynamicsInterfaceKDL"
+         name="inverse_dynamics_interface_kdl/InverseDynamicsInterfaceKDL">
+    <description>This is a plugin implementing an inverse dynamics interface based on KDL.</description>
+  </class>
+</library>

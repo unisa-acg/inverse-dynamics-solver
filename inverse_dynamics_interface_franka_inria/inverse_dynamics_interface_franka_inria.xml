@@ -1,0 +1,9 @@
+<library path="inverse_dynamics_interface_franka_inria">
+  <class base_class_type="inverse_dynamics_interface::InverseDynamicsInterface"
+         type="inverse_dynamics_interface_franka_inria::InverseDynamicsInterfaceFrankaInria"
+         name="inverse_dynamics_interface_franka_inria/InverseDynamicsInterfaceFrankaInria">
+    <description>
+      This is a plugin implementing an inverse dynamics interface for the Franka Emika Panda (FER) real robot using the dynamic model estimated by INRIA.
+    </description>
+  </class>
+</library>
