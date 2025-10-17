@@ -17,16 +17,14 @@
 #include <rclcpp/parameter.hpp>
 
 // KDL
-#include <kdl/jntarray.hpp>
-#include <kdl/jacobian.hpp>
 #include <kdl_parser/kdl_parser.hpp>
 
 // Inverse Dynamics Solver
 #include <inverse_dynamics_solver/exceptions.hpp>
 #include "kdl_inverse_dynamics_solver/kdl_inverse_dynamics_solver.hpp"
 
-using namespace kdl_inverse_dynamics_solver;
-
+namespace kdl_inverse_dynamics_solver
+{
 void InverseDynamicsSolverKDL::initialize(rclcpp::node_interfaces::NodeParametersInterface::ConstSharedPtr parameters_interface,
                                           const std::string& param_namespace, const std::string& robot_description)
 {
@@ -114,55 +112,54 @@ void InverseDynamicsSolverKDL::initialize(rclcpp::node_interfaces::NodeParameter
 
   // Instantiate the solver
   number_of_joints_ = chain_.getNrOfJoints();
-  solver_ = std::make_shared<KDL::ChainDynParam>(chain_, KDL::Vector(gravity[0], gravity[1], gravity[2]));
+  solver_ = std::make_unique<KDL::ChainDynParam>(chain_, KDL::Vector(gravity[0], gravity[1], gravity[2]));
   jacobian_solver_ = std::make_shared<KDL::ChainJntToJacSolver>(chain_);
 
   // Track plugin initialization
   initialized_ = true;
+
+  // Allocate kinematic/dynamic variables once for real-time safeness
+  kdl_joint_positions_ = std::make_unique<KDL::JntArray>(number_of_joints_);
+  kdl_joint_velocities_ = std::make_unique<KDL::JntArray>(number_of_joints_);
+  jacobian_ = std::make_unique<KDL::Jacobian>(number_of_joints_);
+  M_ = std::make_unique<KDL::JntSpaceInertiaMatrix>(number_of_joints_);
+  c_ = std::make_unique<KDL::JntArray>(number_of_joints_);
+  g_ = std::make_unique<KDL::JntArray>(number_of_joints_);
+  zero_.resize(number_of_joints_);
 }
 
 Eigen::MatrixXd InverseDynamicsSolverKDL::getInertiaMatrix(const Eigen::VectorXd& joint_positions) const
 {
   verifyInitialization_();
 
-  KDL::JntArray kdl_joint_positions(number_of_joints_);
-  KDL::JntSpaceInertiaMatrix H(number_of_joints_);
+  kdl_joint_positions_->data = joint_positions;
 
-  kdl_joint_positions.data = joint_positions;
+  solver_->JntToMass(*kdl_joint_positions_, *M_);
 
-  solver_->JntToMass(kdl_joint_positions, H);
-
-  return H.data;
+  return M_->data;
 }
 
 Eigen::VectorXd InverseDynamicsSolverKDL::getCoriolisVector(const Eigen::VectorXd& joint_positions, const Eigen::VectorXd& joint_velocities) const
 {
   verifyInitialization_();
 
-  KDL::JntArray kdl_joint_positions(number_of_joints_);
-  KDL::JntArray kdl_joint_velocities(number_of_joints_);
-  KDL::JntArray C(number_of_joints_);
+  kdl_joint_positions_->data = joint_positions;
+  kdl_joint_velocities_->data = joint_velocities;
 
-  kdl_joint_positions.data = joint_positions;
-  kdl_joint_velocities.data = joint_velocities;
+  solver_->JntToCoriolis(*kdl_joint_positions_, *kdl_joint_velocities_, *c_);
 
-  solver_->JntToCoriolis(kdl_joint_positions, kdl_joint_velocities, C);
-
-  return C.data;
+  return c_->data;
 }
 
 Eigen::VectorXd InverseDynamicsSolverKDL::getGravityVector(const Eigen::VectorXd& joint_positions) const
 {
   verifyInitialization_();
 
-  KDL::JntArray kdl_joint_positions(number_of_joints_);
-  KDL::JntArray g(number_of_joints_);
+  kdl_joint_positions_->data = joint_positions;
 
-  kdl_joint_positions.data = joint_positions;
+  solver_->JntToGravity(*kdl_joint_positions_, *g_);
 
-  solver_->JntToGravity(kdl_joint_positions, g);
-
-  return g.data;
+  return g_->data;
 }
 
 Eigen::VectorXd InverseDynamicsSolverKDL::getFrictionVector(const Eigen::VectorXd&) const
@@ -171,7 +168,7 @@ Eigen::VectorXd InverseDynamicsSolverKDL::getFrictionVector(const Eigen::VectorX
   // associated with joint frictions. In the future, this function could be implemented by
   // reading the friction coefficients present in the URDF.
   verifyInitialization_();
-  return Eigen::VectorXd::Zero(number_of_joints_);
+  return zero_;
 }
 
 Eigen::VectorXd InverseDynamicsSolverKDL::getExternalTorques(const Eigen::VectorXd& joint_positions,
@@ -182,18 +179,15 @@ Eigen::VectorXd InverseDynamicsSolverKDL::getExternalTorques(const Eigen::Vector
   // Skip computing Jacobian if no external wrenches are applied
   if (external_wrench.isZero())
   {
-    return Eigen::VectorXd::Zero(number_of_joints_);
+    return zero_;
   }
 
-  KDL::JntArray kdl_joint_positions(number_of_joints_);
-  kdl_joint_positions.data = joint_positions;
-
-  KDL::Jacobian jacobian(number_of_joints_);
+  kdl_joint_positions_->data = joint_positions;
 
   // JntToJac returns 0 when no error occurs: https://docs.ros.org/en/indigo/api/orocos_kdl/html/chainjnttojacsolver_8cpp_source.html#l00048
-  if (jacobian_solver_->JntToJac(kdl_joint_positions, jacobian) == 0)
+  if (jacobian_solver_->JntToJac(*kdl_joint_positions_, *jacobian_) == 0)
   {
-    return jacobian.data.transpose() * external_wrench;
+    return jacobian_->data.transpose() * external_wrench;
   }
   else
   {
@@ -208,6 +202,7 @@ void InverseDynamicsSolverKDL::verifyInitialization_() const
     throw inverse_dynamics_solver::UninitializedException();
   }
 }
+}  // namespace kdl_inverse_dynamics_solver
 
 #include <pluginlib/class_list_macros.hpp>
 PLUGINLIB_EXPORT_CLASS(kdl_inverse_dynamics_solver::InverseDynamicsSolverKDL, inverse_dynamics_solver::InverseDynamicsSolver)

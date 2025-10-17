@@ -21,6 +21,9 @@
 #include <kdl/chain.hpp>
 #include <kdl/chaindynparam.hpp>
 #include <kdl/chainjnttojacsolver.hpp>
+#include <kdl/jntarray.hpp>
+#include <kdl/jacobian.hpp>
+#include <kdl/jntspaceinertiamatrix.hpp>
 #include <rclcpp/node_interfaces/node_parameters_interface.hpp>
 
 #include <inverse_dynamics_solver/inverse_dynamics_solver.hpp>
@@ -81,8 +84,18 @@ private:
   bool initialized_ = false;
   unsigned int number_of_joints_;
   KDL::Chain chain_;
-  std::shared_ptr<KDL::ChainDynParam> solver_;
+  std::unique_ptr<KDL::ChainDynParam> solver_;
   std::shared_ptr<KDL::ChainJntToJacSolver> jacobian_solver_;
+
+  // Kinematic/dynamic variables are allocated in the `initialize` method for real-time safeness; they are declared with smart pointers because all
+  // the methods in this class are `const`, and this would not allow changing their values if they were not declared with pointers
+  std::unique_ptr<KDL::JntArray> kdl_joint_positions_;
+  std::unique_ptr<KDL::JntArray> kdl_joint_velocities_;
+  std::unique_ptr<KDL::Jacobian> jacobian_;
+  std::unique_ptr<KDL::JntSpaceInertiaMatrix> M_;
+  std::unique_ptr<KDL::JntArray> c_;
+  std::unique_ptr<KDL::JntArray> g_;
+  Eigen::VectorXd zero_;
 };
 
 }  // namespace kdl_inverse_dynamics_solver
