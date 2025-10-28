@@ -17,15 +17,15 @@
 #include <rclcpp/parameter.hpp>
 
 // Pinocchio
-#include <pinocchio/parsers/urdf.hpp>              // Needed for pinocchio::urdf::buildModelFromXML
 #include <pinocchio/algorithm/crba.hpp>            // Composite Rigid Body Algorithm
-#include <pinocchio/algorithm/rnea.hpp>            // Recursive Newton-Euler Algorithm
+#include <pinocchio/algorithm/frames.hpp>          // Needed for pinocchio::{getFrameJacobian, updateFramePlacements}
 #include <pinocchio/algorithm/jacobian.hpp>        // Needed for pinocchio::computeJointJacobians
-#include <pinocchio/algorithm/frames.hpp>          // Needed for pinocchio::getFrameJacobian
-#include <pinocchio/multibody/fwd.hpp>             // Needed for pinocchio::FrameIndex
-#include <pinocchio/spatial/fwd.hpp>               // Needed for pinocchio::{Force, SE3}
-#include <pinocchio/container/aligned-vector.hpp>  // Needed for pinocchio::container::aligned_vector
 #include <pinocchio/algorithm/kinematics.hpp>      // Needed for pinocchio::forwardKinematics
+#include <pinocchio/algorithm/rnea.hpp>            // Recursive Newton-Euler Algorithm
+#include <pinocchio/container/aligned-vector.hpp>  // Needed for pinocchio::container::aligned_vector
+#include <pinocchio/multibody/fwd.hpp>             // Needed for pinocchio::FrameIndex
+#include <pinocchio/parsers/urdf.hpp>              // Needed for pinocchio::urdf::buildModelFromXML
+#include <pinocchio/spatial/fwd.hpp>               // Needed for pinocchio::{Force, SE3}
 
 // Inverse Dynamics Solver
 #include <inverse_dynamics_interface/exceptions.hpp>
@@ -93,7 +93,7 @@ void InverseDynamicsInterfacePinocchio::initialize(rclcpp::node_interfaces::Node
   // Instantiate the solver
   pinocchio::urdf::buildModelFromXML(robot_description_local, model_);
   data_ = std::make_unique<pinocchio::Data>(model_);
-  model_.gravity.linear() = Eigen::Vector3d(gravity.data());
+  model_.gravity.linear() = Eigen::Map<const Eigen::Vector3d>(gravity.data());
   number_of_joints_ = model_.nq;
 
   // Check if tip is included in the model
@@ -106,7 +106,7 @@ void InverseDynamicsInterfacePinocchio::initialize(rclcpp::node_interfaces::Node
   initialized_ = true;
 
   // Allocate kinematic/dynamic variables once for real-time safeness
-  jacobian_ = pinocchio::Data::Matrix6x(jacobian_.RowsAtCompileTime, model_.nv);
+  jacobian_ = pinocchio::Data::Matrix6x(6, model_.nv);
   zero_ = Eigen::VectorXd::Zero(number_of_joints_);
 }
 
@@ -166,6 +166,10 @@ Eigen::VectorXd InverseDynamicsInterfacePinocchio::getTorques(const Eigen::Vecto
 
   // Build the wrench in world frame
   pinocchio::Force f_ee_world(external_wrench.head(3), external_wrench.tail(3));
+
+  // Update kinematics
+  pinocchio::forwardKinematics(model_, *data_, joint_positions, joint_velocities, joint_accelerations);
+  pinocchio::updateFramePlacements(model_, *data_);
 
   // M is the homogenous transform matrix: "oMf" stands for "transform from frame 'f' to origin (world)"
   pinocchio::SE3 frame_to_world = data_->oMf[ee_frame_id];
