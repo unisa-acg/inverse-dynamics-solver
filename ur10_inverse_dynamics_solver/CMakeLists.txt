@@ -13,6 +13,12 @@ if(CMAKE_COMPILER_IS_GNUCXX
   )
 endif()
 
+# Code optimization flags are available here
+# https://clang.llvm.org/docs/CommandGuide/clang.html#code-generation-options
+set(CMAKE_CXX_FLAGS
+    "-O3"
+)
+
 # find dependencies
 find_package(ament_cmake REQUIRED)
 

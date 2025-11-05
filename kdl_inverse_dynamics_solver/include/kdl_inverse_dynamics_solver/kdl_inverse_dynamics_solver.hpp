@@ -18,7 +18,10 @@
 
 #include <string>
 #include <eigen3/Eigen/Core>
+#include <kdl/chain.hpp>
 #include <kdl/chaindynparam.hpp>
+#include <kdl/jntarray.hpp>
+#include <kdl/jntspaceinertiamatrix.hpp>
 #include <rclcpp/node_interfaces/node_parameters_interface.hpp>
 
 #include <inverse_dynamics_solver/inverse_dynamics_solver.hpp>
@@ -79,10 +82,17 @@ private:
   bool initialized_ = false;
   unsigned int number_of_joints_;
   KDL::Chain chain_;
-  std::shared_ptr<KDL::ChainDynParam> solver_;
-
-  Eigen::VectorXd static_friction_;  // static friction [Nm]
+  std::unique_ptr<KDL::ChainDynParam> solver_;
+  Eigen::VectorXd static_friction_;   // static friction [Nm]
   Eigen::VectorXd viscous_friction_;  // viscous friction [Nm/(rad/s)]
+
+  // Kinematic/dynamic variables are allocated in the `initialize` method for real-time safeness; they are declared with smart pointers because all
+  // the methods in this class are `const`, and this would not allow changing their values if they were not declared with pointers
+  std::unique_ptr<KDL::JntArray> kdl_joint_positions_;
+  std::unique_ptr<KDL::JntArray> kdl_joint_velocities_;
+  std::unique_ptr<KDL::JntSpaceInertiaMatrix> H_;
+  std::unique_ptr<KDL::JntArray> c_;
+  std::unique_ptr<KDL::JntArray> g_;
 };
 
 }  // namespace kdl_inverse_dynamics_solver

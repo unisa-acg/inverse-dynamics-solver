@@ -24,8 +24,8 @@
 #include <inverse_dynamics_solver/exceptions.hpp>
 #include "kdl_inverse_dynamics_solver/kdl_inverse_dynamics_solver.hpp"
 
-using namespace kdl_inverse_dynamics_solver;
-
+namespace kdl_inverse_dynamics_solver
+{
 void InverseDynamicsSolverKDL::initialize(rclcpp::node_interfaces::NodeParametersInterface::ConstSharedPtr parameters_interface,
                                           const std::string& param_namespace, const std::string& robot_description)
 {
@@ -109,8 +109,16 @@ void InverseDynamicsSolverKDL::initialize(rclcpp::node_interfaces::NodeParameter
 
   // Instantiate the solver
   number_of_joints_ = chain_.getNrOfJoints();
-  solver_ = std::make_shared<KDL::ChainDynParam>(chain_, KDL::Vector(gravity[0], gravity[1], gravity[2]));
+  solver_ = std::make_unique<KDL::ChainDynParam>(chain_, KDL::Vector(gravity[0], gravity[1], gravity[2]));
   parseFrictionFromURDF_(robot_description_local);
+
+  // Allocate kinematic/dynamic variables once for real-time safeness
+  kdl_joint_positions_ = std::make_unique<KDL::JntArray>(number_of_joints_);
+  kdl_joint_velocities_ = std::make_unique<KDL::JntArray>(number_of_joints_);
+  H_ = std::make_unique<KDL::JntSpaceInertiaMatrix>(number_of_joints_);
+  c_ = std::make_unique<KDL::JntArray>(number_of_joints_);
+  g_ = std::make_unique<KDL::JntArray>(number_of_joints_);
+  zero_ = Eigen::VectorXd::Zero(number_of_joints_);
 
   // Track plugin initialization
   initialized_ = true;
@@ -120,44 +128,34 @@ Eigen::MatrixXd InverseDynamicsSolverKDL::getInertiaMatrix(const Eigen::VectorXd
 {
   verifyInitialization_();
 
-  KDL::JntArray kdl_joint_positions(number_of_joints_);
-  KDL::JntSpaceInertiaMatrix H(number_of_joints_);
+  kdl_joint_positions_->data = joint_positions;
 
-  kdl_joint_positions.data = joint_positions;
+  solver_->JntToMass(*kdl_joint_positions_, *H_);
 
-  solver_->JntToMass(kdl_joint_positions, H);
-
-  return H.data;
+  return H_->data;
 }
 
 Eigen::VectorXd InverseDynamicsSolverKDL::getCoriolisVector(const Eigen::VectorXd& joint_positions, const Eigen::VectorXd& joint_velocities) const
 {
   verifyInitialization_();
 
-  KDL::JntArray kdl_joint_positions(number_of_joints_);
-  KDL::JntArray kdl_joint_velocities(number_of_joints_);
-  KDL::JntArray C(number_of_joints_);
+  kdl_joint_positions_->data = joint_positions;
+  kdl_joint_velocities_->data = joint_velocities;
 
-  kdl_joint_positions.data = joint_positions;
-  kdl_joint_velocities.data = joint_velocities;
+  solver_->JntToCoriolis(*kdl_joint_positions_, *kdl_joint_velocities_, *c_);
 
-  solver_->JntToCoriolis(kdl_joint_positions, kdl_joint_velocities, C);
-
-  return C.data;
+  return c_->data;
 }
 
 Eigen::VectorXd InverseDynamicsSolverKDL::getGravityVector(const Eigen::VectorXd& joint_positions) const
 {
   verifyInitialization_();
 
-  KDL::JntArray kdl_joint_positions(number_of_joints_);
-  KDL::JntArray g(number_of_joints_);
+  kdl_joint_positions_->data = joint_positions;
 
-  kdl_joint_positions.data = joint_positions;
+  solver_->JntToGravity(*kdl_joint_positions_, *g_);
 
-  solver_->JntToGravity(kdl_joint_positions, g);
-
-  return g.data;
+  return g_->data;
 }
 
 Eigen::VectorXd InverseDynamicsSolverKDL::getFrictionVector(const Eigen::VectorXd& joint_velocities) const
@@ -173,6 +171,7 @@ void InverseDynamicsSolverKDL::verifyInitialization_() const
     throw inverse_dynamics_solver::UninitializedException();
   }
 }
+}  // namespace kdl_inverse_dynamics_solver
 
 void InverseDynamicsSolverKDL::parseFrictionFromURDF_(const std::string& robot_description)
 {
@@ -180,8 +179,7 @@ void InverseDynamicsSolverKDL::parseFrictionFromURDF_(const std::string& robot_d
   urdf::Model urdf_model;
   if (!urdf_model.initString(robot_description))
   {
-    throw inverse_dynamics_solver::InvalidParameterValueException(
-        "Failed to parse URDF string.");
+    throw inverse_dynamics_solver::InvalidParameterValueException("Failed to parse URDF string.");
   }
 
   static_friction_.resize(number_of_joints_);
@@ -203,7 +201,7 @@ void InverseDynamicsSolverKDL::parseFrictionFromURDF_(const std::string& robot_d
         }
         if (joint->dynamics->damping)
         {
-          viscous_friction_(i) = joint->dynamics->damping; // viscous friction
+          viscous_friction_(i) = joint->dynamics->damping;  // viscous friction
         }
       }
     }
