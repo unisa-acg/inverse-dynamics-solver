@@ -118,7 +118,6 @@ void InverseDynamicsSolverKDL::initialize(rclcpp::node_interfaces::NodeParameter
   H_ = std::make_unique<KDL::JntSpaceInertiaMatrix>(number_of_joints_);
   c_ = std::make_unique<KDL::JntArray>(number_of_joints_);
   g_ = std::make_unique<KDL::JntArray>(number_of_joints_);
-  zero_ = Eigen::VectorXd::Zero(number_of_joints_);
 
   // Track plugin initialization
   initialized_ = true;
@@ -164,6 +163,13 @@ Eigen::VectorXd InverseDynamicsSolverKDL::getFrictionVector(const Eigen::VectorX
   return static_friction_.cwiseProduct(joint_velocities.cwiseSign()) + viscous_friction_.cwiseProduct(joint_velocities);
 }
 
+Eigen::VectorXd InverseDynamicsSolverKDL::getTorques(const Eigen::VectorXd& joint_positions, const Eigen::VectorXd& joint_velocities,
+                                                     const Eigen::VectorXd& joint_accelerations) const
+{
+  return inverse_dynamics_solver::InverseDynamicsSolver::getTorques(joint_positions, joint_velocities, joint_accelerations) +
+         getFrictionVector(joint_velocities);
+}
+
 void InverseDynamicsSolverKDL::verifyInitialization_() const
 {
   if (!initialized_)
@@ -171,7 +177,6 @@ void InverseDynamicsSolverKDL::verifyInitialization_() const
     throw inverse_dynamics_solver::UninitializedException();
   }
 }
-}  // namespace kdl_inverse_dynamics_solver
 
 void InverseDynamicsSolverKDL::parseFrictionFromURDF_(const std::string& robot_description)
 {
@@ -207,6 +212,7 @@ void InverseDynamicsSolverKDL::parseFrictionFromURDF_(const std::string& robot_d
     }
   }
 }
+}  // namespace kdl_inverse_dynamics_solver
 
 #include <pluginlib/class_list_macros.hpp>
 PLUGINLIB_EXPORT_CLASS(kdl_inverse_dynamics_solver::InverseDynamicsSolverKDL, inverse_dynamics_solver::InverseDynamicsSolver)

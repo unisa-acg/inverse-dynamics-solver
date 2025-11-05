@@ -66,6 +66,12 @@ public:
    */
   Eigen::VectorXd getFrictionVector(const Eigen::VectorXd&) const override;
 
+  /**
+   * @brief Refer to the superclass documentation
+   */
+  Eigen::VectorXd getTorques(const Eigen::VectorXd& joint_positions, const Eigen::VectorXd& joint_velocities,
+                             const Eigen::VectorXd& joint_accelerations) const override;
+
 private:
   /**
    * @brief Verify that the solver has been correctly initialized
