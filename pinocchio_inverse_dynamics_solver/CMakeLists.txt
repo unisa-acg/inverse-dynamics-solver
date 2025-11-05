@@ -19,6 +19,7 @@ find_package(ament_cmake REQUIRED)
 set(THIS_PACKAGE_INCLUDE_DEPENDS
     Eigen3
     rclcpp
+    urdfdom
     pluginlib
     pinocchio
     inverse_dynamics_solver
@@ -46,6 +47,7 @@ target_link_libraries(
   pinocchio_inverse_dynamics_solver
   PUBLIC Eigen3::Eigen
          rclcpp::rclcpp
+         urdfdom::urdf_parser
          pluginlib::pluginlib
          pinocchio::pinocchio
          inverse_dynamics_solver::inverse_dynamics_solver_lib

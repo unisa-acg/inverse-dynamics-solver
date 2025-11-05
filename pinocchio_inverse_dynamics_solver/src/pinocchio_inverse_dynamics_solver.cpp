@@ -16,6 +16,9 @@
 // ROS
 #include <rclcpp/parameter.hpp>
 
+// URDF
+#include <urdf_parser/urdf_parser.h>
+
 // Pinocchio
 #include <pinocchio/algorithm/crba.hpp>            // Composite Rigid Body Algorithm
 #include <pinocchio/algorithm/frames.hpp>          // Needed for pinocchio::{getFrameJacobian, updateFramePlacements}
@@ -94,6 +97,7 @@ void InverseDynamicsSolverPinocchio::initialize(rclcpp::node_interfaces::NodePar
   data_ = std::make_unique<pinocchio::Data>(model_);
   model_.gravity.linear() = Eigen::Map<const Eigen::Vector3d>(gravity.data());
   number_of_joints_ = model_.nq;
+  parseFrictionFromURDF_(robot_description_local);
 
   // Check if tip is included in the model
   if (!model_.existFrame(tip_))
@@ -106,7 +110,6 @@ void InverseDynamicsSolverPinocchio::initialize(rclcpp::node_interfaces::NodePar
 
   // Allocate kinematic/dynamic variables once for real-time safeness
   jacobian_ = pinocchio::Data::Matrix6x(6, model_.nv);
-  zero_ = Eigen::VectorXd::Zero(number_of_joints_);
 }
 
 Eigen::MatrixXd InverseDynamicsSolverPinocchio::getInertiaMatrix(const Eigen::VectorXd& joint_positions) const
@@ -136,13 +139,10 @@ Eigen::VectorXd InverseDynamicsSolverPinocchio::getGravityVector(const Eigen::Ve
   return data_->g;
 }
 
-Eigen::VectorXd InverseDynamicsSolverPinocchio::getFrictionVector(const Eigen::VectorXd&) const
+Eigen::VectorXd InverseDynamicsSolverPinocchio::getFrictionVector(const Eigen::VectorXd& joint_velocities) const
 {
-  // Pinocchio joint model does not include friction, thus it is not able to compute the torque vector
-  // associated with joint frictions. In the future, this function could be implemented by
-  // reading the friction coefficients present in the URDF.
   verifyInitialization_();
-  return zero_;
+  return static_friction_.cwiseProduct(joint_velocities.cwiseSign()) + viscous_friction_.cwiseProduct(joint_velocities);
 }
 
 Eigen::VectorXd InverseDynamicsSolverPinocchio::getExternalTorques(const Eigen::VectorXd& joint_positions,
@@ -189,6 +189,34 @@ void InverseDynamicsSolverPinocchio::verifyInitialization_() const
   if (!initialized_)
   {
     throw inverse_dynamics_solver::UninitializedException();
+  }
+}
+
+void InverseDynamicsSolverPinocchio::parseFrictionFromURDF_(const std::string& robot_description)
+{
+  // Parse the URDF again to extract joint friction coefficients
+  urdf::ModelInterfaceSharedPtr urdf_model = urdf::parseURDF(robot_description);
+  if (!urdf_model)
+  {
+    throw inverse_dynamics_solver::InvalidParameterValueException("Failed to parse URDF string.");
+  }
+
+  static_friction_.resize(number_of_joints_);
+  viscous_friction_.resize(number_of_joints_);
+
+  for (std::size_t i = 0; i < model_.names.size(); ++i)
+  {
+    const std::string joint_name = model_.names[i];
+
+    if (urdf_model->joints_.find(joint_name) != urdf_model->joints_.end())
+    {
+      auto urdf_joint = urdf_model->joints_.at(joint_name);
+      if (urdf_joint->dynamics)
+      {
+        static_friction_(i) = urdf_joint->dynamics->friction;  // coulomb/static friction
+        viscous_friction_(i) = urdf_joint->dynamics->damping;  // viscous friction
+      }
+    }
   }
 }
 

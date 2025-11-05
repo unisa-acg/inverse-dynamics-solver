@@ -65,7 +65,6 @@ public:
 
   /**
    * @brief Refer to the superclass documentation
-   * @note This methods returns a 0-vector as KDL can not compute friction
    */
   Eigen::VectorXd getFrictionVector(const Eigen::VectorXd&) const override;
 
@@ -74,6 +73,13 @@ public:
    * @throw std::runtime_error if the KDL solver fails to compute Jacobian
    */
   Eigen::VectorXd getExternalTorques(const Eigen::VectorXd& joint_positions, const Eigen::Matrix<double, 6, 1>& external_wrench) const override;
+
+  /**
+   * @brief Refer to the superclass documentation
+   */
+  Eigen::VectorXd getTorques(const Eigen::VectorXd& joint_positions, const Eigen::VectorXd& joint_velocities,
+                             const Eigen::VectorXd& joint_accelerations,
+                             const Eigen::Matrix<double, 6, 1>& external_wrench = Eigen::VectorXd::Zero(6)) const override;
 
 private:
   /**
@@ -92,6 +98,7 @@ private:
   unsigned int number_of_joints_;
   KDL::Chain chain_;
   std::unique_ptr<KDL::ChainDynParam> solver_;
+  std::shared_ptr<KDL::ChainJntToJacSolver> jacobian_solver_;
   Eigen::VectorXd static_friction_;   // static friction [Nm]
   Eigen::VectorXd viscous_friction_;  // viscous friction [Nm/(rad/s)]
 
@@ -103,6 +110,7 @@ private:
   std::unique_ptr<KDL::JntSpaceInertiaMatrix> M_;
   std::unique_ptr<KDL::JntArray> c_;
   std::unique_ptr<KDL::JntArray> g_;
+  Eigen::VectorXd zero_;
 };
 
 }  // namespace kdl_inverse_dynamics_solver
