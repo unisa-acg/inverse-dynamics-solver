@@ -16,7 +16,11 @@
 // ROS
 #include <rclcpp/parameter.hpp>
 
+// URDF
+#include <urdf/model.hpp>
+
 // KDL
+#include <kdl/segment.hpp>
 #include <kdl_parser/kdl_parser.hpp>
 
 // Inverse Dynamics Solver
@@ -115,9 +119,7 @@ void InverseDynamicsInterfaceKDL::initialize(rclcpp::node_interfaces::NodeParame
   number_of_joints_ = chain_.getNrOfJoints();
   dynamics_ = std::make_unique<KDL::ChainDynParam>(chain_, KDL::Vector(gravity[0], gravity[1], gravity[2]));
   jacobian_solver_ = std::make_shared<KDL::ChainJntToJacSolver>(chain_);
-
-  // Track plugin initialization
-  initialized_ = true;
+  parseFrictionFromURDF_(robot_description_local);
 
   // Allocate kinematic/dynamic variables once for real-time safeness
   kdl_joint_positions_ = std::make_unique<KDL::JntArray>(number_of_joints_);
@@ -126,7 +128,10 @@ void InverseDynamicsInterfaceKDL::initialize(rclcpp::node_interfaces::NodeParame
   M_ = std::make_unique<KDL::JntSpaceInertiaMatrix>(number_of_joints_);
   c_ = std::make_unique<KDL::JntArray>(number_of_joints_);
   g_ = std::make_unique<KDL::JntArray>(number_of_joints_);
-  zero_ = Eigen::VectorXd::Zero(number_of_joints_);
+  zero_ = Eigen::VectorXd(number_of_joints_);
+
+  // Track plugin initialization
+  initialized_ = true;
 }
 
 Eigen::MatrixXd InverseDynamicsInterfaceKDL::getInertiaMatrix(const Eigen::VectorXd& joint_positions) const
@@ -163,13 +168,10 @@ Eigen::VectorXd InverseDynamicsInterfaceKDL::getGravityVector(const Eigen::Vecto
   return g_->data;
 }
 
-Eigen::VectorXd InverseDynamicsInterfaceKDL::getFrictionVector(const Eigen::VectorXd&) const
+Eigen::VectorXd InverseDynamicsInterfaceKDL::getFrictionVector(const Eigen::VectorXd& joint_velocities) const
 {
-  // KDL joint model does not include friction, thus it is not able to compute the torque vector
-  // associated with joint frictions. In the future, this function could be implemented by
-  // reading the friction coefficients present in the URDF.
   verifyInitialization_();
-  return zero_;
+  return static_friction_.cwiseProduct(joint_velocities.cwiseSign()) + viscous_friction_.cwiseProduct(joint_velocities);
 }
 
 Eigen::VectorXd InverseDynamicsInterfaceKDL::getExternalTorques(const Eigen::VectorXd& joint_positions,
@@ -196,11 +198,54 @@ Eigen::VectorXd InverseDynamicsInterfaceKDL::getExternalTorques(const Eigen::Vec
   }
 }
 
+Eigen::VectorXd InverseDynamicsInterfaceKDL::getTorques(const Eigen::VectorXd& joint_positions, const Eigen::VectorXd& joint_velocities,
+                                                        const Eigen::VectorXd& joint_accelerations,
+                                                        const Eigen::Matrix<double, 6, 1>& external_wrench) const
+{
+  return inverse_dynamics_solver::InverseDynamicsInterface::getTorques(joint_positions, joint_velocities, joint_accelerations, external_wrench) +
+         getFrictionVector(joint_velocities);
+}
+
 void InverseDynamicsInterfaceKDL::verifyInitialization_() const
 {
   if (!initialized_)
   {
     throw inverse_dynamics_interface::UninitializedException();
+  }
+}
+
+void InverseDynamicsInterfaceKDL::parseFrictionFromURDF_(const std::string& robot_description)
+{
+  // Parse the URDF again to extract joint friction coefficients
+  urdf::Model urdf_model;
+  if (!urdf_model.initString(robot_description))
+  {
+    throw inverse_dynamics_solver::InvalidParameterValueException("Failed to parse URDF string.");
+  }
+
+  static_friction_.resize(number_of_joints_);
+  viscous_friction_.resize(number_of_joints_);
+
+  for (unsigned int i = 0; i < chain_.getNrOfSegments(); ++i)
+  {
+    const KDL::Segment seg = chain_.getSegment(i);
+    const std::string joint_name = seg.getJoint().getName();
+
+    if (urdf_model.joints_.find(joint_name) != urdf_model.joints_.end())
+    {
+      urdf::JointSharedPtr joint = urdf_model.joints_.at(joint_name);
+      if (joint->dynamics)
+      {
+        if (joint->dynamics->friction)
+        {
+          static_friction_(i) = joint->dynamics->friction;  // coulomb/static friction
+        }
+        if (joint->dynamics->damping)
+        {
+          viscous_friction_(i) = joint->dynamics->damping;  // viscous friction
+        }
+      }
+    }
   }
 }
 }  // namespace inverse_dynamics_interface_kdl

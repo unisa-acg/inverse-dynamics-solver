@@ -19,6 +19,7 @@ find_package(ament_cmake REQUIRED)
 set(THIS_PACKAGE_INCLUDE_DEPENDS
     Eigen3
     rclcpp
+    urdf
     kdl_parser
     pluginlib
     inverse_dynamics_interface
@@ -46,6 +47,7 @@ target_link_libraries(
   inverse_dynamics_interface_kdl
   PUBLIC Eigen3::Eigen
          rclcpp::rclcpp
+         urdf::urdf
          kdl_parser::kdl_parser
          pluginlib::pluginlib
          inverse_dynamics_interface::inverse_dynamics_interface_lib

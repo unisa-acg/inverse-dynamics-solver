@@ -16,6 +16,7 @@
   <depend>pinocchio</depend>
   <depend>pluginlib</depend>
   <depend>rclcpp</depend>
+  <depend>urdfdom</depend>
 
   <exec_depend>ur_description</exec_depend>
 

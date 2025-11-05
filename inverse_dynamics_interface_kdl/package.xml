@@ -16,6 +16,7 @@
   <depend>kdl_parser</depend>
   <depend>pluginlib</depend>
   <depend>rclcpp</depend>
+  <depend>urdf</depend>
 
   <exec_depend>ur_description</exec_depend>
 

@@ -20,7 +20,7 @@ exclude: inverse_dynamics_interface_franka_inria/src/(?!inverse_dynamics_interfa
 repos:
   # Standard hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v6.0.0
     hooks:
       - id: check-added-large-files
         files: ".*stl$|.*dae$|.*mesh$"
@@ -60,7 +60,7 @@ repos:
         args: ["--style", ".mdstyle.rb"]
 
   - repo: https://github.com/psf/black
-    rev: 25.1.0
+    rev: 25.9.0
     hooks:
       - id: black
 

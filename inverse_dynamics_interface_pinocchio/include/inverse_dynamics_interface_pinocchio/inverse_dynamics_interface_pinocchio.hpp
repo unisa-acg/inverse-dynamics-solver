@@ -68,7 +68,6 @@ public:
 
   /**
    * @brief Refer to the superclass documentation
-   * @note This methods returns a 0-vector as Pinocchio can not compute friction
    */
   Eigen::VectorXd getFrictionVector(const Eigen::VectorXd&) const override;
 
@@ -91,18 +90,26 @@ public:
 private:
   /**
    * @brief Verify that the solver has been correctly initialized
+   * @throw UninitializedException if the solver is not initialized
    */
   void verifyInitialization_() const;
+
+  /**
+   * @brief Parse robot description from URDF and retrieves friction parameters
+   * @throw InvalidParameterValueException if the robot description parsing fails
+   */
+  void parseFrictionFromURDF_(const std::string& robot_description);
 
   std::string tip_;
   std::shared_ptr<pinocchio::Data> data_;
   pinocchio::Model model_;
   unsigned int number_of_joints_;
   bool initialized_ = false;
+  Eigen::VectorXd static_friction_;   // static friction [Nm]
+  Eigen::VectorXd viscous_friction_;  // viscous friction [Nm/(rad/s)]
 
   // This variables avoid dynamic allocation and ensure real-time safeness
   pinocchio::Data::Matrix6x jacobian_;
-  Eigen::VectorXd zero_;
 };
 
 }  // namespace inverse_dynamics_interface_pinocchio

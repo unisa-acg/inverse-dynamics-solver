@@ -65,7 +65,6 @@ public:
 
   /**
    * @brief Refer to the superclass documentation
-   * @note This methods returns a 0-vector as KDL can not compute friction
    */
   Eigen::VectorXd getFrictionVector(const Eigen::VectorXd&) const override;
 
@@ -75,17 +74,33 @@ public:
    */
   Eigen::VectorXd getExternalTorques(const Eigen::VectorXd& joint_positions, const Eigen::Matrix<double, 6, 1>& external_wrench) const override;
 
+  /**
+   * @brief Refer to the superclass documentation
+   */
+  Eigen::VectorXd getTorques(const Eigen::VectorXd& joint_positions, const Eigen::VectorXd& joint_velocities,
+                             const Eigen::VectorXd& joint_accelerations,
+                             const Eigen::Matrix<double, 6, 1>& external_wrench = Eigen::VectorXd::Zero(6)) const override;
+
 private:
   /**
-   * @brief Verify that the interface has been correctly initialized
+   * @brief Verify that the solver has been correctly initialized
+   * @throw UninitializedException if the solver is not initialized
    */
   void verifyInitialization_() const;
+
+  /**
+   * @brief Parse robot description from URDF and retrieves friction parameters
+   * @throw InvalidParameterValueException if the robot description parsing fails
+   */
+  void parseFrictionFromURDF_(const std::string& robot_description);
 
   bool initialized_ = false;
   unsigned int number_of_joints_;
   KDL::Chain chain_;
   std::unique_ptr<KDL::ChainDynParam> dynamics_;
   std::shared_ptr<KDL::ChainJntToJacSolver> jacobian_solver_;
+  Eigen::VectorXd static_friction_;   // static friction [Nm]
+  Eigen::VectorXd viscous_friction_;  // viscous friction [Nm/(rad/s)]
 
   // Kinematic/dynamic variables are allocated in the `initialize` method for real-time safeness; they are declared with smart pointers because all
   // the methods in this class are `const`, and this would not allow changing their values if they were not declared with pointers
