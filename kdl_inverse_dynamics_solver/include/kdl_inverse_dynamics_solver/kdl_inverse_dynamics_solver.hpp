@@ -66,13 +66,23 @@ public:
 private:
   /**
    * @brief Verify that the solver has been correctly initialized
+   * @throw UninitializedException if the solver is not initialized
    */
   void verifyInitialization_() const;
+
+  /**
+   * @brief Parse robot description from URDF and retrieves friction parameters
+   * @throw InvalidParameterValueException if the robot description parsing fails
+   */
+  void parseFrictionFromURDF_(const std::string& robot_description);
 
   bool initialized_ = false;
   unsigned int number_of_joints_;
   KDL::Chain chain_;
   std::shared_ptr<KDL::ChainDynParam> solver_;
+
+  Eigen::VectorXd static_friction_;  // static friction [Nm]
+  Eigen::VectorXd viscous_friction_;  // viscous friction [Nm/(rad/s)]
 };
 
 }  // namespace kdl_inverse_dynamics_solver
