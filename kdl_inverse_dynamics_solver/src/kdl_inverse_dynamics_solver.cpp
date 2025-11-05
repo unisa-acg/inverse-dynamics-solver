@@ -117,7 +117,7 @@ void InverseDynamicsSolverKDL::initialize(rclcpp::node_interfaces::NodeParameter
   // Instantiate the solver
   number_of_joints_ = chain_.getNrOfJoints();
   solver_ = std::make_unique<KDL::ChainDynParam>(chain_, KDL::Vector(gravity[0], gravity[1], gravity[2]));
-  jacobian_solver_ = std::make_shared<KDL::ChainJntToJacSolver>(chain_);
+  jacobian_solver_ = std::make_unique<KDL::ChainJntToJacSolver>(chain_);
   parseFrictionFromURDF_(robot_description_local);
 
   // Allocate kinematic/dynamic variables once for real-time safeness

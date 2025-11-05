@@ -98,7 +98,7 @@ private:
   unsigned int number_of_joints_;
   KDL::Chain chain_;
   std::unique_ptr<KDL::ChainDynParam> solver_;
-  std::shared_ptr<KDL::ChainJntToJacSolver> jacobian_solver_;
+  std::unique_ptr<KDL::ChainJntToJacSolver> jacobian_solver_;
   Eigen::VectorXd static_friction_;   // static friction [Nm]
   Eigen::VectorXd viscous_friction_;  // viscous friction [Nm/(rad/s)]
 
