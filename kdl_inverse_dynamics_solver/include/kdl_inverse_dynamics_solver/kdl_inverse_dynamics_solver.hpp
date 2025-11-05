@@ -85,7 +85,7 @@ private:
   unsigned int number_of_joints_;
   KDL::Chain chain_;
   std::unique_ptr<KDL::ChainDynParam> solver_;
-  std::shared_ptr<KDL::ChainJntToJacSolver> jacobian_solver_;
+  std::unique_ptr<KDL::ChainJntToJacSolver> jacobian_solver_;
 
   // Kinematic/dynamic variables are allocated in the `initialize` method for real-time safeness; they are declared with smart pointers because all
   // the methods in this class are `const`, and this would not allow changing their values if they were not declared with pointers
