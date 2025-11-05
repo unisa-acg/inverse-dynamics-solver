@@ -78,14 +78,22 @@ public:
 private:
   /**
    * @brief Verify that the solver has been correctly initialized
+   * @throw UninitializedException if the solver is not initialized
    */
   void verifyInitialization_() const;
+
+  /**
+   * @brief Parse robot description from URDF and retrieves friction parameters
+   * @throw InvalidParameterValueException if the robot description parsing fails
+   */
+  void parseFrictionFromURDF_(const std::string& robot_description);
 
   bool initialized_ = false;
   unsigned int number_of_joints_;
   KDL::Chain chain_;
   std::unique_ptr<KDL::ChainDynParam> solver_;
-  std::shared_ptr<KDL::ChainJntToJacSolver> jacobian_solver_;
+  Eigen::VectorXd static_friction_;   // static friction [Nm]
+  Eigen::VectorXd viscous_friction_;  // viscous friction [Nm/(rad/s)]
 
   // Kinematic/dynamic variables are allocated in the `initialize` method for real-time safeness; they are declared with smart pointers because all
   // the methods in this class are `const`, and this would not allow changing their values if they were not declared with pointers
@@ -95,7 +103,6 @@ private:
   std::unique_ptr<KDL::JntSpaceInertiaMatrix> M_;
   std::unique_ptr<KDL::JntArray> c_;
   std::unique_ptr<KDL::JntArray> g_;
-  Eigen::VectorXd zero_;
 };
 
 }  // namespace kdl_inverse_dynamics_solver
