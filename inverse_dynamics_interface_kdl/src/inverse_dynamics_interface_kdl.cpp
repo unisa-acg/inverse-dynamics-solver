@@ -202,7 +202,7 @@ Eigen::VectorXd InverseDynamicsInterfaceKDL::getTorques(const Eigen::VectorXd& j
                                                         const Eigen::VectorXd& joint_accelerations,
                                                         const Eigen::Matrix<double, 6, 1>& external_wrench) const
 {
-  return inverse_dynamics_solver::InverseDynamicsInterface::getTorques(joint_positions, joint_velocities, joint_accelerations, external_wrench) +
+  return inverse_dynamics_interface::InverseDynamicsInterface::getTorques(joint_positions, joint_velocities, joint_accelerations, external_wrench) +
          getFrictionVector(joint_velocities);
 }
 
@@ -220,7 +220,7 @@ void InverseDynamicsInterfaceKDL::parseFrictionFromURDF_(const std::string& robo
   urdf::Model urdf_model;
   if (!urdf_model.initString(robot_description))
   {
-    throw inverse_dynamics_solver::InvalidParameterValueException("Failed to parse URDF string.");
+    throw inverse_dynamics_interface::InvalidParameterValueException("Failed to parse URDF string.");
   }
 
   static_friction_.resize(number_of_joints_);

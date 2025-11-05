@@ -192,15 +192,14 @@ void InverseDynamicsInterfacePinocchio::verifyInitialization_() const
     throw inverse_dynamics_interface::UninitializedException();
   }
 }
-}  // namespace inverse_dynamics_interface_pinocchio
 
-void InverseDynamicsSolverPinocchio::parseFrictionFromURDF_(const std::string& robot_description)
+void InverseDynamicsInterfacePinocchio::parseFrictionFromURDF_(const std::string& robot_description)
 {
   // Parse the URDF again to extract joint friction coefficients
   urdf::ModelInterfaceSharedPtr urdf_model = urdf::parseURDF(robot_description);
   if (!urdf_model)
   {
-    throw inverse_dynamics_solver::InvalidParameterValueException("Failed to parse URDF string.");
+    throw inverse_dynamics_interface::InvalidParameterValueException("Failed to parse URDF string.");
   }
 
   static_friction_.resize(number_of_joints_);
@@ -221,6 +220,7 @@ void InverseDynamicsSolverPinocchio::parseFrictionFromURDF_(const std::string& r
     }
   }
 }
+}  // namespace inverse_dynamics_interface_pinocchio
 
 #include <pluginlib/class_list_macros.hpp>
 PLUGINLIB_EXPORT_CLASS(inverse_dynamics_interface_pinocchio::InverseDynamicsInterfacePinocchio, inverse_dynamics_interface::InverseDynamicsInterface)
