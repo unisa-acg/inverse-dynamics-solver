@@ -73,10 +73,11 @@ public:
 
   /**
    * @brief Refer to the superclass documentation
+   *
    * @note Calls pinocchio::computeJointJacobians before pinocchio::getFrameJacobian
    * @see https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/namespacepinocchio.html#ae13e2fae5dd6f8845ef31b32d9868a0d
    */
-  Eigen::VectorXd getExternalTorques(const Eigen::VectorXd& joint_positions, const Eigen::Matrix<double, 6, 1>& external_wrench) const override;
+  Eigen::MatrixXd getJacobian(const Eigen::VectorXd& joint_positions) const override;
 
   /**
    * @brief Refer to the superclass documentation
@@ -105,11 +106,12 @@ private:
   pinocchio::Model model_;
   unsigned int number_of_joints_;
   bool initialized_ = false;
-  Eigen::VectorXd static_friction_;   // static friction [Nm]
-  Eigen::VectorXd viscous_friction_;  // viscous friction [Nm/(rad/s)]
 
   // This variables avoid dynamic allocation and ensure real-time safeness
   pinocchio::Data::Matrix6x jacobian_;
+  Eigen::VectorXd friction_;  // coulomb friction [Nm]
+  Eigen::VectorXd damping_;   // viscous friction [Nm/(rad/s)]
+  Eigen::VectorXd zero_;
 };
 
 }  // namespace inverse_dynamics_interface_pinocchio

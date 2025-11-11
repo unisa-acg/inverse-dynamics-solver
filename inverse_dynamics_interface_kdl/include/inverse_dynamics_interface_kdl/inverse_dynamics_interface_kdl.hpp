@@ -72,7 +72,7 @@ public:
    * @brief Refer to the superclass documentation
    * @throw std::runtime_error if the KDL interface fails to compute Jacobian
    */
-  Eigen::VectorXd getExternalTorques(const Eigen::VectorXd& joint_positions, const Eigen::Matrix<double, 6, 1>& external_wrench) const override;
+  Eigen::MatrixXd getJacobian(const Eigen::VectorXd& joint_positions) const override;
 
   /**
    * @brief Refer to the superclass documentation
@@ -99,8 +99,6 @@ private:
   KDL::Chain chain_;
   std::unique_ptr<KDL::ChainDynParam> dynamics_;
   std::unique_ptr<KDL::ChainJntToJacSolver> jacobian_solver_;
-  Eigen::VectorXd static_friction_;   // static friction [Nm]
-  Eigen::VectorXd viscous_friction_;  // viscous friction [Nm/(rad/s)]
 
   // Kinematic/dynamic variables are allocated in the `initialize` method for real-time safeness; they are declared with smart pointers because all
   // the methods in this class are `const`, and this would not allow changing their values if they were not declared with pointers
@@ -110,7 +108,8 @@ private:
   std::unique_ptr<KDL::JntSpaceInertiaMatrix> M_;
   std::unique_ptr<KDL::JntArray> c_;
   std::unique_ptr<KDL::JntArray> g_;
-  Eigen::VectorXd zero_;
+  Eigen::VectorXd friction_;  // coulomb friction [Nm]
+  Eigen::VectorXd damping_;   // viscous friction [Nm/(rad/s)]
 };
 
 }  // namespace inverse_dynamics_interface_kdl

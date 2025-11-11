@@ -3,12 +3,13 @@
  * This module has been developed by the Automatic Control Group
  * of the University of Salerno, Italy.
  *
- * Title:   test_inverse_dynamics_interface_kdl.cpp
+ * Title:   test_kdl_interface_on_2r_planar.cpp
  * Author:  Vincenzo Petrone
  * Org.:    UNISA
- * Date:    May 2, 2024
+ * Date:    Oct 29, 2025
  *
- * This is a test for InverseDynamicsInterfaceKDL.
+ * This is a test for InverseDynamicsInterfaceKDL on the 2R planar
+ * robot.
  *
  * -------------------------------------------------------------------
  */
@@ -35,7 +36,12 @@ class SharedData
   const char* ROBOT_DESCRIPTION_PARAM = "robot_description";
 
   std::shared_ptr<rclcpp::Node> node_;
-  std::string inverse_dynamics_solver_plugin_name_;
+  std::string inverse_dynamics_interface_plugin_name_;
+  std::vector<double> link_lengths_;
+  std::vector<double> com_;
+  std::vector<double> mass_;
+  std::vector<double> inertia_;
+  std::vector<double> gravity_;
   std::string robot_description_;
   std::unique_ptr<InverseDynamicsInterfaceLoader> loader_;
 
@@ -51,12 +57,18 @@ class SharedData
     rclcpp::NodeOptions node_options;
     node_options.automatically_declare_parameters_from_overrides(true);
     node_ = rclcpp::Node::make_shared("inverse_dynamics_interface_kdl_test", node_options);
+    node_ = rclcpp::Node::make_shared("kdl_interface_on_2r_planar_test", node_options);
 
     // Get robot_description parameter
     robot_description_ = node_->get_parameter_or<std::string>(ROBOT_DESCRIPTION_PARAM, "");
 
     // Load parameters
-    ASSERT_TRUE(node_->get_parameter("inverse_dynamics_interface_plugin_name", inverse_dynamics_solver_plugin_name_));
+    ASSERT_TRUE(node_->get_parameter("inverse_dynamics_interface_plugin_name", inverse_dynamics_interface_plugin_name_));
+    ASSERT_TRUE(node_->get_parameter("link_lengths", link_lengths_));
+    ASSERT_TRUE(node_->get_parameter("com", com_));
+    ASSERT_TRUE(node_->get_parameter("mass", mass_));
+    ASSERT_TRUE(node_->get_parameter("inertia", inertia_));
+    ASSERT_TRUE(node_->get_parameter("kdl.gravity", gravity_));
 
     // Initialize inverse dynamics solver class loader
     loader_ = std::make_unique<InverseDynamicsInterfaceLoader>("inverse_dynamics_interface", "inverse_dynamics_interface::InverseDynamicsInterface");
@@ -88,7 +100,12 @@ protected:
   void operator=(const SharedData& data)
   {
     node = data.node_;
-    inverse_dynamics_interface_plugin_name = data.inverse_dynamics_solver_plugin_name_;
+    inverse_dynamics_interface_plugin_name = data.inverse_dynamics_interface_plugin_name_;
+    link_lengths = data.link_lengths_;
+    com = data.com_;
+    mass = data.mass_;
+    inertia = data.inertia_;
+    gravity = data.gravity_;
     robot_description = data.robot_description_;
   }
 
@@ -119,6 +136,11 @@ public:
 
   rclcpp::Node::SharedPtr node;
   std::string inverse_dynamics_interface_plugin_name;
+  std::vector<double> link_lengths;
+  std::vector<double> com;
+  std::vector<double> mass;
+  std::vector<double> inertia;
+  std::vector<double> gravity;
   std::string robot_description;
   pluginlib::UniquePtr<inverse_dynamics_interface::InverseDynamicsInterface> dynamics;
 };
@@ -177,120 +199,91 @@ TEST_F(InverseDynamicsInterfaceKDLTest, FailedInitialization)
 TEST_F(InverseDynamicsInterfaceKDLTest, TestDynamicParameters)
 {
   // Number of joints
-  const unsigned short int N_JOINTS = 6;
+  const unsigned short int N_JOINTS = 2;
 
   // Joint states the dynamics will be evaluated on
-  Eigen::VectorXd joint_positions(N_JOINTS);
-  Eigen::VectorXd joint_velocities(N_JOINTS);
-  Eigen::VectorXd wrench(6);
+  Eigen::VectorXd q(N_JOINTS);
+  Eigen::VectorXd dq(N_JOINTS);
+  Eigen::VectorXd ddq(N_JOINTS);
 
-  // Dynamic components references
-  Eigen::MatrixXd inertia_ref(N_JOINTS, N_JOINTS);
-  Eigen::VectorXd coriolis_ref(N_JOINTS);
-  Eigen::VectorXd gravity_ref(N_JOINTS);
-  Eigen::VectorXd external_torques_ref(N_JOINTS);
+  // Ground-truth for dynamic components
+  Eigen::MatrixXd B_ref(N_JOINTS, N_JOINTS);
+  Eigen::MatrixXd C_ref(N_JOINTS, N_JOINTS);
+  Eigen::VectorXd g_ref(N_JOINTS);
+  Eigen::VectorXd torque_ref(N_JOINTS);
+
+  // Kinematic parameters
+  double a1 = link_lengths[0];
+  double l1 = com[0];
+  double l2 = com[1];
+  double m1 = mass[0];
+  double m2 = mass[1];
+  double I1 = inertia[0];
+  double I2 = inertia[1];
+  double G = -gravity[1];
 
   // Initialize joint positions
-  joint_positions(0) = 1.2947;
-  joint_positions(1) = 0.2911;
-  joint_positions(2) = -1.2749;
-  joint_positions(3) = -2.3696;
-  joint_positions(4) = -2.7176;
-  joint_positions(5) = 0.7307;
+  q(0) = M_PI_4;
+  q(1) = -M_PI / 8;
+  double q1 = q(0);
+  double q2 = q(1);
 
   // Initialize joint velocities
-  joint_velocities(0) = 0.2541;
-  joint_velocities(1) = -0.0215;
-  joint_velocities(2) = 0.0271;
-  joint_velocities(3) = 0.0000;
-  joint_velocities(4) = -0.0319;
-  joint_velocities(5) = -0.0082;
+  dq(0) = -0.5;
+  dq(1) = 0.25;
+  double dq1 = dq(0);
+  double dq2 = dq(1);
 
-  // Initialize wrench
-  wrench(0) = 1.11;
-  wrench(1) = 2.22;
-  wrench(2) = 3.33;
-  wrench(3) = 4.44;
-  wrench(4) = 5.55;
-  wrench(5) = 6.66;
+  // Initialize joint accelerations
+  ddq(0) = 0.25;
+  ddq(1) = -0.125;
+  double ddq1 = ddq(0);
+  double ddq2 = ddq(1);
 
-  // Reference for inertia matrix
-  inertia_ref(0, 0) = 7.9568758917431666;
-  inertia_ref(0, 1) = -0.15356653813893528;
-  inertia_ref(0, 2) = -0.45223815924492533;
-  inertia_ref(0, 3) = -0.04274852903377474;
-  inertia_ref(0, 4) = 0.017768956060114485;
-  inertia_ref(0, 5) = 0.000029405942705745;
-  inertia_ref(1, 0) = inertia_ref(0, 1);
-  inertia_ref(1, 1) = 8.4360889306976752;
-  inertia_ref(1, 2) = 3.1238160066785405;
-  inertia_ref(1, 3) = 0.089001667454824171;
-  inertia_ref(1, 4) = 0.011606396483416548;
-  inertia_ref(1, 5) = -0.00030989423097216068;
-  inertia_ref(2, 0) = inertia_ref(0, 2);
-  inertia_ref(2, 1) = inertia_ref(1, 2);
-  inertia_ref(2, 2) = 2.4987253226594062;
-  inertia_ref(2, 3) = 0.16293116855410714;
-  inertia_ref(2, 4) = 0.027781234621060101;
-  inertia_ref(2, 5) = -0.00030989423097216068;
-  inertia_ref(3, 0) = inertia_ref(0, 3);
-  inertia_ref(3, 1) = inertia_ref(1, 3);
-  inertia_ref(3, 2) = inertia_ref(2, 3);
-  inertia_ref(3, 3) = 0.034761083598807779;
-  inertia_ref(3, 4) = 0.0058899062997593166;
-  inertia_ref(3, 5) = -0.00030989423097216068;
-  inertia_ref(4, 0) = inertia_ref(0, 4);
-  inertia_ref(4, 1) = inertia_ref(1, 4);
-  inertia_ref(4, 2) = inertia_ref(2, 4);
-  inertia_ref(4, 3) = inertia_ref(3, 4);
-  inertia_ref(4, 4) = 0.0048731364912810386;
-  inertia_ref(4, 5) = 0.0;
-  inertia_ref(5, 0) = inertia_ref(0, 5);
-  inertia_ref(5, 1) = inertia_ref(1, 5);
-  inertia_ref(5, 2) = inertia_ref(2, 5);
-  inertia_ref(5, 3) = inertia_ref(3, 5);
-  inertia_ref(5, 4) = inertia_ref(4, 5);
-  inertia_ref(5, 5) = 0.00034000000000000002;
+  // Initialize inertia reference
+  B_ref(0, 0) = I1 + m1 * pow(l1, 2) + I2 + m2 * (pow(a1, 2) + pow(l2, 2) + 2 * a1 * l2 * cos(q2));
+  B_ref(0, 1) = I2 + m2 * (pow(l2, 2) + a1 * l2 * cos(q2));
+  B_ref(1, 0) = B_ref(0, 1);
+  B_ref(1, 1) = I2 + m2 * pow(l2, 2);
 
-  // Reference for Coriolis vector
-  coriolis_ref(0) = 0.026805336072946623;
-  coriolis_ref(1) = -0.098732105348253413;
-  coriolis_ref(2) = -0.20563364273954066;
-  coriolis_ref(3) = -0.016956328985455512;
-  coriolis_ref(4) = -0.0032321654684497785;
-  coriolis_ref(5) = -0.0000005155190684466;
+  // Initialize Coriolis reference
+  double h = -m2 * a1 * l2 * sin(q2);
+  C_ref(0, 0) = h * dq2;
+  C_ref(0, 1) = h * (dq1 + dq2);
+  C_ref(1, 0) = -h * dq1;
+  C_ref(1, 1) = 0.0;
+  Eigen::VectorXd c_ref = C_ref * dq;
 
-  // Reference for gravity vector
-  gravity_ref(0) = 0.0;
-  gravity_ref(1) = -98.259559688518962;
-  gravity_ref(2) = -20.91035165315413;
-  gravity_ref(3) = 0.37230391574247756;
-  gravity_ref(4) = 0.11308941822386981;
-  gravity_ref(5) = 0.0;
+  // Initialize gravity reference
+  g_ref(0) = (m1 * l1 + m2 * a1) * G * cos(q1) + m2 * l2 * G * cos(q1 + q2);
+  g_ref(1) = m2 * l2 * G * cos(q1 + q2);
 
-  // Reference for external torques
-  external_torques_ref(0) = 6.0412455745414819;
-  external_torques_ref(1) = -4.7802333853740384;
-  external_torques_ref(2) = -2.3996941527001958;
-  external_torques_ref(3) = -2.5061192652830306;
-  external_torques_ref(4) = 5.3757640159512885;
-  external_torques_ref(5) = 5.7251548801681595;
+  // Initialize torque reference
+  torque_ref(0) = (I1 + m1 * pow(l1, 2) + I2 + m2 * (pow(a1, 2) + pow(l2, 2) + 2 * a1 * l2 * cos(q2))) * ddq1 +
+                  (I2 + m2 * (pow(l2, 2) + a1 * l2 * cos(q2))) * ddq2 - 2 * m2 * a1 * l2 * sin(q2) * dq1 * dq2 -
+                  m2 * a1 * l2 * sin(q2) * pow(dq2, 2) + (m1 * l1 + m2 * a1) * G * cos(q1) + m2 * l2 * G * cos(q1 + q2);
+  torque_ref(1) = (I2 + m2 * (pow(l2, 2) + a1 * l2 * cos(q2))) * ddq1 + (I2 + m2 * pow(l2, 2)) * ddq2 + m2 * a1 * l2 * sin(q2) * pow(dq1, 2) +
+                  m2 * l2 * G * cos(q1 + q2);
 
-  // Test the solver
+  // Evaluate the solver
   initializeSolver();
   std::tuple<Eigen::MatrixXd, Eigen::VectorXd, Eigen::VectorXd> dyn_params = dynamics->getDynamicParameters(joint_positions, joint_velocities);
-  Eigen::VectorXd external_torques = dynamics->getExternalTorques(joint_positions, wrench);
+  Eigen::MatrixXd B = std::get<0>(dyn_params);
+  Eigen::MatrixXd c = std::get<1>(dyn_params);
+  Eigen::MatrixXd g = std::get<2>(dyn_params);
+  Eigen::VectorXd torque = inverse_dynamics_solver->getTorques(q, dq, ddq);
+
+  // Test the solver
   const double ABS_ERROR = 1e-8;
   for (unsigned int i = 0; i < N_JOINTS; i++)
   {
     for (unsigned int j = 0; j < N_JOINTS; j++)
     {
-      EXPECT_NEAR(std::get<0>(dyn_params)(i, j), inertia_ref(i, j), ABS_ERROR)
-          << "Element (" << i << "," << j << ") of inertia matrix is beyond tolerance";
+      EXPECT_NEAR(B(i, j), B_ref(i, j), ABS_ERROR) << "Element (" << i << "," << j << ") of inertia matrix is beyond tolerance";
     }
-    EXPECT_NEAR(std::get<1>(dyn_params)(i), coriolis_ref(i), ABS_ERROR) << "Element " << i << " of Coriolis vector is beyond tolerance";
-    EXPECT_NEAR(std::get<2>(dyn_params)(i), gravity_ref(i), ABS_ERROR) << "Element " << i << " of gravity vector is beyond tolerance";
-    EXPECT_NEAR(external_torques(i), external_torques_ref(i), ABS_ERROR) << "Element " << i << " of external torques is beyond tolerance";
+    EXPECT_NEAR(c(i), c_ref(i), ABS_ERROR) << "Element " << i << " of Coriolis vector is beyond tolerance";
+    EXPECT_NEAR(g(i), g_ref(i), ABS_ERROR) << "Element " << i << " of gravity vector is beyond tolerance";
+    EXPECT_NEAR(torque(i), torque_ref(i), ABS_ERROR) << "Element " << i << " of torque vector is beyond tolerance";
   }
 }
 

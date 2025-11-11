@@ -14,6 +14,7 @@
  */
 
 // Inverse dynamics solver
+#include <inverse_dynamics_interface/exceptions.hpp>
 #include "inverse_dynamics_interface_ur10/getInertiaCurrents.hpp"
 #include "inverse_dynamics_interface_ur10/getCoriolisCurrents.hpp"
 #include "inverse_dynamics_interface_ur10/getGravityCurrents.hpp"
@@ -63,10 +64,10 @@ Eigen::VectorXd InverseDynamicsInterfaceUR10::getFrictionVector(const Eigen::Vec
   return getDriveGainsMatrix_() * getFrictionCurrents_(joint_velocities);
 }
 
-Eigen::VectorXd InverseDynamicsInterfaceUR10::getExternalTorques(const Eigen::VectorXd&, const Eigen::Matrix<double, 6, 1>&) const
+Eigen::MatrixXd InverseDynamicsInterfaceUR10::getJacobian(const Eigen::VectorXd&) const
 {
-  throw rclcpp::exceptions::UnimplementedError("`getExternalTorques` is not implemented because this plugin can not compute the Jacobian matrix. "
-                                               "Please use an external robot-agnostic library.");
+  throw inverse_dynamics_solver::UnimplementedError(
+      "`getJacobian` is not implemented because this plugin can not compute the Jacobian matrix. Please use an external robot-agnostic library.");
 }
 
 Eigen::VectorXd InverseDynamicsInterfaceUR10::getTorques(const Eigen::VectorXd& joint_positions, const Eigen::VectorXd& joint_velocities,

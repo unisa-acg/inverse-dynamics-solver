@@ -14,38 +14,45 @@ from unittest import TestCase
 
 @pytest.mark.launch_test
 def generate_test_description():
-    # UR10 kinematic description
-    ROBOT_NAME = "ur10"
+    # 3R kinematic description
+    (a1, a2, a3) = (1.0, 0.8, 0.6)
     robot_description = Command(
         [
             FindExecutable(name="xacro"),
             " ",
             PathJoinSubstitution(
-                [FindPackageShare("ur_description"), "urdf", "ur.urdf.xacro"]
+                [
+                    FindPackageShare("planar_3r_description"),
+                    "urdf",
+                    "planar_3r.urdf.xacro",
+                ]
             ),
-            " ",
-            "name:=",
-            ROBOT_NAME,
-            " ",
-            "ur_type:=",
-            ROBOT_NAME,
+            f" a1:={a1} a2:={a2} a3:={a3}",
         ]
     )
 
     # Input arguments
+    DEFAULT_GRAVITY = [0, 0, -9.81]
     parameters = {
         "robot_description": robot_description,
         "inverse_dynamics_interface_plugin_name": "inverse_dynamics_interface_pinocchio/InverseDynamicsInterfacePinocchio",
+        "link_lengths": [a1, a2, a3],
         "ids.root": "base_link",
-        "ids.tip": "tool0",
-        "ids.gravity": [0, 0, -9.81],
+        "ids.tip": "flange",
+        "ids.gravity": DEFAULT_GRAVITY,
+        "empty_root.root": "",
+        "empty_root.tip": "flange",
+        "empty_root.gravity": DEFAULT_GRAVITY,
+        "empty_tip.root": "",  # This setup shall raise a ParameterUninitializedException
+        "empty_tip.tip": "",
+        "empty_tip.gravity": DEFAULT_GRAVITY,
     }
 
     # The node to test
-    test_inverse_dynamics_interface_pinocchio_node = Node(
-        package="inverse_dynamics_interface_pinocchio",
-        executable="inverse_dynamics_interface_pinocchio_test",
-        name="test_inverse_dynamics_interface_pinocchio_node",
+    test_pinocchio_interface_on_3r_planar_node = Node(
+        package="pinocchio_inverse_dynamics_solver",
+        executable="pinocchio_interface_on_3r_planar_test",
+        name="test_pinocchio_interface_on_3r_planar_node",
         parameters=[parameters],
         output="screen",
     )
@@ -54,23 +61,23 @@ def generate_test_description():
     return (
         LaunchDescription(
             [
-                test_inverse_dynamics_interface_pinocchio_node,
+                test_pinocchio_interface_on_3r_planar_node,
                 KeepAliveProc(),
                 ReadyToTest(),
             ]
         ),
         {
-            "test_inverse_dynamics_interface_pinocchio_node": test_inverse_dynamics_interface_pinocchio_node
+            "test_pinocchio_interface_on_3r_planar_node": test_pinocchio_interface_on_3r_planar_node
         },
     )
 
 
 class TestTerminatingProcessStops(TestCase):
     def test_gtest_run_complete(
-        self, proc_info, test_inverse_dynamics_interface_pinocchio_node
+        self, proc_info, test_pinocchio_interface_on_3r_planar_node
     ):
         proc_info.assertWaitForShutdown(
-            process=test_inverse_dynamics_interface_pinocchio_node, timeout=4000.0
+            process=test_pinocchio_interface_on_3r_planar_node, timeout=4000.0
         )
 
 

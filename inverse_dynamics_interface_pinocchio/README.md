@@ -2,7 +2,7 @@
 
 ## Contents
 
-This is an implementation of [`InverseDynamicsInterface`](../inverse_dynamics_interface/README.md) using the general-purpose KDL dynamics solver based on [pluginlib](https://docs.ros.org/en/humble/Tutorials/Beginner-Client-Libraries/Pluginlib.html).
+This is an implementation of [`InverseDynamicsInterface`](../inverse_dynamics_interface/README.md) using the general-purpose Pinocchio dynamics solver based on [pluginlib](https://docs.ros.org/en/humble/Tutorials/Beginner-Client-Libraries/Pluginlib.html).
 
 It uses the [Pinocchio library](https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/devel/doxygen-html/index.html) to read a robot description from a parameter spawned by [xacro](https://github.com/ros/xacro/tree/ros2).
 So, in order to use this library, this parameter must be passed via launch files.

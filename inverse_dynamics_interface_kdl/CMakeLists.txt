@@ -86,21 +86,33 @@ if(BUILD_TESTING)
   find_package(ros_testing REQUIRED)
   find_package(rclcpp REQUIRED)
 
-  # add tests
-  set(TEST_NAME
-      ${PROJECT_NAME}_test
+  # add test on 2R planar
+  ament_add_gtest_executable(kdl_interface_on_2r_planar_test
+                             test/test_kdl_interface_on_2r_planar.cpp
   )
-  ament_add_gtest_executable(${TEST_NAME} test/test_inverse_dynamics_interface_kdl.cpp)
   target_link_libraries(
-    ${TEST_NAME}
+    kdl_interface_on_2r_planar_test
     rclcpp::rclcpp
     pluginlib::pluginlib
     inverse_dynamics_interface::inverse_dynamics_interface_lib
     inverse_dynamics_interface_kdl
   )
-  add_ros_test(test/test_inverse_dynamics_interface_kdl.py)
+  add_ros_test(test/test_kdl_interface_on_2r_planar.py)
 
-  install(TARGETS ${TEST_NAME}
+  # add test on 3R planar
+  ament_add_gtest_executable(kdl_interface_on_3r_planar_test
+                             test/test_kdl_interface_on_3r_planar.cpp
+  )
+  target_link_libraries(
+    kdl_interface_on_3r_planar_test
+    rclcpp::rclcpp
+    pluginlib::pluginlib
+    inverse_dynamics_solver::inverse_dynamics_solver_lib
+    kdl_inverse_dynamics_solver
+  )
+  add_ros_test(test/test_kdl_interface_on_3r_planar.py)
+
+  install(TARGETS kdl_interface_on_3r_planar_test kdl_interface_on_2r_planar_test
           RUNTIME DESTINATION lib/${PROJECT_NAME}
   )
 endif()
