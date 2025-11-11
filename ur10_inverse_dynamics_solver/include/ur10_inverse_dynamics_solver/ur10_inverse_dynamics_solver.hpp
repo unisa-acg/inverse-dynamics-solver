@@ -72,7 +72,7 @@ public:
    * @brief Refer to the superclass documentation
    * @throw rclcpp::exceptions::UnimplementedError
    */
-  Eigen::VectorXd getExternalTorques(const Eigen::VectorXd& joint_positions, const Eigen::Matrix<double, 6, 1>& external_wrench) const override;
+  Eigen::MatrixXd getJacobian(const Eigen::VectorXd& joint_positions) const override;
 
   /**
    * @brief Refer to the superclass documentation

@@ -94,13 +94,24 @@ public:
   virtual Eigen::VectorXd getFrictionVector(const Eigen::VectorXd& joint_velocities) const = 0;
 
   /**
+   * @brief Get the Jacobian
+   *
+   * @param[in] joint_positions joint positions
+   * @return Jacobian matrix, corresponding to J(q)
+   */
+  virtual Eigen::MatrixXd getJacobian(const Eigen::VectorXd& joint_positions) const = 0;
+
+  /**
    * @brief Get the torques due to exerting external contact wrench
    *
-   * @param joint_positions joint positions
-   * @param external_wrench external contact wrench in base frame
-   * @return external torques, corresponding to J(q)*external_wrench
+   * @param[in] joint_positions joint positions
+   * @param[in] external_wrench external contact wrench in base frame
+   * @return external torques, corresponding to J^T(q)*h
    */
-  virtual Eigen::VectorXd getExternalTorques(const Eigen::VectorXd& joint_positions, const Eigen::Matrix<double, 6, 1>& external_wrench) const = 0;
+  virtual Eigen::VectorXd getExternalTorques(const Eigen::VectorXd& joint_positions, const Eigen::Matrix<double, 6, 1>& external_wrench) const
+  {
+    return getJacobian(joint_positions).transpose() * external_wrench;
+  }
 
   /**
    * @brief Get the vector of torques due to inertia, Coriolis effects, gravity, and external wrench
@@ -109,7 +120,7 @@ public:
    * @param[in] joint_velocities joint velocities
    * @param[in] joint_accelerations joint accelerations
    * @param[in] external_wrench external wrench
-   * @return torques vector, corresponding to M(q)*ddq + C(q,dq)*dq + f(dq) + g(q) + J(q)*h
+   * @return torques vector, corresponding to M(q)*ddq + C(q,dq)*dq + f(dq) + g(q) + J^T(q)*h
    */
   virtual Eigen::VectorXd getTorques(const Eigen::VectorXd& joint_positions, const Eigen::VectorXd& joint_velocities,
                                      const Eigen::VectorXd& joint_accelerations,

@@ -73,7 +73,7 @@ public:
    * @brief Refer to the superclass documentation
    * @throw std::runtime_error if the KDL solver fails to compute Jacobian
    */
-  Eigen::VectorXd getExternalTorques(const Eigen::VectorXd& joint_positions, const Eigen::Matrix<double, 6, 1>& external_wrench) const override;
+  Eigen::MatrixXd getJacobian(const Eigen::VectorXd& joint_positions) const override;
 
 private:
   /**

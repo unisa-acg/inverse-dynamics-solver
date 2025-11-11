@@ -14,21 +14,23 @@ from unittest import TestCase
 
 @pytest.mark.launch_test
 def generate_test_description():
-    # UR10 kinematic description
-    ROBOT_NAME = "ur10"
+    # 3R kinematic description
+    (a1, a2) = (1.0, 0.8)
+    (l1, l2) = map(lambda a: 0.5 * a, (a1, a2))
+    (m1, m2) = (50.0, 40.0)
+    (I1, I2) = (10.0, 8.0)
     robot_description = Command(
         [
             FindExecutable(name="xacro"),
             " ",
             PathJoinSubstitution(
-                [FindPackageShare("ur_description"), "urdf", "ur.urdf.xacro"]
+                [
+                    FindPackageShare("planar_2r_description"),
+                    "urdf",
+                    "planar_2r.urdf.xacro",
+                ]
             ),
-            " ",
-            "name:=",
-            ROBOT_NAME,
-            " ",
-            "ur_type:=",
-            ROBOT_NAME,
+            f" a1:={a1} a2:={a2} l1:={l1} l2:={l2} m1:={m1} m2:={m2} I1:={I1} I2:={I2}",
         ]
     )
 
@@ -36,16 +38,20 @@ def generate_test_description():
     parameters = {
         "robot_description": robot_description,
         "inverse_dynamics_solver_plugin_name": "kdl_inverse_dynamics_solver/InverseDynamicsSolverKDL",
+        "link_lengths": [a1, a2],
+        "com": [l1, l2],
+        "mass": [m1, m2],
+        "inertia": [I1, I2],
         "kdl.root": "base_link",
-        "kdl.tip": "tool0",
-        "kdl.gravity": [0, 0, -9.81],
+        "kdl.tip": "flange",
+        "kdl.gravity": [0, -9.81, 0],
     }
 
     # The node to test
-    test_kdl_inverse_dynamics_solver_node = Node(
+    test_kdl_ids_on_2r_planar_node = Node(
         package="kdl_inverse_dynamics_solver",
-        executable="kdl_inverse_dynamics_solver_test",
-        name="test_kdl_inverse_dynamics_solver_node",
+        executable="kdl_ids_on_2r_planar_test",
+        name="test_kdl_ids_on_2r_planar_node",
         parameters=[parameters],
         output="screen",
     )
@@ -54,21 +60,19 @@ def generate_test_description():
     return (
         LaunchDescription(
             [
-                test_kdl_inverse_dynamics_solver_node,
+                test_kdl_ids_on_2r_planar_node,
                 KeepAliveProc(),
                 ReadyToTest(),
             ]
         ),
-        {
-            "test_kdl_inverse_dynamics_solver_node": test_kdl_inverse_dynamics_solver_node
-        },
+        {"test_kdl_ids_on_2r_planar_node": test_kdl_ids_on_2r_planar_node},
     )
 
 
 class TestTerminatingProcessStops(TestCase):
-    def test_gtest_run_complete(self, proc_info, test_kdl_inverse_dynamics_solver_node):
+    def test_gtest_run_complete(self, proc_info, test_kdl_ids_on_2r_planar_node):
         proc_info.assertWaitForShutdown(
-            process=test_kdl_inverse_dynamics_solver_node, timeout=4000.0
+            process=test_kdl_ids_on_2r_planar_node, timeout=4000.0
         )
 
 

@@ -17,6 +17,8 @@
   <depend>pluginlib</depend>
   <depend>rclcpp</depend>
 
+  <exec_depend>planar_2r_description</exec_depend>
+  <exec_depend>planar_3r_description</exec_depend>
   <exec_depend>ur_description</exec_depend>
 
   <test_depend>ament_cmake_gtest</test_depend>
