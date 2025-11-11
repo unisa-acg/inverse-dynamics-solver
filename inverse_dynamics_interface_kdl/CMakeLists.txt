@@ -62,7 +62,7 @@ pluginlib_export_plugin_description_file(
 # building the dll but not consuming it.
 target_compile_definitions(
   inverse_dynamics_interface_kdl
-  PRIVATE "INVERSE_DYNAMICS_SOLVER_KDL_BUILDING_LIBRARY"
+  PRIVATE "INVERSE_DYNAMICS_INTERFACE_KDL_BUILDING_LIBRARY"
 )
 
 # install library
@@ -107,8 +107,8 @@ if(BUILD_TESTING)
     kdl_interface_on_3r_planar_test
     rclcpp::rclcpp
     pluginlib::pluginlib
-    inverse_dynamics_solver::inverse_dynamics_solver_lib
-    kdl_inverse_dynamics_solver
+    inverse_dynamics_interface::inverse_dynamics_interface_lib
+    inverse_dynamics_interface_kdl
   )
   add_ros_test(test/test_kdl_interface_on_3r_planar.py)
 

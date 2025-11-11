@@ -30,7 +30,7 @@
 #include <pinocchio/parsers/urdf.hpp>              // Needed for pinocchio::urdf::buildModelFromXML
 #include <pinocchio/spatial/fwd.hpp>               // Needed for pinocchio::{Force, SE3}
 
-// Inverse Dynamics Solver
+// Inverse Dynamics Interface
 #include <inverse_dynamics_interface/exceptions.hpp>
 #include "inverse_dynamics_interface_pinocchio/inverse_dynamics_interface_pinocchio.hpp"
 
@@ -93,7 +93,7 @@ void InverseDynamicsInterfacePinocchio::initialize(rclcpp::node_interfaces::Node
     gravity = std::vector<double>({ 0, 0, -9.81 });
   }
 
-  // Instantiate the solver
+  // Instantiate the interface
   pinocchio::urdf::buildModelFromXML(robot_description_local, model_);
   data_ = std::make_unique<pinocchio::Data>(model_);
   model_.gravity.linear() = Eigen::Map<const Eigen::Vector3d>(gravity.data());

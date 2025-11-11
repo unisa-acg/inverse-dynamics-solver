@@ -16,16 +16,24 @@
 
 #pragma once
 
+// Standard libraries
 #include <string>
+
+// Eigen
 #include <eigen3/Eigen/Core>
+
+// ROS
+#include <rclcpp/node_interfaces/node_parameters_interface.hpp>
+
+// KDL
 #include <kdl/chain.hpp>
 #include <kdl/chaindynparam.hpp>
 #include <kdl/chainjnttojacsolver.hpp>
 #include <kdl/jntarray.hpp>
 #include <kdl/jacobian.hpp>
 #include <kdl/jntspaceinertiamatrix.hpp>
-#include <rclcpp/node_interfaces/node_parameters_interface.hpp>
 
+// Inverse Dynamics Interface
 #include <inverse_dynamics_interface/inverse_dynamics_interface.hpp>
 
 namespace inverse_dynamics_interface_kdl
@@ -83,8 +91,8 @@ public:
 
 private:
   /**
-   * @brief Verify that the solver has been correctly initialized
-   * @throw UninitializedException if the solver is not initialized
+   * @brief Verify that the interface has been correctly initialized
+   * @throw UninitializedException if the interface is not initialized
    */
   void verifyInitialization_() const;
 

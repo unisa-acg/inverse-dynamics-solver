@@ -32,7 +32,7 @@ source install/setup.bash
 
 ## Demo
 
-You can evaluate the plugin using the [demo](../inverse_dynamics_interface/demo/evaluate_dynamics.cpp), currently configured in a [launch file](./launch/evaluate_solver_franka.launch.py).
+You can evaluate the plugin using the [demo](../inverse_dynamics_interface/demo/evaluate_dynamics.cpp), currently configured in a [launch file](./launch/evaluate_dynamics.launch.py).
 The demo reads a bag file containing a sequence of `sensor_msgs/msg/JointState` messages and, for each state, computes the corresponding torques according to the `InverseDynamicsInterfaceFrankaInria` plugin, which are saved in another bag file.
 
 ### Run the demo

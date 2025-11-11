@@ -27,6 +27,6 @@ typedef rclcpp::exceptions::UnimplementedError UnimplementedError;
 class UninitializedException : public std::runtime_error
 {
 public:
-  UninitializedException() : std::runtime_error("Solver is not initialized") {}
+  UninitializedException() : std::runtime_error("Interface not initialized") {}
 };
 }  // namespace inverse_dynamics_interface

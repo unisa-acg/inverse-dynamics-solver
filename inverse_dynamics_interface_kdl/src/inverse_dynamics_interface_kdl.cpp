@@ -25,7 +25,7 @@
 #include <kdl/solveri.hpp>
 #include <kdl_parser/kdl_parser.hpp>
 
-// Inverse Dynamics Solver
+// Inverse Dynamics Interface
 #include <inverse_dynamics_interface/exceptions.hpp>
 #include "inverse_dynamics_interface_kdl/inverse_dynamics_interface_kdl.hpp"
 

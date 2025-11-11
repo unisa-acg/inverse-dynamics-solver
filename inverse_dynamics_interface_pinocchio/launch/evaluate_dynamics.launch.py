@@ -48,7 +48,7 @@ def launch_setup(_: LaunchContext, *args, **kwargs):
         ]
     )
 
-    # Evaluate solver
+    # Evaluate dynamics
     return [
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(

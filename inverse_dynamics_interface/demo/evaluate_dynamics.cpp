@@ -3,7 +3,7 @@
  * This module has been developed by the Automatic Control Group
  * of the University of Salerno, Italy.
  *
- * Title:   evaluate_solver.cpp
+ * Title:   evaluate_dynamics.cpp
  * Author:  Vincenzo Petrone
  * Org.:    UNISA
  * Date:    Feb 5, 2025
@@ -26,14 +26,14 @@
 #include <urdf/model.hpp>
 #include "inverse_dynamics_interface/inverse_dynamics_interface.hpp"
 
-class EvaluateSolverNode : public rclcpp::Node
+class EvaluateDynamicsNode : public rclcpp::Node
 {
   typedef pluginlib::ClassLoader<inverse_dynamics_interface::InverseDynamicsInterface> InverseDynamicsInterfaceLoader;
 
 public:
-  RCLCPP_SMART_PTR_DEFINITIONS(EvaluateSolverNode)
+  RCLCPP_SMART_PTR_DEFINITIONS(EvaluateDynamicsNode)
 
-  EvaluateSolverNode(const std::string& node_name, const rclcpp::NodeOptions options = rclcpp::NodeOptions()) : Node(node_name, options)
+  EvaluateDynamicsNode(const std::string& node_name, const rclcpp::NodeOptions options = rclcpp::NodeOptions()) : Node(node_name, options)
   {
     // Read parameters
     std::string plugin_name = this->get_parameter("plugin_name").as_string();
@@ -253,7 +253,7 @@ int main(int argc, char** argv)
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
   options.automatically_declare_parameters_from_overrides(true);
-  EvaluateSolverNode::SharedPtr processor = EvaluateSolverNode::make_shared("evaluate_solver_node", options);
+  EvaluateDynamicsNode::SharedPtr processor = EvaluateDynamicsNode::make_shared("evaluate_dynamics_node", options);
   processor->processBag();
   rclcpp::shutdown();
   return 0;

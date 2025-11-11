@@ -44,7 +44,7 @@ def launch_setup(_: LaunchContext, *args, **kwargs):
         [FindPackageShare("inverse_dynamics_interface_kdl"), "bagfiles", input_bag]
     )
 
-    # Evaluate solver
+    # Evaluate dynamics
     return [
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(

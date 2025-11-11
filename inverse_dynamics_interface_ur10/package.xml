@@ -3,7 +3,7 @@
 <package format="3">
   <name>inverse_dynamics_interface_ur10</name>
   <version>1.0.1</version>
-  <description>A C++ library implementing the inverse dynamics solver for the UR10 real robot.</description>
+  <description>A C++ library implementing the inverse dynamics interface for the UR10 real robot.</description>
   <url>https://github.com/unisa-acg/inverse-dynamics-solver.git</url>
   <maintainer email="eferrentino@unisa.it">Enrico Ferrentino</maintainer>
   <author email="vipetrone@unisa.it">Vincenzo Petrone</author>

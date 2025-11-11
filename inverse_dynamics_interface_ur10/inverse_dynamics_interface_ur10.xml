@@ -2,6 +2,6 @@
   <class base_class_type="inverse_dynamics_interface::InverseDynamicsInterface"
          type="inverse_dynamics_interface_ur10::InverseDynamicsInterfaceUR10"
          name="inverse_dynamics_interface_ur10/InverseDynamicsInterfaceUR10">
-    <description>This is a plugin implementing an inverse dynamics solver for the UR10 real robot.</description>
+    <description>This is a plugin implementing an inverse dynamics interface for the UR10 real robot.</description>
   </class>
 </library>

@@ -8,10 +8,10 @@
  * Org.:    UNISA
  * Date:    Dec 3, 2019
  *
- * This class is a plugin interface for dynamic solvers, that are
- * solvers providing the dynamic parameters of a given robot, namely
- * inertia matrix, Coriolis vector, gravity vector and friction
- * vector.
+ * This class is a plugin interface for dynamic interfaces providing
+ * the dynamic components of a given robot, namely inertia matrix,
+ * Coriolis vector, gravity vector, friction vector, and external
+ * torques
  *
  * -------------------------------------------------------------------
  */

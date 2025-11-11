@@ -3,12 +3,12 @@
  * This module has been developed by the Automatic Control Group
  * of the University of Salerno, Italy.
  *
- * Title:   test_pinocchio_ids_on_2r_planar.cpp
+ * Title:   test_kdl_interface_on_2r_planar.cpp
  * Author:  Vincenzo Petrone
  * Org.:    UNISA
  * Date:    Oct 29, 2025
  *
- * This is a test for InverseDynamicsSolverPinocchio on the 2R planar
+ * This is a test for InverseDynamicsInterfaceKDL on the 2R planar
  * robot.
  *
  * -------------------------------------------------------------------
@@ -23,15 +23,15 @@
 // Gtest
 #include <gtest/gtest.h>
 
-// Inverse Dynamics Solver
-#include <inverse_dynamics_solver/inverse_dynamics_solver.hpp>
-#include <inverse_dynamics_solver/exceptions.hpp>
+// Inverse Dynamics Interface
+#include <inverse_dynamics_interface/inverse_dynamics_interface.hpp>
+#include <inverse_dynamics_interface/exceptions.hpp>
 
 // This class shares parameters and data across all tests
 class SharedData
 {
-  typedef pluginlib::ClassLoader<inverse_dynamics_solver::InverseDynamicsSolver> InverseDynamicsSolverLoader;
-  friend class InverseDynamicsSolverPinocchio;
+  typedef pluginlib::ClassLoader<inverse_dynamics_interface::InverseDynamicsInterface> InverseDynamicsInterfaceLoader;
+  friend class InverseDynamicsInterfaceKDLTest;
 
   const char* ROBOT_DESCRIPTION_PARAM = "robot_description";
 
@@ -43,7 +43,7 @@ class SharedData
   std::vector<double> inertia_;
   std::vector<double> gravity_;
   std::string robot_description_;
-  std::unique_ptr<InverseDynamicsSolverLoader> inverse_dynamics_solver_loader_;
+  std::unique_ptr<InverseDynamicsInterfaceLoader> loader_;
 
   SharedData(const SharedData&) = delete;  // this is a singleton
   SharedData()
@@ -56,29 +56,29 @@ class SharedData
     // Instantiate the node
     rclcpp::NodeOptions node_options;
     node_options.automatically_declare_parameters_from_overrides(true);
-    node_ = rclcpp::Node::make_shared("pinocchio_ids_on_2r_planar_test", node_options);
+    node_ = rclcpp::Node::make_shared("inverse_dynamics_interface_kdl_test", node_options);
+    node_ = rclcpp::Node::make_shared("kdl_interface_on_2r_planar_test", node_options);
 
     // Get robot_description parameter
     robot_description_ = node_->get_parameter_or<std::string>(ROBOT_DESCRIPTION_PARAM, "");
 
     // Load parameters
-    ASSERT_TRUE(node_->get_parameter("inverse_dynamics_solver_plugin_name", inverse_dynamics_interface_plugin_name_));
+    ASSERT_TRUE(node_->get_parameter("inverse_dynamics_interface_plugin_name", inverse_dynamics_interface_plugin_name_));
     ASSERT_TRUE(node_->get_parameter("link_lengths", link_lengths_));
     ASSERT_TRUE(node_->get_parameter("com", com_));
     ASSERT_TRUE(node_->get_parameter("mass", mass_));
     ASSERT_TRUE(node_->get_parameter("inertia", inertia_));
-    ASSERT_TRUE(node_->get_parameter("ids.gravity", gravity_));
+    ASSERT_TRUE(node_->get_parameter("kdl.gravity", gravity_));
 
-    // Initialize inverse dynamics solver class loader
-    inverse_dynamics_solver_loader_ =
-        std::make_unique<InverseDynamicsSolverLoader>("inverse_dynamics_solver", "inverse_dynamics_solver::InverseDynamicsSolver");
-    ASSERT_TRUE(bool(inverse_dynamics_solver_loader_)) << "Failed to instantiate ClassLoader<InverseDynamicsSolver>";
+    // Initialize inverse dynamics interface class loader
+    loader_ = std::make_unique<InverseDynamicsInterfaceLoader>("inverse_dynamics_interface", "inverse_dynamics_interface::InverseDynamicsInterface");
+    ASSERT_TRUE(bool(loader_)) << "Failed to instantiate ClassLoader<InverseDynamicsInterface>";
   }
 
 public:
-  pluginlib::UniquePtr<inverse_dynamics_solver::InverseDynamicsSolver> createUniqueInstance(const std::string& name) const
+  pluginlib::UniquePtr<inverse_dynamics_interface::InverseDynamicsInterface> createUniqueInstance(const std::string& name) const
   {
-    return inverse_dynamics_solver_loader_->createUniqueInstance(name);
+    return loader_->createUniqueInstance(name);
   }
 
   static const SharedData& instance()
@@ -89,18 +89,18 @@ public:
   static void release()
   {
     SharedData& shared = const_cast<SharedData&>(instance());
-    shared.inverse_dynamics_solver_loader_.reset();
+    shared.loader_.reset();
   }
 };
 
 // This class implements the tests
-class InverseDynamicsSolverPinocchio : public ::testing::Test
+class InverseDynamicsInterfaceKDLTest : public ::testing::Test
 {
 protected:
   void operator=(const SharedData& data)
   {
     node = data.node_;
-    inverse_dynamics_solver_plugin_name = data.inverse_dynamics_interface_plugin_name_;
+    inverse_dynamics_interface_plugin_name = data.inverse_dynamics_interface_plugin_name_;
     link_lengths = data.link_lengths_;
     com = data.com_;
     mass = data.mass_;
@@ -113,91 +113,90 @@ protected:
   {
     *this = SharedData::instance();
 
-    // Load Pinocchio inverse dynamics solver plugin
-    RCLCPP_INFO_STREAM(node->get_logger(), "Loading " << inverse_dynamics_solver_plugin_name);
-    inverse_dynamics_solver = SharedData::instance().createUniqueInstance(inverse_dynamics_solver_plugin_name);
-    ASSERT_TRUE(bool(inverse_dynamics_solver)) << "Failed to load plugin: " << inverse_dynamics_solver_plugin_name;
-    RCLCPP_INFO_STREAM(node->get_logger(), inverse_dynamics_solver_plugin_name << " loaded.");
+    // Load KDL inverse dynamics interface plugin
+    RCLCPP_INFO_STREAM(node->get_logger(), "Loading " << inverse_dynamics_interface_plugin_name);
+    dynamics = SharedData::instance().createUniqueInstance(inverse_dynamics_interface_plugin_name);
+    ASSERT_TRUE(bool(dynamics)) << "Failed to load plugin: " << inverse_dynamics_interface_plugin_name;
+    RCLCPP_INFO_STREAM(node->get_logger(), inverse_dynamics_interface_plugin_name << " loaded.");
   }
 
 public:
-  void initializeSolver(const std::string& robot_description_param = "")
+  void initializeInterface(const std::string& robot_description_param = "")
   {
     if (robot_description_param.empty())
     {
-      ASSERT_NO_THROW(inverse_dynamics_solver->initialize(node->get_node_parameters_interface(), "ids"));
+      ASSERT_NO_THROW(dynamics->initialize(node->get_node_parameters_interface(), "kdl"));
     }
     else
     {
-      ASSERT_NO_THROW(inverse_dynamics_solver->initialize(node->get_node_parameters_interface(), "ids", robot_description_param));
+      ASSERT_NO_THROW(dynamics->initialize(node->get_node_parameters_interface(), "kdl", robot_description_param));
     }
-    RCLCPP_INFO_STREAM(node->get_logger(), inverse_dynamics_solver_plugin_name << " initialized.");
+    RCLCPP_INFO_STREAM(node->get_logger(), inverse_dynamics_interface_plugin_name << " initialized.");
   }
 
   rclcpp::Node::SharedPtr node;
-  std::string inverse_dynamics_solver_plugin_name;
+  std::string inverse_dynamics_interface_plugin_name;
   std::vector<double> link_lengths;
   std::vector<double> com;
   std::vector<double> mass;
   std::vector<double> inertia;
   std::vector<double> gravity;
   std::string robot_description;
-  pluginlib::UniquePtr<inverse_dynamics_solver::InverseDynamicsSolver> inverse_dynamics_solver;
+  pluginlib::UniquePtr<inverse_dynamics_interface::InverseDynamicsInterface> dynamics;
 };
 
 // Tests
 // Test 1
 /**
- * @brief verifies that the solver can be initialized when the robot description is passed as an input argument
+ * @brief verifies that the interface can be initialized when the robot description is passed as an input argument
  */
-TEST_F(InverseDynamicsSolverPinocchio, TestInitializationFromInputArgument)
+TEST_F(InverseDynamicsInterfaceKDLTest, TestInitializationFromInputArgument)
 {
-  initializeSolver(robot_description);
+  initializeInterface(robot_description);
 }
 
 // Test 2
 /**
- * @brief verifies that the solver can be initialized when the robot description is passed through the node parameters interface
+ * @brief verifies that the interface can be initialized when the robot description is passed through the node parameters interface
  */
-TEST_F(InverseDynamicsSolverPinocchio, TestInitializationFromNodeParametersInterface)
+TEST_F(InverseDynamicsInterfaceKDLTest, TestInitializationFromNodeParametersInterface)
 {
-  initializeSolver();
+  initializeInterface();
 }
 
 // Test 3
 /**
- * @brief verifies that the solver can be initialized when the root link is empty
+ * @brief verifies that the interface can be initialized when the root link is empty
  */
-TEST_F(InverseDynamicsSolverPinocchio, TestInitializationWithEmptyRoot)
+TEST_F(InverseDynamicsInterfaceKDLTest, TestInitializationWithEmptyRoot)
 {
   std::string root = node->get_parameter("empty_root.root").as_string();
   std::string tip = node->get_parameter("empty_root.tip").as_string();
   RCLCPP_INFO_STREAM(node->get_logger(),
-                     "Initializing " << inverse_dynamics_solver_plugin_name << " with root '" << root << "' and tip '" << tip << "'.");
-  ASSERT_NO_THROW(inverse_dynamics_solver->initialize(node->get_node_parameters_interface(), "empty_root"));
-  RCLCPP_INFO_STREAM(node->get_logger(), inverse_dynamics_solver_plugin_name << " initialized.");
+                     "Initializing " << inverse_dynamics_interface_plugin_name << " with root '" << root << "' and tip '" << tip << "'.");
+  ASSERT_NO_THROW(dynamics->initialize(node->get_node_parameters_interface(), "empty_root"));
+  RCLCPP_INFO_STREAM(node->get_logger(), inverse_dynamics_interface_plugin_name << " initialized.");
 }
 
 // Test 4
 /**
- * @brief verifies that the solver can not be initialized when the tip link is empty
+ * @brief verifies that the interface can not be initialized when the tip link is empty
  */
-TEST_F(InverseDynamicsSolverPinocchio, FailedInitialization)
+TEST_F(InverseDynamicsInterfaceKDLTest, FailedInitialization)
 {
   std::string root = node->get_parameter("empty_tip.root").as_string();
   std::string tip = node->get_parameter("empty_tip.tip").as_string();
   RCLCPP_INFO_STREAM(node->get_logger(),
-                     "Initializing " + inverse_dynamics_solver_plugin_name << " with root '" << root << "' and tip '" << tip << "'.");
-  ASSERT_THROW(inverse_dynamics_solver->initialize(node->get_node_parameters_interface(), "empty_tip"),
-               inverse_dynamics_solver::ParameterUninitializedException);
-  RCLCPP_ERROR_STREAM(node->get_logger(), inverse_dynamics_solver_plugin_name << " not initialized.");
+                     "Initializing " + inverse_dynamics_interface_plugin_name << " with root '" << root << "' and tip '" << tip << "'.");
+  ASSERT_THROW(dynamics->initialize(node->get_node_parameters_interface(), "empty_tip"), inverse_dynamics_interface::ParameterUninitializedException);
+  RCLCPP_ERROR_STREAM(node->get_logger(), inverse_dynamics_interface_plugin_name << " not initialized.");
 }
 
 // Test 5
 /**
  * @brief verifies that method getDynamicParameters returns the expected values
  */
-TEST_F(InverseDynamicsSolverPinocchio, TestDynamicParameters)
+TEST_F(InverseDynamicsInterfaceKDLTest, TestDynamicParameters)
 {
   // Number of joints
   const unsigned short int N_JOINTS = 2;
@@ -266,15 +265,15 @@ TEST_F(InverseDynamicsSolverPinocchio, TestDynamicParameters)
   torque_ref(1) = (I2 + m2 * (pow(l2, 2) + a1 * l2 * cos(q2))) * ddq1 + (I2 + m2 * pow(l2, 2)) * ddq2 + m2 * a1 * l2 * sin(q2) * pow(dq1, 2) +
                   m2 * l2 * G * cos(q1 + q2);
 
-  // Evaluate the solver
-  initializeSolver();
-  std::tuple<Eigen::MatrixXd, Eigen::VectorXd, Eigen::VectorXd> dyn_params = inverse_dynamics_solver->getDynamicParameters(q, dq);
+  // Evaluate the dynamics
+  initializeInterface();
+  std::tuple<Eigen::MatrixXd, Eigen::VectorXd, Eigen::VectorXd> dyn_params = dynamics->getDynamicParameters(q, dq);
   Eigen::MatrixXd B = std::get<0>(dyn_params);
   Eigen::MatrixXd c = std::get<1>(dyn_params);
   Eigen::MatrixXd g = std::get<2>(dyn_params);
-  Eigen::VectorXd torque = inverse_dynamics_solver->getTorques(q, dq, ddq);
+  Eigen::VectorXd torque = dynamics->getTorques(q, dq, ddq);
 
-  // Test the solver
+  // Test the dynamics
   const double ABS_ERROR = 1e-8;
   for (unsigned int i = 0; i < N_JOINTS; i++)
   {

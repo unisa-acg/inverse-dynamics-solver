@@ -2,11 +2,11 @@
 
 ## Contents
 
-This is an implementation of [`InverseDynamicsInterface`](../inverse_dynamics_interface/README.md) using the general-purpose Pinocchio dynamics solver based on [pluginlib](https://docs.ros.org/en/humble/Tutorials/Beginner-Client-Libraries/Pluginlib.html).
+This is an implementation of [`InverseDynamicsInterface`](../inverse_dynamics_interface/README.md) using the general-purpose Pinocchio dynamics implementation based on [pluginlib](https://docs.ros.org/en/rolling/Tutorials/Beginner-Client-Libraries/Pluginlib.html).
 
 It uses the [Pinocchio library](https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/devel/doxygen-html/index.html) to read a robot description from a parameter spawned by [xacro](https://github.com/ros/xacro/tree/ros2).
 So, in order to use this library, this parameter must be passed via launch files.
-Please refer to the [test section](#how-to-test), specifically to the [test launch file](./test/test_inverse_dynamics_interface_pinocchio.py), for an example, and to [the official guide](https://docs.ros.org/en/humble/Tutorials/Intermediate/Launch/Launch-Main.html) to know how to pass parameters.
+Please refer to the [test section](#how-to-test), specifically to the [test launch files](#how-to-test), for an example, and to [the official guide](https://docs.ros.org/en/rolling/Tutorials/Intermediate/Launch/Launch-Main.html) to know how to pass parameters.
 
 ## How to build
 
@@ -19,8 +19,8 @@ source install/setup.bash
 
 ## Demo
 
-You can evaluate the solver using the [demo](../inverse_dynamics_interface/demo/evaluate_dynamics.cpp), currently configured in a launch file for the [UR10](./launch/evaluate_dynamics.launch.py) robot.
-The demo reads a bag file containing a sequence of `sensor_msgs/msg/JointState` messages and, for each state, computes the corresponding torques according to the `InverseDynamicsSolverPinocchio` solver, which are saved in another bag file.
+You can evaluate the dynamics using the [demo](../inverse_dynamics_interface/demo/evaluate_dynamics.cpp), currently configured in a launch file for the [UR10](./launch/evaluate_dynamics.launch.py) robot.
+The demo reads a bag file containing a sequence of `sensor_msgs/msg/JointState` messages and, for each state, computes the corresponding torques according to the `InverseDynamicsInterfacePinocchio` class, which are saved in another bag file.
 
 ### Run the demo
 
@@ -46,7 +46,10 @@ Please refer to [the parent class documentation](../inverse_dynamics_interface/R
 This library is tested against a simulated UR10 robot.
 The kinematic description is taken from UR's official package, [ur_description](https://github.com/UniversalRobots/Universal_Robots_ROS2_Description/tree/rolling).
 
-The tests consist in checking that, given a fixed joint position and velocity state, the Pinocchio solver returns the expected values for the dynamic components.
+The tests consist in checking that, given a fixed joint position and velocity state, the Pinocchio interface returns the expected values for the dynamic components.
+The expected values are not hardcoded, but extracted from formulas available in the following book:
+
+> 'Robotics: modelling, planning and control' (2009) by B. Siciliano, L. Sciavicco, L. Villani, G. Oriolo, 1st ed., Springer, sections 2.9.1 and 7.3.2. DOI: [https://doi.org/10.1007/978-1-84628-642-1](https://doi.org/10.1007/978-1-84628-642-1)
 
 To build and execute the test, run the following:
 
@@ -63,10 +66,11 @@ colcon test-result --all --verbose
 The expected output should be the following:
 
 ```text
-build/inverse_dynamics_interface_pinocchio/Testing/20251010-0811/Test.xml: 1 test, 0 errors, 0 failures, 0 skipped
-build/inverse_dynamics_interface_pinocchio/test_results/inverse_dynamics_interface_pinocchio/test_test_pinocchio_inverse_dynamics_solver.py.xunit.xml: 2 tests, 0 errors, 0 failures, 0 skipped
+build/inverse_dynamics_interface_interface/Testing/20251111-1319/Test.xml: 2 tests, 0 errors, 0 failures, 0 skipped
+build/inverse_dynamics_interface_interface/test_results/inverse_dynamics_interface_interface/test_test_kdl_interface_on_2r_planar.py.xunit.xml: 2 tests, 0 errors, 0 failures, 0 skipped
+build/inverse_dynamics_interface_interface/test_results/inverse_dynamics_interface_interface/test_test_kdl_interface_on_3r_planar.py.xunit.xml: 2 tests, 0 errors, 0 failures, 0 skipped
 
-Summary: 3 tests, 0 errors, 0 failures, 0 skipped
+Summary: 6 tests, 0 errors, 0 failures, 0 skipped
 ```
 
 ### Optional analysis
@@ -80,7 +84,7 @@ colcon test --packages-select inverse_dynamics_interface_pinocchio --event-handl
 The expected output should contain the following line:
 
 ```text
-100% tests passed, 0 tests failed out of 1
+100% tests passed, 0 tests failed out of 2
 ```
 
 ### Comparison with KDL
@@ -89,15 +93,15 @@ This test also assess that the torques computed with `getDynamicComponents` and 
 
 ## Configuration
 
-The solver can be configured with the following parameters, to be passed via the node parameters interface:
+The interface can be configured with the following parameters, to be passed via the node parameters interface:
 
 * `robot_description`: a string representing the URDF robot description;
 * `tip`: the tip of the kinematic chain to solve the dynamics for
 * `gravity`: a 3x1 vector of real numbers describing the gravity effect in `root` frame
     * defaults to `[0, 0, -9.81]`
 
-The [test launch file](./test/test_inverse_dynamics_interface_pinocchio.py) provides an example on how the solver is initialized and configured.
-In the following snippet, the user is choosing the solver's `tip` and `gravity` parameters, and is passing the URDF `robot_description` to the node initializing the solver.
+The [test launch file](./test/test_inverse_dynamics_interface_pinocchio.py) provides an example on how the class is initialized and configured.
+In the following snippet, the user is choosing the interface's `tip` and `gravity` parameters, and is passing the URDF `robot_description` to the node initializing the class.
 
 ```python
 # Input arguments
@@ -128,22 +132,22 @@ node = rclcpp::Node::make_shared("inverse_dynamics_interface_pinocchio_test", no
 // Get robot_description parameter
 robot_description_ = node->get_parameter_or<std::string>("robot_description", "");
 // Load parameters
-node->get_parameter("inverse_dynamics_interface_plugin_name", inverse_dynamics_solver_plugin_name_);
+node->get_parameter("inverse_dynamics_interface_plugin_name", inverse_dynamics_interface_plugin_name);
 ```
 
-... loads the solver via `pluginlib`...
+... loads the interface via `pluginlib`...
 
 ```cpp
-// Initialize inverse dynamics solver class loader
-loader = std::make_unique<InverseDynamicsSolverLoader>("inverse_dynamics_interface", "inverse_dynamics_interface::InverseDynamicsInterface");
-// Load KDL inverse dynamics solver plugin
-dynamics = loader->createUniqueInstance(inverse_dynamics_solver_plugin_name_);
+// Initialize inverse dynamics interface class loader
+loader = std::make_unique<InverseDynamicsInterfaceLoader>("inverse_dynamics_interface", "inverse_dynamics_interface::InverseDynamicsInterface");
+// Load KDL inverse dynamics interface plugin
+dynamics = loader->createUniqueInstance(inverse_dynamics_interface_plugin_name);
 ```
 
-... and initializes the solver:
+... and initializes the interface:
 
 ```cpp
-// Initialize inverse dynamics solver
+// Initialize inverse dynamics interface
 dynamics->initialize(node->get_node_parameters_interface(), "ids", robot_description_);  // or ...
 dynamics->initialize(node->get_node_parameters_interface(), "ids");
 ```

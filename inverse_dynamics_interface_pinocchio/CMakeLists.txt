@@ -107,8 +107,8 @@ if(BUILD_TESTING)
     pinocchio_interface_on_3r_planar_test
     rclcpp::rclcpp
     pluginlib::pluginlib
-    inverse_dynamics_solver::inverse_dynamics_solver_lib
-    pinocchio_inverse_dynamics_solver
+    inverse_dynamics_interface::inverse_dynamics_interface_lib
+    inverse_dynamics_interface_pinocchio
   )
   add_ros_test(test/test_pinocchio_interface_on_3r_planar.py)
 

@@ -13,7 +13,7 @@ Date:     Feb 2, 2025
 This script reads a bag file containing a sequence of joint state
 messages from two topics, which include ground truth and computed
 torques. The former are measured from the robot, while the latter are
-estimated by the inverse dynamics solver.
+estimated by the inverse dynamics interface.
 
 ----------------------------------------------------------------------
 """

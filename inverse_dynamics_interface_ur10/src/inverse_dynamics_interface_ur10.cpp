@@ -13,7 +13,6 @@
  * -------------------------------------------------------------------
  */
 
-// Inverse dynamics solver
 #include <inverse_dynamics_interface/exceptions.hpp>
 #include "inverse_dynamics_interface_ur10/getInertiaCurrents.hpp"
 #include "inverse_dynamics_interface_ur10/getCoriolisCurrents.hpp"
@@ -66,7 +65,7 @@ Eigen::VectorXd InverseDynamicsInterfaceUR10::getFrictionVector(const Eigen::Vec
 
 Eigen::MatrixXd InverseDynamicsInterfaceUR10::getJacobian(const Eigen::VectorXd&) const
 {
-  throw inverse_dynamics_solver::UnimplementedError(
+  throw inverse_dynamics_interface::UnimplementedError(
       "`getJacobian` is not implemented because this plugin can not compute the Jacobian matrix. Please use an external robot-agnostic library.");
 }
 

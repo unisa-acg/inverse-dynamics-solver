@@ -1,8 +1,8 @@
 # inverse_dynamics_interface
 
-This package provides a superclass for a generic inverse dynamics solver.
+This package provides a superclass for a generic inverse dynamics interface.
 
-!["Inverse dynamics solver block scheme"](./doc/media/inverse_dynamics_interface.png "Inverse dynamics solver block scheme")
+!["Inverse dynamics interface block scheme"](./doc/media/inverse_dynamics_interface.png "Inverse dynamics interface block scheme")
 
 Given a dynamic model in the form `M(q) * ddq + C(q,dq) * dq + f(dq) + g(q) + J(q) * h = tau`, this library can return the following values:
 
@@ -18,7 +18,7 @@ Please check the [InverseDynamicsInterface](./include/inverse_dynamics_interface
 
 ## Usage
 
-A plugin implementing the interface must be initialized before usage, via the [`initialize()`](./include/inverse_dynamics_interface/inverse_dynamics_interface.hpp#L0047) method.
+A plugin implementing the interface must be initialized before usage, via the [`initialize()`](./include/inverse_dynamics_interface/inverse_dynamics_interface.hpp#L0046) method.
 This method accepts a `NodeParametersInterface` through which the [configuration parameters](#configuration) must be passed under the correct namespace, together with the `robot_description` (in string format) the dynamics shall be solved for.
 Please refer to the method documentation for more information.
 
@@ -26,21 +26,21 @@ Please refer to the method documentation for more information.
 
 The plugin can be (optionally) configured with parameters, to pass via the node parameters interface.
 The necessity and effectiveness of these parameters depend on the specific implementation.
-For the time being, only the [KDL based plugin](../kdl_inverse_dynamics_solver/include/kdl_inverse_dynamics_solver/kdl_inverse_dynamics_solver.hpp) is affected by this configuration.
-Thus, please refer to [the related documentation](../kdl_inverse_dynamics_solver/README.md#configuration) for an example on how these parameters are configured.
+For the time being, only the [KDL-based plugin](../inverse_dynamics_interface_kdl/include/inverse_dynamics_interface_kdl/inverse_dynamics_interface_kdl.hpp) and the [Pinocchio-based plugin](../inverse_dynamics_interface_pinocchio/include/inverse_dynamics_interface_pinocchio/inverse_dynamics_interface_pinocchio.hpp) are affected by this configuration.
+Thus, please refer to the related documentation ([KDL](../inverse_dynamics_interface_kdl/README.md#configuration) and [Pinocchio](../inverse_dynamics_interface_pinocchio/README.md#configuration)) for examples on how these parameters are configured.
 
 ## Demo
 
-Demos and tests are available with concrete implementations of this library: please check [InverseDynamicsSolverKDL](../kdl_inverse_dynamics_solver/README.md#demo), [InverseDynamicsSolverUR10](../ur10_inverse_dynamics_solver/README.md#demo) or [InverseDynamicsSolverFrankaInria](../franka_inria_inverse_dynamics_solver/README.md#demo).
+Demos and tests are available with concrete implementations of this library: please check [InverseDynamicsInterfaceKDL](../inverse_dynamics_interface_kdl/README.md#demo), [InverseDynamicsInterfacePinocchio](../inverse_dynamics_interface_pinocchio/README.md#demo), [InverseDynamicsInterfaceUR10](../inverse_dynamics_interface_ur10/README.md#demo) or [InverseDynamicsInterfaceFrankaInria](../inverse_dynamics_interface_franka_inria/README.md#demo).
 
-### Evaluate the solver
+### Evaluate the dynamics
 
-You can evaluate the solver computing the torques corresponding to a sequence of `sensor_msgs/msg/JointState` messages by launching the [`evaluate_dynamics`](./launch/evaluate_dynamics.launch.py) demo.
-Please refer to the launch files in [`kdl_inverse_dynamics_solver`](../kdl_inverse_dynamics_solver/launch/evaluate_solver_kdl_ur10.launch.py), [`ur10_inverse_dynamics_solver`](../ur10_inverse_dynamics_solver/launch/evaluate_solver_ur10.launch.py) or [`franka_inria_inverse_dynamics_solver`](../franka_inria_inverse_dynamics_solver/launch/evaluate_solver_franka.launch.py) to see how this demo can be configured with different plugins.
+You can evaluate the dynamics computing the torques corresponding to a sequence of `sensor_msgs/msg/JointState` messages by launching the [`evaluate_dynamics`](./launch/evaluate_dynamics.launch.py) demo.
+Please refer to the launch files in [`inverse_dynamics_interface_kdl`](../inverse_dynamics_interface_kdl/launch/evaluate_dynamics.launch.py), [`inverse_dynamics_interface_pinocchio`](../inverse_dynamics_interface_pinocchio/launch/evaluate_dynamics.launch.py),  [`inverse_dynamics_interface_ur10`](../inverse_dynamics_interface_ur10/launch/evaluate_dynamics.launch.py) or [`inverse_dynamics_interface_franka_inria`](../inverse_dynamics_interface_franka_inria/launch/evaluate_dynamics.launch.py) to see how this demo can be configured with different plugins.
 
 #### Visualize the results
 
-Run the [plot_joint_state](./scripts/plot_joint_state.py) Python script to assess the performance of the solver, i.e. the comparison between ground truth (GT) and computed torques, where the GT torques are retrieved from the measured joint states, as mentioned above:
+Run the [plot_joint_state](./scripts/plot_joint_state.py) Python script to assess the performance of the dynamics evaluation, i.e. the comparison between ground truth (GT) and computed torques, where the GT torques are retrieved from the measured joint states, as mentioned above:
 
 ```bash
 ros2 run inverse_dynamics_interface plot_joint_state.py -b BAG_FILES [BAG_FILES ...] -o OUTPUT_DIR

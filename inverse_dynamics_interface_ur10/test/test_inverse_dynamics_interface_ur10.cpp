@@ -3,7 +3,7 @@
  * This module has been developed by the Automatic Control Group
  * of the University of Salerno, Italy.
  *
- * Title:   test_ur10_inverse_dynamics_solver.cpp
+ * Title:   test_inverse_dynamics_interface_ur10.cpp
  * Author:  Vincenzo Petrone
  * Org.:    UNISA
  * Date:    May 10, 2024
@@ -25,7 +25,7 @@
 // Gtest
 #include <gtest/gtest.h>
 
-// Inverse Dynamics Solver
+// Inverse Dynamics Interface
 #include <inverse_dynamics_interface/inverse_dynamics_interface.hpp>
 #include "inverse_dynamics_interface_ur10/inverse_dynamics_interface_ur10.hpp"
 
@@ -33,7 +33,7 @@
 class SharedData
 {
   typedef pluginlib::ClassLoader<inverse_dynamics_interface::InverseDynamicsInterface> InverseDynamicsInterfaceLoader;
-  friend class InverseDynamicsSolverUR10Test;
+  friend class InverseDynamicsInterfaceUR10Test;
 
   std::shared_ptr<rclcpp::Node> node_;
   std::string inverse_dynamics_interface_plugin_name_;
@@ -52,14 +52,14 @@ class SharedData
     // Instantiate the node
     rclcpp::NodeOptions node_options;
     node_options.automatically_declare_parameters_from_overrides(true);
-    node_ = rclcpp::Node::make_shared("ur10_inverse_dynamics_solver_test", node_options);
+    node_ = rclcpp::Node::make_shared("ur10_inverse_dynamics_interface_test", node_options);
 
     // Load parameters
     ASSERT_TRUE(node_->get_parameter("inverse_dynamics_interface_plugin_name", inverse_dynamics_interface_plugin_name_));
     ASSERT_TRUE(node_->get_parameter("bag_filename", bag_filename_));
     ASSERT_TRUE(node_->get_parameter("topic_name", topic_name_));
 
-    // Initialize inverse dynamics solver class loader
+    // Initialize inverse dynamics interface class loader
     loader_ = std::make_unique<InverseDynamicsInterfaceLoader>("inverse_dynamics_interface", "inverse_dynamics_interface::InverseDynamicsInterface");
     ASSERT_TRUE(bool(loader_)) << "Failed to instantiate ClassLoader<InverseDynamicsInterface>";
   }
@@ -83,7 +83,7 @@ public:
 };
 
 // This class implements the tests
-class InverseDynamicsSolverUR10Test : public ::testing::Test
+class InverseDynamicsInterfaceUR10Test : public ::testing::Test
 {
 protected:
   void operator=(const SharedData& data)
@@ -98,13 +98,13 @@ protected:
   {
     *this = SharedData::instance();
 
-    // Load KDL inverse dynamics solver plugin
+    // Load KDL inverse dynamics interface plugin
     RCLCPP_INFO_STREAM(node->get_logger(), "Loading " << inverse_dynamics_interface_plugin_name);
     dynamics = SharedData::instance().createUniqueInstance(inverse_dynamics_interface_plugin_name);
     ASSERT_TRUE(bool(dynamics)) << "Failed to load plugin: " << inverse_dynamics_interface_plugin_name;
     RCLCPP_INFO_STREAM(node->get_logger(), inverse_dynamics_interface_plugin_name << " loaded.");
 
-    // Initialize inverse dynamics solver
+    // Initialize inverse dynamics interface
     RCLCPP_INFO_STREAM(node->get_logger(), "Initializing " << inverse_dynamics_interface_plugin_name);
     ASSERT_NO_THROW(dynamics->initialize());
     RCLCPP_INFO_STREAM(node->get_logger(), inverse_dynamics_interface_plugin_name << " initialized.");
@@ -123,7 +123,7 @@ public:
 /**
  * @brief verifies that method getDynamicParameters returns the expected values
  */
-TEST_F(InverseDynamicsSolverUR10Test, TestDynamicParameters)
+TEST_F(InverseDynamicsInterfaceUR10Test, TestDynamicParameters)
 {
   using inverse_dynamics_interface_ur10::Matrix6d;
   using inverse_dynamics_interface_ur10::NUMBER_OF_JOINTS;
@@ -135,7 +135,7 @@ TEST_F(InverseDynamicsSolverUR10Test, TestDynamicParameters)
   rosbag2_cpp::Reader reader;
   reader.open(bag_filename);
 
-  // For each trajectory in the rosbag file, evaluate the dynamics solver
+  // For each trajectory in the rosbag file, evaluate the dynamics
   while (reader.has_next())
   {
     rosbag2_storage::SerializedBagMessageSharedPtr message = reader.read_next();
