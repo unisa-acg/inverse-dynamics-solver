@@ -2,7 +2,7 @@
 
 ## Contents
 
-This is an implementation of [`InverseDynamicsSolver`](../inverse_dynamics_solver/README.md) using the general-purpose KDL dynamics solver based on [pluginlib](https://docs.ros.org/en/humble/Tutorials/Beginner-Client-Libraries/Pluginlib.html).
+This is an implementation of [`InverseDynamicsSolver`](../inverse_dynamics_solver/README.md) using the general-purpose Pinocchio dynamics solver based on [pluginlib](https://docs.ros.org/en/humble/Tutorials/Beginner-Client-Libraries/Pluginlib.html).
 
 It uses the [Pinocchio library](https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/devel/doxygen-html/index.html) to read a robot description from a parameter spawned by [xacro](https://github.com/ros/xacro/tree/ros2).
 So, in order to use this library, this parameter must be passed via launch files.
@@ -137,7 +137,7 @@ node_->get_parameter("inverse_dynamics_solver_plugin_name", inverse_dynamics_sol
 // Initialize inverse dynamics solver class loader
 inverse_dynamics_solver_loader_ =
     std::make_unique<InverseDynamicsSolverLoader>("inverse_dynamics_solver", "inverse_dynamics_solver::InverseDynamicsSolver");
-// Load KDL inverse dynamics solver plugin
+// Load Pinocchio inverse dynamics solver plugin
 inverse_dynamics_solver_ = inverse_dynamics_solver_loader_->createUniqueInstance(inverse_dynamics_solver_plugin_name_);
 ```
 

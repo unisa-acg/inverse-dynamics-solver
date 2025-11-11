@@ -35,6 +35,7 @@ def generate_test_description():
     )
 
     # Input arguments
+    DEFAULT_GRAVITY = [0, -9.81, 0]
     parameters = {
         "robot_description": robot_description,
         "inverse_dynamics_solver_plugin_name": "kdl_inverse_dynamics_solver/InverseDynamicsSolverKDL",
@@ -44,7 +45,13 @@ def generate_test_description():
         "inertia": [I1, I2],
         "kdl.root": "base_link",
         "kdl.tip": "flange",
-        "kdl.gravity": [0, -9.81, 0],
+        "kdl.gravity": DEFAULT_GRAVITY,
+        "empty_root.root": "",
+        "empty_root.tip": "flange",
+        "empty_root.gravity": DEFAULT_GRAVITY,
+        "empty_tip.root": "",  # This setup shall raise a ParameterUninitializedException
+        "empty_tip.tip": "",
+        "empty_tip.gravity": DEFAULT_GRAVITY,
     }
 
     # The node to test

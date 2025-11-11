@@ -97,7 +97,6 @@ void InverseDynamicsSolverPinocchio::initialize(rclcpp::node_interfaces::NodePar
   data_ = std::make_unique<pinocchio::Data>(model_);
   model_.gravity.linear() = Eigen::Map<const Eigen::Vector3d>(gravity.data());
   number_of_joints_ = model_.nq;
-  parseFrictionFromURDF_(robot_description_local);
 
   // Check if tip is included in the model
   if (!model_.existFrame(tip_))
@@ -105,11 +104,17 @@ void InverseDynamicsSolverPinocchio::initialize(rclcpp::node_interfaces::NodePar
     throw inverse_dynamics_solver::InvalidParameterValueException("Tip frame '" + tip_ + "' not found in robot description.");
   }
 
-  // Track plugin initialization
-  initialized_ = true;
-
   // Allocate kinematic/dynamic variables once for real-time safeness
   jacobian_ = pinocchio::Data::Matrix6x(6, model_.nv);
+  zero_ = Eigen::VectorXd::Zero(number_of_joints_);
+
+  // Get friction
+  friction_ = Eigen::VectorXd::Zero(number_of_joints_);
+  damping_ = Eigen::VectorXd::Zero(number_of_joints_);
+  parseFrictionFromURDF_(robot_description_local);
+
+  // Track plugin initialization
+  initialized_ = true;
 }
 
 Eigen::MatrixXd InverseDynamicsSolverPinocchio::getInertiaMatrix(const Eigen::VectorXd& joint_positions) const
@@ -142,16 +147,15 @@ Eigen::VectorXd InverseDynamicsSolverPinocchio::getGravityVector(const Eigen::Ve
 Eigen::VectorXd InverseDynamicsSolverPinocchio::getFrictionVector(const Eigen::VectorXd& joint_velocities) const
 {
   verifyInitialization_();
-  return static_friction_.cwiseProduct(joint_velocities.cwiseSign()) + viscous_friction_.cwiseProduct(joint_velocities);
+  return friction_.cwiseProduct(joint_velocities.cwiseSign()) + damping_.cwiseProduct(joint_velocities);
 }
 
-Eigen::VectorXd InverseDynamicsSolverPinocchio::getExternalTorques(const Eigen::VectorXd& joint_positions,
-                                                                   const Eigen::Matrix<double, 6, 1>& external_wrench) const
+Eigen::MatrixXd InverseDynamicsSolverPinocchio::getJacobian(const Eigen::VectorXd& joint_positions) const
 {
   verifyInitialization_();
   pinocchio::computeJointJacobians(model_, *data_, joint_positions);
   pinocchio::getFrameJacobian(model_, *data_, model_.getFrameId(tip_), pinocchio::LOCAL_WORLD_ALIGNED, jacobian_);
-  return jacobian_.transpose() * external_wrench;
+  return jacobian_;
 }
 
 Eigen::VectorXd InverseDynamicsSolverPinocchio::getTorques(const Eigen::VectorXd& joint_positions, const Eigen::VectorXd& joint_velocities,
@@ -159,29 +163,8 @@ Eigen::VectorXd InverseDynamicsSolverPinocchio::getTorques(const Eigen::VectorXd
                                                            const Eigen::Matrix<double, 6, 1>& external_wrench) const
 {
   verifyInitialization_();
-
-  // Get the last joint
-  pinocchio::FrameIndex ee_frame_id = model_.getFrameId(tip_);
-
-  // Build the wrench in world frame
-  pinocchio::Force f_ee_world(external_wrench.head(3), external_wrench.tail(3));
-
-  // Update kinematics
-  pinocchio::forwardKinematics(model_, *data_, joint_positions, joint_velocities, joint_accelerations);
-  pinocchio::updateFramePlacements(model_, *data_);
-
-  // M is the homogenous transform matrix: "oMf" stands for "transform from frame 'f' to origin (world)"
-  pinocchio::SE3 frame_to_world = data_->oMf[ee_frame_id];
-
-  // Convert the force from the world frame to the last frame
-  pinocchio::Force f_frame_local = frame_to_world.actInv(f_ee_world);
-
-  // Pinocchio assumes a Force can be applied to possibly every joint: we set a force on the last frame only
-  pinocchio::container::aligned_vector<pinocchio::Force> fext(model_.njoints, pinocchio::Force::Zero());
-  fext[ee_frame_id] = f_frame_local;
-
-  // Get all the torques
-  return pinocchio::rnea(model_, *data_, joint_positions, joint_velocities, joint_accelerations, fext);
+  return pinocchio::rnea(model_, *data_, joint_positions, joint_velocities, joint_accelerations) +
+         (external_wrench.isZero() ? zero_ : getExternalTorques(joint_positions, external_wrench));
 }
 
 void InverseDynamicsSolverPinocchio::verifyInitialization_() const
@@ -194,28 +177,24 @@ void InverseDynamicsSolverPinocchio::verifyInitialization_() const
 
 void InverseDynamicsSolverPinocchio::parseFrictionFromURDF_(const std::string& robot_description)
 {
-  // Parse the URDF again to extract joint friction coefficients
   urdf::ModelInterfaceSharedPtr urdf_model = urdf::parseURDF(robot_description);
   if (!urdf_model)
   {
     throw inverse_dynamics_solver::InvalidParameterValueException("Failed to parse URDF string.");
   }
 
-  static_friction_.resize(number_of_joints_);
-  viscous_friction_.resize(number_of_joints_);
-
-  for (std::size_t i = 0; i < model_.names.size(); ++i)
+  std::size_t j = 0;
+  for (const std::string& joint_name : model_.names)
   {
-    const std::string joint_name = model_.names[i];
-
     if (urdf_model->joints_.find(joint_name) != urdf_model->joints_.end())
     {
-      auto urdf_joint = urdf_model->joints_.at(joint_name);
+      urdf::JointSharedPtr urdf_joint = urdf_model->joints_.at(joint_name);
       if (urdf_joint->dynamics)
       {
-        static_friction_(i) = urdf_joint->dynamics->friction;  // coulomb/static friction
-        viscous_friction_(i) = urdf_joint->dynamics->damping;  // viscous friction
+        friction_(j) = urdf_joint->dynamics->friction;  // coulomb friction
+        damping_(j) = urdf_joint->dynamics->damping;    // viscous friction
       }
+      ++j;
     }
   }
 }
