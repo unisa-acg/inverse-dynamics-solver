@@ -158,6 +158,7 @@ TEST_F(InverseDynamicsSolverKDLTest, getJacobian)
 
   // Joint states the jacobian will be evaluated on
   Eigen::VectorXd q(N_JOINTS);
+  Eigen::VectorXd h(6);
 
   // Jacobian reference
   Eigen::MatrixXd jacobian_ref = Eigen::MatrixXd::Zero(6, N_JOINTS);
@@ -175,6 +176,14 @@ TEST_F(InverseDynamicsSolverKDLTest, getJacobian)
   double q2 = q(1);
   double q3 = q(2);
 
+  // Initialize external wrench
+  h(0) = 1.11;
+  h(1) = 2.22;
+  h(2) = 3.33;
+  h(3) = 4.44;
+  h(4) = 5.55;
+  h(5) = 6.66;
+
   // Initialize Jacobian reference
   jacobian_ref(0, 0) = -a1 * sin(q1) - a2 * sin(q1 + q2) - a3 * sin(q1 + q2 + q3);
   jacobian_ref(0, 1) = -a2 * sin(q1 + q2) - a3 * sin(q1 + q2 + q3);
@@ -182,20 +191,25 @@ TEST_F(InverseDynamicsSolverKDLTest, getJacobian)
   jacobian_ref(1, 0) = a1 * cos(q1) + a2 * cos(q1 + q2) + a3 * cos(q1 + q2 + q3);
   jacobian_ref(1, 1) = a2 * cos(q1 + q2) + a3 * cos(q1 + q2 + q3);
   jacobian_ref(1, 2) = a3 * cos(q1 + q2 + q3);
-  jacobian_ref.row(5) = Eigen::Vector3d::Ones();
+  jacobian_ref.row(5) = Eigen::VectorXd::Ones(N_JOINTS);
+
+  // Initialize external torques reference
+  Eigen::VectorXd torques_ref = jacobian_ref.transpose() * h;
 
   // Get the Jacobian
   initializeSolver();
   Eigen::MatrixXd jacobian = inverse_dynamics_solver->getJacobian(q);
+  Eigen::VectorXd torques = inverse_dynamics_solver->getExternalTorques(q, h);
 
   // Test the solver
   const double ABS_ERROR = 1e-8;
-  for (unsigned int i = 0; i < 6; i++)
+  for (unsigned int j = 0; j < N_JOINTS; j++)
   {
-    for (unsigned int j = 0; j < N_JOINTS; j++)
+    for (unsigned int i = 0; i < 6; i++)
     {
       EXPECT_NEAR(jacobian(i, j), jacobian_ref(i, j), ABS_ERROR) << "Element (" << i << "," << j << ") of Jacobian matrix is beyond tolerance";
     }
+    EXPECT_NEAR(torques(j), torques_ref(j), ABS_ERROR) << "Element " << j << " of external torques is beyond tolerance";
   }
 }
 
