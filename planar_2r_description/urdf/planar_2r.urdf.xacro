@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="planar_2r">
+  <!-- Kinematic parameters -->
+  <xacro:arg name="a1" default="1.0"/>
+  <xacro:arg name="a2" default="0.8"/>
+  <xacro:arg name="width" default="0.05"/>
+
+  <!-- Dynamic parameters -->
+  <xacro:arg name="l1" default="${$(arg a1) * 0.5}"/>
+  <xacro:arg name="l2" default="${$(arg a2) * 0.5}"/>
+  <xacro:arg name="m1" default="50"/>
+  <xacro:arg name="m2" default="40"/>
+  <xacro:arg name="I1" default="10"/>
+  <xacro:arg name="I2" default="8"/>
+
+  <!-- Base link -->
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <cylinder length="$(arg width)" radius="$(arg width)"/>
+      </geometry>
+      <origin xyz="0 0 0"/>
+      <material name="grey">
+        <color rgba="0.5 0.5 0.5 1.0"/>
+      </material>
+    </visual>
+  </link>
+
+  <!-- Link 1 -->
+  <link name="link1">
+    <inertial>
+      <origin xyz="$(arg l1) 0 0" rpy="0 0 0"/>
+      <mass value="$(arg m1)"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="$(arg I1)"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <box size="$(arg a1) $(arg width) $(arg width)"/>
+      </geometry>
+      <origin xyz="${$(arg a1) * 0.5} 0 0"/>
+      <material name="red">
+        <color rgba="1 0 0 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="joint1" type="revolute">
+    <parent link="base_link"/>
+    <child link="link1"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="${-pi}" upper="${pi}" effort="1.0" velocity="1.0"/>
+  </joint>
+
+  <!-- Link 2 -->
+  <link name="link2">
+    <inertial>
+      <origin xyz="$(arg l2) 0 0" rpy="0 0 0"/>
+      <mass value="$(arg m2)"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="$(arg I2)"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <box size="$(arg a2) $(arg width) $(arg width)"/>
+      </geometry>
+      <origin xyz="${$(arg a2) * 0.5} 0 0"/>
+      <material name="green">
+        <color rgba="0 1 0 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="joint2" type="revolute">
+    <parent link="link1"/>
+    <child link="link2"/>
+    <origin xyz="$(arg a1) 0 0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="${-pi}" upper="${pi}" effort="1.0" velocity="1.0"/>
+  </joint>
+
+  <!-- Flange -->
+  <link name="flange"/>
+
+  <joint name="flange_joint" type="fixed">
+    <parent link="link2"/>
+    <child link="flange"/>
+    <origin xyz="$(arg a2) 0 0" rpy="0 0 0 "/>
+  </joint>
+</robot>

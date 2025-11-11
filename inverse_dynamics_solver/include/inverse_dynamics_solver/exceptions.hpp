@@ -22,6 +22,7 @@ namespace inverse_dynamics_solver
 
 typedef rclcpp::exceptions::InvalidParameterValueException InvalidParameterValueException;
 typedef rclcpp::exceptions::ParameterUninitializedException ParameterUninitializedException;
+typedef rclcpp::exceptions::UnimplementedError UnimplementedError;
 
 class UninitializedException : public std::runtime_error
 {

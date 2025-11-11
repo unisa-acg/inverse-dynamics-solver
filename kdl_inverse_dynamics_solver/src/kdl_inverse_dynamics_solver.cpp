@@ -21,6 +21,7 @@
 
 // KDL
 #include <kdl/segment.hpp>
+#include <kdl/solveri.hpp>
 #include <kdl_parser/kdl_parser.hpp>
 
 // Inverse Dynamics Solver
@@ -173,23 +174,16 @@ Eigen::VectorXd InverseDynamicsSolverKDL::getFrictionVector(const Eigen::VectorX
   return static_friction_.cwiseProduct(joint_velocities.cwiseSign()) + viscous_friction_.cwiseProduct(joint_velocities);
 }
 
-Eigen::VectorXd InverseDynamicsSolverKDL::getExternalTorques(const Eigen::VectorXd& joint_positions,
-                                                             const Eigen::Matrix<double, 6, 1>& external_wrench) const
+Eigen::MatrixXd InverseDynamicsSolverKDL::getJacobian(const Eigen::VectorXd& joint_positions) const
 {
   verifyInitialization_();
 
-  // Skip computing Jacobian if no external wrenches are applied
-  if (external_wrench.isZero())
-  {
-    return zero_;
-  }
-
   kdl_joint_positions_->data = joint_positions;
 
-  // JntToJac returns 0 when no error occurs: https://docs.ros.org/en/indigo/api/orocos_kdl/html/chainjnttojacsolver_8cpp_source.html#l00048
-  if (jacobian_solver_->JntToJac(*kdl_joint_positions_, *jacobian_) == 0)
+  // JntToJac returns E_NOERROR when no error occurs: https://docs.ros.org/en/indigo/api/orocos_kdl/html/chainjnttojacsolver_8cpp_source.html#l00048
+  if (jacobian_solver_->JntToJac(*kdl_joint_positions_, *jacobian_) == KDL::SolverI::E_NOERROR)
   {
-    return jacobian_->data.transpose() * external_wrench;
+    return jacobian_->data;
   }
   else
   {

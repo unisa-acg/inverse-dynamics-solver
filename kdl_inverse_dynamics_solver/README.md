@@ -43,10 +43,13 @@ Please refer to [the parent class documentation](../inverse_dynamics_solver/READ
 
 ## How to test
 
-This library is tested against a simulated UR10 robot.
-The kinematic description is taken from UR's official package, [ur_description](https://github.com/UniversalRobots/Universal_Robots_ROS2_Description/tree/humble).
+This library is tested against simple planar 2R and 3R robots.
+The kinematic description is taken from custom packages, [`planar_2r_description`](../planar_2r_description/) and [`planar_3r_description`](../planar_3r_description/).
 
 The tests consist in checking that, given a fixed joint position and velocity state, the KDL solver returns the expected values for the dynamic components.
+The expected values are not hardcoded, but extracted from formulas available in the following book:
+
+> 'Robotics: modelling, planning and control' (2009) by B. Siciliano, L. Sciavicco, L. Villani, G. Oriolo, 1st ed., Springer, sections 2.9.1 and 7.3.2. DOI: [https://doi.org/10.1007/978-1-84628-642-1](https://doi.org/10.1007/978-1-84628-642-1)
 
 To build and execute the test, run the following:
 
@@ -63,10 +66,11 @@ colcon test-result --all --verbose
 The expected output should be the following:
 
 ```text
-build/kdl_inverse_dynamics_solver/Testing/20240510-0742/Test.xml: 1 test, 0 errors, 0 failures, 0 skipped
-build/kdl_inverse_dynamics_solver/test_results/kdl_inverse_dynamics_solver/launch_test_kdl_inverse_dynamics_solver.launch.py.xunit.xml: 2 tests, 0 errors, 0 failures, 0 skipped
+build/kdl_inverse_dynamics_solver/Testing/20251111-1319/Test.xml: 2 tests, 0 errors, 0 failures, 0 skipped
+build/kdl_inverse_dynamics_solver/test_results/kdl_inverse_dynamics_solver/test_test_kdl_ids_on_2r_planar.py.xunit.xml: 2 tests, 0 errors, 0 failures, 0 skipped
+build/kdl_inverse_dynamics_solver/test_results/kdl_inverse_dynamics_solver/test_test_kdl_ids_on_3r_planar.py.xunit.xml: 2 tests, 0 errors, 0 failures, 0 skipped
 
-Summary: 3 tests, 0 errors, 0 failures, 0 skipped
+Summary: 6 tests, 0 errors, 0 failures, 0 skipped
 ```
 
 ### Optional analysis
@@ -80,7 +84,7 @@ colcon test --packages-select kdl_inverse_dynamics_solver --event-handlers conso
 The expected output should contain the following line:
 
 ```text
-100% tests passed, 0 tests failed out of 1
+100% tests passed, 0 tests failed out of 2
 ```
 
 ### Comparison with Pinocchio
@@ -98,7 +102,7 @@ The solver can be configured with the following parameters, to be passed via the
 * `gravity`: a 3x1 vector of real numbers describing the gravity effect in `root` frame
     * defaults to `[0, 0, -9.81]`
 
-The [test launch file](./test/test_kdl_inverse_dynamics_solver.py) provides an example on how the solver is initialized and configured.
+The [test launch file](./test/test_kdl_ids_on_2r_planar.py) provides an example on how the solver is initialized and configured.
 In the following snippet, the user is choosing the solver's `root`, `tip`, and `gravity` parameters, and is passing the URDF `robot_description` to the node initializing the solver.
 
 ```python
@@ -107,27 +111,27 @@ parameters = {
     "robot_description": robot_description,  # String to be retrieved via xacro from the URDF
     "inverse_dynamics_solver_plugin_name": inverse_dynamics_solver_plugin_name,  # String to be chosen by the user
     "kdl.root": "base_link",
-    "kdl.tip": "tool0",
-    "kdl.gravity": [0, 0, -9.81],
+    "kdl.tip": "flange",
+    "kdl.gravity": [0, -9.81, 0],
 }
 
 # The node to test
-test_kdl_inverse_dynamics_solver_node = Node(
+test_kdl_ids_on_2r_planar_node = Node(
     package="kdl_inverse_dynamics_solver",
-    executable="kdl_inverse_dynamics_solver_test",
-    name="test_kdl_inverse_dynamics_solver_node",
+    executable="kdl_ids_on_2r_planar_test",
+    name="test_kdl_ids_on_2r_planar_node",
     parameters=[parameters],
     output="screen",
 )
 ```
 
-Consequently, the [node](./test/test_kdl_inverse_dynamics_solver.cpp) retrieves the parameters...
+Consequently, the [node](./test/test_kdl_ids_on_2r_planar.cpp) retrieves the parameters...
 
 ```cpp
 // Instantiate the node
 rclcpp::NodeOptions node_options;
 node_options.automatically_declare_parameters_from_overrides(true);
-node_ = rclcpp::Node::make_shared("kdl_inverse_dynamics_solver_test", node_options);
+node_ = rclcpp::Node::make_shared("kdl_ids_on_2r_planar_test", node_options);
 // Get robot_description parameter
 robot_description_ = node_->get_parameter_or<std::string>("robot_description", "");
 // Load parameters
