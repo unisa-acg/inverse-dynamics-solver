@@ -68,15 +68,15 @@ target_link_libraries(
          urdf::urdf
 )
 install(TARGETS evaluate_solver
-        DESTINATION lib/${PROJECT_NAME}
+        DESTINATION lib/inverse_dynamics_solver
 )
 
 install(PROGRAMS scripts/plot_joint_state.py
-        DESTINATION lib/${PROJECT_NAME}
+        DESTINATION lib/inverse_dynamics_solver
 )
 
 install(DIRECTORY launch
-        DESTINATION share/${PROJECT_NAME}
+        DESTINATION share/inverse_dynamics_solver
 )
 
 install(DIRECTORY include/
