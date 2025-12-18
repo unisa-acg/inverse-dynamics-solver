@@ -25,16 +25,10 @@
 
 #pragma once
 
-#include <eigen3/Eigen/Core>
 #include <inverse_dynamics_solver/inverse_dynamics_solver.hpp>
 
 namespace franka_inria_inverse_dynamics_solver
 {
-
-static const unsigned short int NUMBER_OF_JOINTS = 7;
-typedef Eigen::Matrix<double, NUMBER_OF_JOINTS, 1> Vector7d;
-typedef Eigen::Matrix<double, NUMBER_OF_JOINTS, NUMBER_OF_JOINTS> Matrix7d;
-
 class InverseDynamicsSolverFrankaInria : public inverse_dynamics_solver::InverseDynamicsSolver
 {
 public:
