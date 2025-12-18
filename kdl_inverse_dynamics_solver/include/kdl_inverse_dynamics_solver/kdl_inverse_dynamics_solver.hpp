@@ -16,7 +16,10 @@
 
 #pragma once
 
+#include <memory>
+#include <kdl/chain.hpp>
 #include <kdl/chaindynparam.hpp>
+
 #include <inverse_dynamics_solver/inverse_dynamics_solver.hpp>
 
 namespace kdl_inverse_dynamics_solver

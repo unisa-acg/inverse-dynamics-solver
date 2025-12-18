@@ -13,11 +13,18 @@
  * -------------------------------------------------------------------
  */
 
-// KDL
-#include <kdl_parser/kdl_parser.hpp>
+// Standard library
+#include <string>
+#include <vector>
 
-// Pluginlib
-#include <pluginlib/class_list_macros.hpp>
+// ROS
+#include <rclcpp/parameter.hpp>
+
+// KDL
+#include <kdl/jntarray.hpp>
+#include <kdl/jntspaceinertiamatrix.hpp>
+#include <kdl/tree.hpp>
+#include <kdl_parser/kdl_parser.hpp>
 
 // Inverse Dynamics Solver
 #include <inverse_dynamics_solver/exceptions.hpp>
@@ -175,4 +182,5 @@ void InverseDynamicsSolverKDL::verifyInitialization_() const
   }
 }
 
+#include <pluginlib/class_list_macros.hpp>
 PLUGINLIB_EXPORT_CLASS(kdl_inverse_dynamics_solver::InverseDynamicsSolverKDL, inverse_dynamics_solver::InverseDynamicsSolver)
