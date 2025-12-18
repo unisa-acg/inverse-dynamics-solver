@@ -2,8 +2,8 @@
 Changelog for package inverse_dynamics_solver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+6.0.1 (2025-12-18)
+------------------
 * Merge pull request `#11 <https://github.com/unisa-acg/inverse-dynamics-solver/issues/11>`_ from unisa-acg/feature/update_dependencies_exporting
   feature/update_dependencies_exporting
 * [REF] Avoid using variable for consistency
