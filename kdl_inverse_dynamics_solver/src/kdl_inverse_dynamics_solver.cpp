@@ -13,7 +13,14 @@
  * -------------------------------------------------------------------
  */
 
+// Standard library
+#include <vector>
+
+// ROS
+#include <rclcpp/parameter.hpp>
+
 // KDL
+#include <kdl/tree.hpp>
 #include <kdl_parser/kdl_parser.hpp>
 
 // Inverse Dynamics Solver

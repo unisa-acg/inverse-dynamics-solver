@@ -16,6 +16,9 @@
  * -------------------------------------------------------------------
  */
 
+#include <memory>
+#include <string>
+#include <vector>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/serialization.hpp>
 #include <rosbag2_cpp/reader.hpp>
