@@ -16,6 +16,9 @@
 // Standard library
 #include <vector>
 
+// URDF
+#include <urdf/model.hpp>
+
 // ROS
 #include <rclcpp/parameter.hpp>
 
