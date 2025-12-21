@@ -90,7 +90,8 @@ def main():
     # Process each bag file
     topic = "/torques"
     mae_dict = {}  # {joint_name: {bag_name: mae_value}}
-    mae_tables = []  # store all MAE tables
+    mae_tables = []  # store all MAE tables entries
+    headers = []  # store all MAE tables headers
     bag_names = []  # maintain bag order
     computed_data = []  # store computed signals for overlay
     first_measured = {}  # measured signals from first bag only
@@ -178,7 +179,7 @@ def main():
                     for joint, error in zip(joint_names, mae_values)
                 ]
             )
-            headers = ["Joint", bag_name]
+            headers.append(["Joint", bag_name])
 
     # Overlay mode: plot one figure with all computed signals
     if args.overlay:
@@ -245,12 +246,12 @@ def main():
                 ]
             ]
         ]
-        headers = ["Joint"] + bag_names
+        headers = [["Joint"] + bag_names]
 
     # Display MAE
     print("\nMAE per Joint:")
-    for mae_table in mae_tables:
-        print(tabulate(mae_table, headers=headers, tablefmt="grid"))
+    for mae_table, header in zip(mae_tables, headers):
+        print(tabulate(mae_table, headers=header, tablefmt="grid"))
 
 
 if __name__ == "__main__":
