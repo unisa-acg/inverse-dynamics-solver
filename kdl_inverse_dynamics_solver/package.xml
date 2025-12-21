@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>kdl_inverse_dynamics_solver</name>
-  <version>1.0.1</version>
+  <version>6.0.1</version>
   <description>A KDL-based library implementing an inverse dynamics solver for simulated robots.</description>
   <url>https://github.com/unisa-acg/inverse-dynamics-solver.git</url>
   <maintainer email="eferrentino@unisa.it">Enrico Ferrentino</maintainer>
@@ -11,13 +11,15 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>eigen</depend>
+  <build_depend>liborocos-kdl-dev</build_depend>
+
   <depend>inverse_dynamics_solver</depend>
   <depend>kdl_parser</depend>
   <depend>pluginlib</depend>
   <depend>rclcpp</depend>
   <depend>urdf</depend>
 
+  <exec_depend>liborocos-kdl</exec_depend>
   <exec_depend>planar_2r_description</exec_depend>
   <exec_depend>planar_3r_description</exec_depend>
   <exec_depend>ur_description</exec_depend>

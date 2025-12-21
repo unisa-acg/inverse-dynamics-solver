@@ -13,6 +13,9 @@
  * -------------------------------------------------------------------
  */
 
+// Standard library
+#include <vector>
+
 // ROS
 #include <rclcpp/parameter.hpp>
 
@@ -23,6 +26,7 @@
 #include <kdl/joint.hpp>
 #include <kdl/segment.hpp>
 #include <kdl/solveri.hpp>
+#include <kdl/tree.hpp>
 #include <kdl_parser/kdl_parser.hpp>
 
 // Inverse Dynamics Solver
