@@ -16,21 +16,16 @@
 
 #pragma once
 
-// Standard libraries
+// Standard library
+#include <memory>
 #include <string>
-
-// Eigen
-#include <eigen3/Eigen/Core>
-
-// ROS
-#include <rclcpp/node_interfaces/node_parameters_interface.hpp>
 
 // KDL
 #include <kdl/chain.hpp>
 #include <kdl/chaindynparam.hpp>
 #include <kdl/chainjnttojacsolver.hpp>
-#include <kdl/jntarray.hpp>
 #include <kdl/jacobian.hpp>
+#include <kdl/jntarray.hpp>
 #include <kdl/jntspaceinertiamatrix.hpp>
 
 // Inverse Dynamics Interface

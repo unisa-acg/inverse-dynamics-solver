@@ -19,23 +19,18 @@ set(CMAKE_CXX_FLAGS
     "-O3"
 )
 
-# find dependencies
-find_package(ament_cmake REQUIRED)
-
 set(THIS_PACKAGE_INCLUDE_DEPENDS
-    Eigen3
-    pluginlib
-    rclcpp
-    inverse_dynamics_interface
+    pluginlib inverse_dynamics_interface
 )
 
+# find dependencies
+find_package(ament_cmake REQUIRED)
 foreach(dependency IN
         ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS}
 )
   find_package(${dependency} REQUIRED)
 endforeach()
 
-# add library
 add_library(inverse_dynamics_interface_franka_inria SHARED
             src/get_CoriolisMatrix.cpp
             src/get_FrictionTorque.cpp
@@ -45,33 +40,30 @@ add_library(inverse_dynamics_interface_franka_inria SHARED
 )
 target_compile_features(
   inverse_dynamics_interface_franka_inria
-  PUBLIC c_std_99 cxx_std_17
-) # Require C99 and C++17
+  PUBLIC cxx_std_17
+)
 target_include_directories(
   inverse_dynamics_interface_franka_inria
-  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>
+  PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+         $<INSTALL_INTERFACE:include/inverse_dynamics_interface_franka_inria>
 )
 target_link_libraries(
   inverse_dynamics_interface_franka_inria
-  PUBLIC Eigen3::Eigen
-         pluginlib::pluginlib
-         rclcpp::rclcpp
-         inverse_dynamics_interface::inverse_dynamics_interface_lib
+  PUBLIC pluginlib::pluginlib inverse_dynamics_interface::inverse_dynamics_interface
 )
 
-# create plugin
 pluginlib_export_plugin_description_file(
   inverse_dynamics_interface inverse_dynamics_interface_franka_inria.xml
 )
 
-# Causes the visibility macros to use dllexport rather than dllimport, which is appropriate when
-# building the dll but not consuming it.
-target_compile_definitions(
-  inverse_dynamics_interface_franka_inria
-  PRIVATE "INVERSE_DYNAMICS_INTERFACE_FRANKA_INRIA_BUILDING_LIBRARY"
+install(DIRECTORY bagfiles
+        DESTINATION share/inverse_dynamics_interface_franka_inria
 )
 
-# install library
+install(DIRECTORY launch
+        DESTINATION share/inverse_dynamics_interface_franka_inria
+)
+
 install(DIRECTORY include/
         DESTINATION include
 )
@@ -79,24 +71,12 @@ install(FILES inverse_dynamics_interface_franka_inria.xml
         DESTINATION share/inverse_dynamics_interface_franka_inria
 )
 install(TARGETS inverse_dynamics_interface_franka_inria
-        EXPORT export_${PROJECT_NAME}
+        EXPORT export_inverse_dynamics_interface_franka_inria
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
         RUNTIME DESTINATION bin
 )
 
-# install bag files
-install(DIRECTORY bagfiles
-        DESTINATION share/${PROJECT_NAME}/
-)
-
-# install launch files
-install(DIRECTORY launch
-        DESTINATION share/${PROJECT_NAME}/
-)
-
-# compile the package
+ament_export_targets(export_inverse_dynamics_interface_franka_inria)
 ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
-ament_export_targets(export_${PROJECT_NAME})
-
 ament_package()

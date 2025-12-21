@@ -13,73 +13,48 @@ if(CMAKE_COMPILER_IS_GNUCXX
   )
 endif()
 
-# find dependencies
-find_package(ament_cmake REQUIRED)
-
 set(THIS_PACKAGE_INCLUDE_DEPENDS
-    Eigen3
+    kdl_parser
+    orocos_kdl
+    pluginlib
     rclcpp
     urdf
-    kdl_parser
-    pluginlib
     inverse_dynamics_interface
 )
 
+# find dependencies
+find_package(ament_cmake REQUIRED)
 foreach(dependency IN
         ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS}
 )
   find_package(${dependency} REQUIRED)
 endforeach()
 
-# add library
 add_library(inverse_dynamics_interface_kdl SHARED
             src/inverse_dynamics_interface_kdl.cpp
 )
 target_compile_features(
   inverse_dynamics_interface_kdl
-  PUBLIC c_std_99 cxx_std_17
-) # Require C99 and C++17
+  PUBLIC cxx_std_17
+)
 target_include_directories(
   inverse_dynamics_interface_kdl
-  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>
+  PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+         $<INSTALL_INTERFACE:include/inverse_dynamics_interface_kdl>
 )
 target_link_libraries(
   inverse_dynamics_interface_kdl
-  PUBLIC Eigen3::Eigen
+  PUBLIC kdl_parser::kdl_parser
+         pluginlib::pluginlib
          rclcpp::rclcpp
          urdf::urdf
-         kdl_parser::kdl_parser
-         pluginlib::pluginlib
-         inverse_dynamics_interface::inverse_dynamics_interface_lib
+         inverse_dynamics_interface::inverse_dynamics_interface
 )
 
-# create plugin
 pluginlib_export_plugin_description_file(
   inverse_dynamics_interface inverse_dynamics_interface_kdl.xml
 )
 
-# Causes the visibility macros to use dllexport rather than dllimport, which is appropriate when
-# building the dll but not consuming it.
-target_compile_definitions(
-  inverse_dynamics_interface_kdl
-  PRIVATE "INVERSE_DYNAMICS_INTERFACE_KDL_BUILDING_LIBRARY"
-)
-
-# install library
-install(DIRECTORY include/
-        DESTINATION include
-)
-install(FILES inverse_dynamics_interface_kdl.xml
-        DESTINATION share/inverse_dynamics_interface_kdl
-)
-install(TARGETS inverse_dynamics_interface_kdl
-        EXPORT export_${PROJECT_NAME}
-        ARCHIVE DESTINATION lib
-        LIBRARY DESTINATION lib
-        RUNTIME DESTINATION bin
-)
-
-# tests
 if(BUILD_TESTING)
   # find dependencies
   find_package(ament_cmake_gtest REQUIRED)
@@ -94,7 +69,7 @@ if(BUILD_TESTING)
     kdl_interface_on_2r_planar_test
     rclcpp::rclcpp
     pluginlib::pluginlib
-    inverse_dynamics_interface::inverse_dynamics_interface_lib
+    inverse_dynamics_interface::inverse_dynamics_interface
     inverse_dynamics_interface_kdl
   )
   add_ros_test(test/test_kdl_interface_on_2r_planar.py)
@@ -107,28 +82,34 @@ if(BUILD_TESTING)
     kdl_interface_on_3r_planar_test
     rclcpp::rclcpp
     pluginlib::pluginlib
-    inverse_dynamics_interface::inverse_dynamics_interface_lib
+    inverse_dynamics_interface::inverse_dynamics_interface
     inverse_dynamics_interface_kdl
   )
   add_ros_test(test/test_kdl_interface_on_3r_planar.py)
 
   install(TARGETS kdl_interface_on_3r_planar_test kdl_interface_on_2r_planar_test
-          RUNTIME DESTINATION lib/${PROJECT_NAME}
+          RUNTIME DESTINATION lib/inverse_dynamics_interface_kdl
   )
 endif()
 
-# install bag files
 install(DIRECTORY bagfiles
-        DESTINATION share/${PROJECT_NAME}/
+        DESTINATION share/inverse_dynamics_interface_kdl
 )
 
-# install launch files
 install(DIRECTORY launch
-        DESTINATION share/${PROJECT_NAME}/
+        DESTINATION share/inverse_dynamics_interface_kdl
 )
 
-# compile the package
-ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
-ament_export_targets(export_${PROJECT_NAME})
+install(DIRECTORY include/
+        DESTINATION include
+)
+install(TARGETS inverse_dynamics_interface_kdl
+        EXPORT export_inverse_dynamics_interface_kdl
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin
+)
 
+ament_export_targets(export_inverse_dynamics_interface_kdl)
+ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
 ament_package()

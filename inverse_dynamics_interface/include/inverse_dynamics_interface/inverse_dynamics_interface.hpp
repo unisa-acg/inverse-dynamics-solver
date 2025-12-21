@@ -19,6 +19,7 @@
 #pragma once
 
 #include <string>
+#include <tuple>
 #include <eigen3/Eigen/Core>
 #include <rclcpp/node_interfaces/node_parameters_interface.hpp>
 

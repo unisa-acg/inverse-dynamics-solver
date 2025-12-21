@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <eigen3/Eigen/Core>
 #include <inverse_dynamics_interface/inverse_dynamics_interface.hpp>
 
 namespace inverse_dynamics_interface_ur10

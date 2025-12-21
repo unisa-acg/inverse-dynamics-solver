@@ -18,15 +18,6 @@
 
 // Standard libraries
 #include <memory>
-#include <string>
-
-// Eigen
-#include <eigen3/Eigen/Core>
-
-// ROS
-#include <rclcpp/node_interfaces/node_parameters_interface.hpp>
-
-// Pinocchio
 #include <pinocchio/multibody/data.hpp>
 #include <pinocchio/multibody/model.hpp>
 

@@ -97,13 +97,16 @@ If you find this work useful, please cite it as
 ```bibtex
 @article{Petrone_2025,
     title={The Dynamic Model of the UR10 Robot and Its ROS2 Integration},
+    volume={21},
     ISSN={1941-0050},
     url={http://dx.doi.org/10.1109/tii.2025.3534415},
     DOI={10.1109/tii.2025.3534415},
+    number={5},
     journal={IEEE Transactions on Industrial Informatics},
     publisher={Institute of Electrical and Electronics Engineers (IEEE)},
     author={Petrone, Vincenzo and Ferrentino, Enrico and Chiacchio, Pasquale},
     year={2025},
-    pages={1–11}
+    month=may,
+    pages={3828–3838}
 }
 ```
