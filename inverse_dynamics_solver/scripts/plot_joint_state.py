@@ -90,6 +90,7 @@ def main():
     # Process each bag file
     topic = "/torques"
     mae_dict = {}  # {joint_name: {bag_name: mae_value}}
+    mae_tables = []  # store all MAE tables
     bag_names = []  # maintain bag order
     computed_data = []  # store computed signals for overlay
     first_measured = {}  # measured signals from first bag only
@@ -131,7 +132,7 @@ def main():
                 mae_dict[joint_name] = {}
             mae_dict[joint_name][bag_name] = mae_value
 
-        # --- Plotting ---
+        # Plotting
         if not args.overlay:
             # Normal mode: separate figure for each bag
             fig, axes = plt.subplots(
@@ -164,10 +165,20 @@ def main():
                 ax.tick_params(axis="both", labelsize=FS)
             fig.legend(["Computed", "Measured"], loc="lower right", fontsize=FS)
 
+            # Save figure
             pdf_path = os.path.join(args.output_dir, f"{bag_name}.pdf")
             plt.savefig(pdf_path, format="pdf", bbox_inches="tight")
             plt.close(fig)
             print(f"Figure saved: {pdf_path}")
+
+            # Compute table
+            mae_tables.append(
+                [
+                    [joint, f"{error:.4f}"]
+                    for joint, error in zip(joint_names, mae_values)
+                ]
+            )
+            headers = ["Joint", bag_name]
 
     # Overlay mode: plot one figure with all computed signals
     if args.overlay:
@@ -180,7 +191,7 @@ def main():
         fig.patch.set_alpha(0)
         axes = axes.flatten()
 
-        # For each joint, overlay measured + all computes
+        # For each joint, overlay measured + all computed
         for jj in range(n_joints):
             ax = axes[jj]
 
@@ -219,10 +230,8 @@ def main():
         plt.close(fig)
         print(f"Overlay figure saved: {out_path}")
 
-    # Display MAE
-    print("\nMAE per Joint:")
-    print(
-        tabulate(
+        # Compute MAE table
+        mae_tables = [
             [
                 [joint]
                 + [f"{mae_dict[joint].get(b, float('nan')):.4f}" for b in bag_names]
@@ -234,11 +243,14 @@ def main():
                     f"{np.mean([mae_dict[j][b] for j in joint_names if b in mae_dict[j]]):.4f}"
                     for b in bag_names
                 ]
-            ],
-            headers=["Joint"] + bag_names,
-            tablefmt="grid",
-        )
-    )
+            ]
+        ]
+        headers = ["Joint"] + bag_names
+
+    # Display MAE
+    print("\nMAE per Joint:")
+    for mae_table in mae_tables:
+        print(tabulate(mae_table, headers=headers, tablefmt="grid"))
 
 
 if __name__ == "__main__":

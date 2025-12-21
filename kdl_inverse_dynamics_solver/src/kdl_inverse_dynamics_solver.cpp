@@ -13,11 +13,18 @@
  * -------------------------------------------------------------------
  */
 
+// Standard library
+#include <vector>
+
 // URDF
 #include <urdf/model.hpp>
 
+// ROS
+#include <rclcpp/parameter.hpp>
+
 // KDL
 #include <kdl/segment.hpp>
+#include <kdl/tree.hpp>
 #include <kdl_parser/kdl_parser.hpp>
 
 // Inverse Dynamics Solver
