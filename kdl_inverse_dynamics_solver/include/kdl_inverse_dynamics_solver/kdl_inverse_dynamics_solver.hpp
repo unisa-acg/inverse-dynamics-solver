@@ -16,16 +16,22 @@
 
 #pragma once
 
+// Standard library
+#include <memory>
 #include <string>
-#include <eigen3/Eigen/Core>
+
+// KDL
 #include <kdl/chain.hpp>
 #include <kdl/chaindynparam.hpp>
 #include <kdl/chainjnttojacsolver.hpp>
-#include <kdl/jntarray.hpp>
 #include <kdl/jacobian.hpp>
+#include <kdl/jntarray.hpp>
 #include <kdl/jntspaceinertiamatrix.hpp>
+
+// ROS
 #include <rclcpp/node_interfaces/node_parameters_interface.hpp>
 
+// Inverse Dynamics Solver
 #include <inverse_dynamics_solver/inverse_dynamics_solver.hpp>
 
 namespace kdl_inverse_dynamics_solver
