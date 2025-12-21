@@ -17,9 +17,7 @@
 #pragma once
 
 #include <memory>
-#include <string>
 #include <eigen3/Eigen/Core>
-#include <rclcpp/node_interfaces/node_parameters_interface.hpp>
 #include <pinocchio/multibody/data.hpp>
 #include <pinocchio/multibody/model.hpp>
 
