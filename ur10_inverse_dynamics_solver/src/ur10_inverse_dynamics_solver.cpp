@@ -21,18 +21,29 @@
 #include "ur10_inverse_dynamics_solver/ur10_inverse_dynamics_solver.hpp"
 
 namespace ur10_inverse_dynamics_solver
-
 {
+
+InverseDynamicsSolverUR10::~InverseDynamicsSolverUR10()
+{
+  delete[] q_;
+  delete[] qd_;
+  delete[] qdd_;
+  delete[] H_;
+  delete[] c_;
+  delete[] g_;
+  delete[] currents_;
+}
+
 void InverseDynamicsSolverUR10::initialize(rclcpp::node_interfaces::NodeParametersInterface::ConstSharedPtr, const std::string&, const std::string&)
 {
   // Allocate kinematic/dynamic variables once for real-time safeness
-  q_ = (double*)malloc(NUMBER_OF_JOINTS * sizeof(double));
-  qd_ = (double*)malloc(NUMBER_OF_JOINTS * sizeof(double));
-  qdd_ = (double*)malloc(NUMBER_OF_JOINTS * sizeof(double));
-  H_ = (double*)malloc(NUMBER_OF_JOINTS * NUMBER_OF_JOINTS * sizeof(double));
-  c_ = (double*)malloc(NUMBER_OF_JOINTS * sizeof(double));
-  g_ = (double*)malloc(NUMBER_OF_JOINTS * sizeof(double));
-  currents_ = (double*)malloc(NUMBER_OF_JOINTS * sizeof(double));
+  q_ = new double[NUMBER_OF_JOINTS];
+  qd_ = new double[NUMBER_OF_JOINTS];
+  qdd_ = new double[NUMBER_OF_JOINTS];
+  H_ = new double[NUMBER_OF_JOINTS * NUMBER_OF_JOINTS];
+  c_ = new double[NUMBER_OF_JOINTS];
+  g_ = new double[NUMBER_OF_JOINTS];
+  currents_ = new double[NUMBER_OF_JOINTS];
 }
 
 Eigen::MatrixXd InverseDynamicsSolverUR10::getInertiaMatrix(const Eigen::VectorXd& joint_positions) const

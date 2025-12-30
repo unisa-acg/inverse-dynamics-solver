@@ -78,7 +78,7 @@ private:
    */
   void verifyInitialization_() const;
 
-  bool initialized_ = false;
+  bool initialized_{ false };
   unsigned int number_of_joints_;
   KDL::Chain chain_;
   std::unique_ptr<KDL::ChainDynParam> solver_;

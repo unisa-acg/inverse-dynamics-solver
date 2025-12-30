@@ -39,6 +39,8 @@ class InverseDynamicsSolverUR10 : public inverse_dynamics_solver::InverseDynamic
 public:
   InverseDynamicsSolverUR10() {}
 
+  ~InverseDynamicsSolverUR10();
+
   /**
    * @brief Refer to the superclass documentation
    *
@@ -90,14 +92,14 @@ private:
    */
   Matrix6d getDriveGainsMatrix_() const;
 
-  // Kinematic/dynamic variables are allocated in the `initialize` method for real-time safeness
-  double* q_;
-  double* qd_;
-  double* qdd_;
-  double* H_;
-  double* c_;
-  double* g_;
-  double* currents_;
+  // Kinematic/dynamic variables are allocated in the `initialize` method for real-time safeness, and deallocated in the destructor
+  double* q_{ nullptr };
+  double* qd_{ nullptr };
+  double* qdd_{ nullptr };
+  double* H_{ nullptr };
+  double* c_{ nullptr };
+  double* g_{ nullptr };
+  double* currents_{ nullptr };
 };
 
 }  // namespace ur10_inverse_dynamics_solver
