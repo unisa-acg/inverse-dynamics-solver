@@ -33,13 +33,12 @@ static const double K6 = 11.7682;
 static const unsigned short int NUMBER_OF_JOINTS = 6;
 typedef Eigen::Matrix<double, NUMBER_OF_JOINTS, 1> Vector6d;
 typedef Eigen::Matrix<double, NUMBER_OF_JOINTS, NUMBER_OF_JOINTS> Matrix6d;
+typedef Eigen::DiagonalMatrix<double, NUMBER_OF_JOINTS> DMatrix6d;
 
 class InverseDynamicsSolverUR10 : public inverse_dynamics_solver::InverseDynamicsSolver
 {
 public:
   InverseDynamicsSolverUR10() {}
-
-  ~InverseDynamicsSolverUR10();
 
   /**
    * @brief Refer to the superclass documentation
@@ -85,21 +84,12 @@ private:
    */
   Vector6d getFrictionCurrents_(const Vector6d& joint_velocities) const;
 
-  /**
-   * @brief This method returns the matrix K of motor drive gains, such that tau = K*i
-   *
-   * @return Returns a 6-by-6 diagonal matrix containing joint motor drive gains (expressed in [Nm/A]).
-   */
-  Matrix6d getDriveGainsMatrix_() const;
-
-  // Kinematic/dynamic variables are allocated in the `initialize` method for real-time safeness, and deallocated in the destructor
-  double* q_{ nullptr };
-  double* qd_{ nullptr };
-  double* qdd_{ nullptr };
-  double* H_{ nullptr };
-  double* c_{ nullptr };
-  double* g_{ nullptr };
-  double* currents_{ nullptr };
+  // Kinematic/dynamic variables are stack-allocated for real-time safeness: they are declared as mutable as they are output variables
+  mutable Matrix6d H_;
+  mutable Vector6d c_;
+  mutable Vector6d g_;
+  mutable Vector6d currents_;
+  DMatrix6d K_{ (Vector6d() << K1, K2, K3, K4, K5, K6).finished() };
 };
 
 }  // namespace ur10_inverse_dynamics_solver
