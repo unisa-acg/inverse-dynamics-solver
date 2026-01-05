@@ -44,12 +44,12 @@ def generate_test_description():
         "kdl.gravity": DEFAULT_GRAVITY,
         "no_root.tip": DEFAULT_TIP,  # This setup shall log a warning
         "no_root.gravity": DEFAULT_GRAVITY,
-        "empty_root.root": "",  # This setup shall raise a InvalidParameterValueException
+        "empty_root.root": "",  # This setup shall raise an InvalidParameterValueException
         "empty_root.tip": DEFAULT_TIP,
         "empty_root.gravity": DEFAULT_GRAVITY,
         "no_tip.root": DEFAULT_ROOT,  # This setup shall raise a ParameterUninitializedException
         "no_tip.gravity": DEFAULT_GRAVITY,
-        "empty_tip.tip": "",  # This setup shall raise a InvalidParameterValueException
+        "empty_tip.tip": "",  # This setup shall raise an InvalidParameterValueException
         "empty_tip.gravity": DEFAULT_GRAVITY,
     }
 

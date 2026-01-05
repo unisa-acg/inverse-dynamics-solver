@@ -145,7 +145,7 @@ TEST_F(InverseDynamicsSolverKDLTest, TestInitializationFromNodeParametersInterfa
 
 // Test 3
 /**
- * @brief verifies that the solver can be initialized when the root link is empty
+ * @brief verifies that the solver can be initialized when the root link is undefined
  */
 TEST_F(InverseDynamicsSolverKDLTest, TestInitializationWithNoRoot)
 {
@@ -157,7 +157,7 @@ TEST_F(InverseDynamicsSolverKDLTest, TestInitializationWithNoRoot)
 
 // Test 4
 /**
- * @brief verifies that the solver can be initialized when the root link is empty
+ * @brief verifies that the solver can not be initialized when the root link is empty
  */
 TEST_F(InverseDynamicsSolverKDLTest, FailedInitializationWithEmptyRoot)
 {
@@ -172,7 +172,7 @@ TEST_F(InverseDynamicsSolverKDLTest, FailedInitializationWithEmptyRoot)
 
 // Test 5
 /**
- * @brief verifies that the solver can be initialized when the root link is empty
+ * @brief verifies that the solver can not be initialized when the tip link is undefined
  */
 TEST_F(InverseDynamicsSolverKDLTest, TestInitializationWithNoTip)
 {

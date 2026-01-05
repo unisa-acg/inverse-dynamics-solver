@@ -71,7 +71,7 @@ void InverseDynamicsSolverKDL::initialize(rclcpp::node_interfaces::NodeParameter
   if (!parameters_interface->has_parameter(ns + "root"))
   {
     RCLCPP_WARN(rclcpp::get_logger("kdl_inverse_dynamics_solver"), "Parameter 'root' not found under namespace '%s'. Will default to '%s'.",
-                ns.c_str(), root.c_str());
+                param_namespace.c_str(), root.c_str());
   }
   else
   {
@@ -79,7 +79,8 @@ void InverseDynamicsSolverKDL::initialize(rclcpp::node_interfaces::NodeParameter
     root = root_param.as_string();
     if (root.empty())
     {
-      throw inverse_dynamics_solver::InvalidParameterValueException("Empty 'root' found under namespace '" + ns + "'. Please change configuration.");
+      throw inverse_dynamics_solver::InvalidParameterValueException("Empty 'root' found under namespace '" + param_namespace +
+                                                                    "'. Please change configuration.");
     }
   }
 
@@ -88,13 +89,14 @@ void InverseDynamicsSolverKDL::initialize(rclcpp::node_interfaces::NodeParameter
   std::string tip;
   if (!parameters_interface->has_parameter(ns + "tip"))
   {
-    throw inverse_dynamics_solver::ParameterUninitializedException("Failed to find parameter 'tip' under namespace '" + ns + "'.");
+    throw inverse_dynamics_solver::ParameterUninitializedException("Failed to find parameter 'tip' under namespace '" + param_namespace + "'.");
   }
   parameters_interface->get_parameter(ns + "tip", tip_param);
   tip = tip_param.as_string();
   if (tip.empty())
   {
-    throw inverse_dynamics_solver::InvalidParameterValueException("Empty 'tip' found under namespace '" + ns + "'. Please change configuration.");
+    throw inverse_dynamics_solver::InvalidParameterValueException("Empty 'tip' found under namespace '" + param_namespace +
+                                                                  "'. Please change configuration.");
   }
 
   // Get kinematic chain
