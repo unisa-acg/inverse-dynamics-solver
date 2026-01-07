@@ -18,6 +18,7 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
     orocos_kdl
     pluginlib
     rclcpp
+    urdf
     inverse_dynamics_solver
 )
 
@@ -46,6 +47,7 @@ target_link_libraries(
   PUBLIC kdl_parser::kdl_parser
          pluginlib::pluginlib
          rclcpp::rclcpp
+         urdf::urdf
          inverse_dynamics_solver::inverse_dynamics_solver
 )
 

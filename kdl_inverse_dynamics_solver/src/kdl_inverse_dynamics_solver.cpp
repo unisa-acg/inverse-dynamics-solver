@@ -16,10 +16,18 @@
 // Standard library
 #include <vector>
 
+// URDF
+#include <urdf/model.hpp>
+
 // ROS
 #include <rclcpp/parameter.hpp>
 
+// URDF
+#include <urdf/model.hpp>
+
 // KDL
+#include <kdl/joint.hpp>
+#include <kdl/segment.hpp>
 #include <kdl/solveri.hpp>
 #include <kdl/tree.hpp>
 #include <kdl_parser/kdl_parser.hpp>
@@ -64,12 +72,14 @@ void InverseDynamicsSolverKDL::initialize(rclcpp::node_interfaces::NodeParameter
   // Get root name
   rclcpp::Parameter root_param = rclcpp::Parameter();
   std::string root;
-  if (parameters_interface->has_parameter(ns + "root"))
+  bool root_found = parameters_interface->has_parameter(ns + "root");
+  if (root_found)
   {
     parameters_interface->get_parameter(ns + "root", root_param);
     root = root_param.as_string();
+    root_found = !root.empty();
   }
-  else
+  if (!root_found)
   {
     root = robot_tree.getRootSegment()->first;
   }
@@ -77,12 +87,14 @@ void InverseDynamicsSolverKDL::initialize(rclcpp::node_interfaces::NodeParameter
   // Get tip name
   rclcpp::Parameter tip_param = rclcpp::Parameter();
   std::string tip;
-  if (parameters_interface->has_parameter(ns + "tip"))
+  bool tip_found = parameters_interface->has_parameter(ns + "tip");
+  if (tip_found)
   {
     parameters_interface->get_parameter(ns + "tip", tip_param);
     tip = tip_param.as_string();
+    tip_found = !tip.empty();
   }
-  else
+  if (!tip_found)
   {
     throw inverse_dynamics_solver::ParameterUninitializedException("Failed to find parameter 'tip'.");
   }
@@ -116,9 +128,6 @@ void InverseDynamicsSolverKDL::initialize(rclcpp::node_interfaces::NodeParameter
   solver_ = std::make_unique<KDL::ChainDynParam>(chain_, KDL::Vector(gravity[0], gravity[1], gravity[2]));
   jacobian_solver_ = std::make_unique<KDL::ChainJntToJacSolver>(chain_);
 
-  // Track plugin initialization
-  initialized_ = true;
-
   // Allocate kinematic/dynamic variables once for real-time safeness
   kdl_joint_positions_ = std::make_unique<KDL::JntArray>(number_of_joints_);
   kdl_joint_velocities_ = std::make_unique<KDL::JntArray>(number_of_joints_);
@@ -126,7 +135,14 @@ void InverseDynamicsSolverKDL::initialize(rclcpp::node_interfaces::NodeParameter
   M_ = std::make_unique<KDL::JntSpaceInertiaMatrix>(number_of_joints_);
   c_ = std::make_unique<KDL::JntArray>(number_of_joints_);
   g_ = std::make_unique<KDL::JntArray>(number_of_joints_);
-  zero_ = Eigen::VectorXd::Zero(number_of_joints_);
+
+  // Get friction
+  friction_ = Eigen::VectorXd::Zero(number_of_joints_);
+  damping_ = Eigen::VectorXd::Zero(number_of_joints_);
+  parseFrictionFromURDF_(robot_description_local);
+
+  // Track plugin initialization
+  initialized_ = true;
 }
 
 Eigen::MatrixXd InverseDynamicsSolverKDL::getInertiaMatrix(const Eigen::VectorXd& joint_positions) const
@@ -163,13 +179,10 @@ Eigen::VectorXd InverseDynamicsSolverKDL::getGravityVector(const Eigen::VectorXd
   return g_->data;
 }
 
-Eigen::VectorXd InverseDynamicsSolverKDL::getFrictionVector(const Eigen::VectorXd&) const
+Eigen::VectorXd InverseDynamicsSolverKDL::getFrictionVector(const Eigen::VectorXd& joint_velocities) const
 {
-  // KDL joint model does not include friction, thus it is not able to compute the torque vector
-  // associated with joint frictions. In the future, this function could be implemented by
-  // reading the friction coefficients present in the URDF.
   verifyInitialization_();
-  return zero_;
+  return friction_.cwiseProduct(joint_velocities.cwiseSign()) + damping_.cwiseProduct(joint_velocities);
 }
 
 Eigen::MatrixXd InverseDynamicsSolverKDL::getJacobian(const Eigen::VectorXd& joint_positions) const
@@ -189,11 +202,52 @@ Eigen::MatrixXd InverseDynamicsSolverKDL::getJacobian(const Eigen::VectorXd& joi
   }
 }
 
+Eigen::VectorXd InverseDynamicsSolverKDL::getTorques(const Eigen::VectorXd& joint_positions, const Eigen::VectorXd& joint_velocities,
+                                                     const Eigen::VectorXd& joint_accelerations,
+                                                     const Eigen::Matrix<double, 6, 1>& external_wrench) const
+{
+  return inverse_dynamics_solver::InverseDynamicsSolver::getTorques(joint_positions, joint_velocities, joint_accelerations, external_wrench) +
+         getFrictionVector(joint_velocities);
+}
+
 void InverseDynamicsSolverKDL::verifyInitialization_() const
 {
   if (!initialized_)
   {
     throw inverse_dynamics_solver::UninitializedException();
+  }
+}
+
+void InverseDynamicsSolverKDL::parseFrictionFromURDF_(const std::string& robot_description)
+{
+  urdf::Model urdf_model;
+  if (!urdf_model.initString(robot_description))
+  {
+    throw inverse_dynamics_solver::InvalidParameterValueException("Failed to parse URDF string.");
+  }
+
+  std::size_t j = 0;
+  for (const KDL::Segment& segment : chain_.segments)
+  {
+    KDL::Joint joint = segment.getJoint();
+    const std::string joint_name = joint.getName();
+
+    if (joint.getType() != KDL::Joint::Fixed && urdf_model.joints_.find(joint_name) != urdf_model.joints_.end())
+    {
+      urdf::JointSharedPtr joint = urdf_model.joints_.at(joint_name);
+      if (joint->dynamics)
+      {
+        if (joint->dynamics->friction)
+        {
+          friction_(j) = joint->dynamics->friction;  // coulomb friction
+        }
+        if (joint->dynamics->damping)
+        {
+          damping_(j) = joint->dynamics->damping;  // viscous friction
+        }
+      }
+      ++j;
+    }
   }
 }
 }  // namespace kdl_inverse_dynamics_solver

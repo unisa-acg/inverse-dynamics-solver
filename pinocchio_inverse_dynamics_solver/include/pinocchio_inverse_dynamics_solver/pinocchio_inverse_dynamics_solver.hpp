@@ -3,44 +3,33 @@
  * This module has been developed by the Automatic Control Group
  * of the University of Salerno, Italy.
  *
- * Title:   kdl_inverse_dynamics_solver.hpp
- * Author:  Enrico Ferrentino, Vincenzo Petrone
+ * Title:   pinocchio_inverse_dynamics_solver.hpp
+ * Author:  Vincenzo Petrone
  * Org.:    UNISA
- * Date:    Dec 3, 2019
+ * Date:    Oct 10, 2025
  *
- * This is an implementation of DynamicsSolver using the
- * general-purpose, robot-agnostic KDL library.
+ * This is an implementation of InverseDynamicsSolver using the
+ * general-purpose, robot-agnostic Pinocchio library.
  *
  * -------------------------------------------------------------------
  */
 
 #pragma once
 
-// Standard library
 #include <memory>
-#include <string>
+#include <eigen3/Eigen/Core>
+#include <pinocchio/multibody/data.hpp>
+#include <pinocchio/multibody/model.hpp>
 
-// KDL
-#include <kdl/chain.hpp>
-#include <kdl/chaindynparam.hpp>
-#include <kdl/chainjnttojacsolver.hpp>
-#include <kdl/jacobian.hpp>
-#include <kdl/jntarray.hpp>
-#include <kdl/jntspaceinertiamatrix.hpp>
-
-// ROS
-#include <rclcpp/node_interfaces/node_parameters_interface.hpp>
-
-// Inverse Dynamics Solver
 #include <inverse_dynamics_solver/inverse_dynamics_solver.hpp>
 
-namespace kdl_inverse_dynamics_solver
+namespace pinocchio_inverse_dynamics_solver
 {
 
-class InverseDynamicsSolverKDL : public inverse_dynamics_solver::InverseDynamicsSolver
+class InverseDynamicsSolverPinocchio : public inverse_dynamics_solver::InverseDynamicsSolver
 {
 public:
-  InverseDynamicsSolverKDL() {}
+  InverseDynamicsSolverPinocchio() {}
 
   /**
    * @brief Refer to the superclass documentation
@@ -48,24 +37,30 @@ public:
    * This method must be called before any other.
    *
    * @throw ParameterUninitializedException if the required parameters are not found in \e parameters_interface
-   * @throw InvalidParameterValueException if the parameters are not valid, i.e. \e robot_description is malformed, the kinematic chain's root and tip
-   * are not correctly configured, or the gravity vector is not coherent
+   * @throw InvalidParameterValueException if the parameters are not valid, i.e. \e robot_description is malformed, the kinematic chain's tip is not
+   * correctly configured, or the gravity vector is not coherent
    */
   void initialize(rclcpp::node_interfaces::NodeParametersInterface::ConstSharedPtr parameters_interface, const std::string& param_namespace = "",
                   const std::string& robot_description = "") override;
 
   /**
    * @brief Refer to the superclass documentation
+   * @note Calls pinocchio::crba
+   * @see https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/devel/doxygen-html/namespacepinocchio.html#aceb2f63122315f978667acb902f21618
    */
   Eigen::MatrixXd getInertiaMatrix(const Eigen::VectorXd& joint_positions) const override;
 
   /**
    * @brief Refer to the superclass documentation
+   * @note Calls pinocchio::computeCoriolisMatrix
+   * @see https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/devel/doxygen-html/namespacepinocchio.html#aa8054f1b4946aefea90d819031b98df3
    */
   Eigen::VectorXd getCoriolisVector(const Eigen::VectorXd& joint_positions, const Eigen::VectorXd& joint_velocities) const override;
 
   /**
    * @brief Refer to the superclass documentation
+   * @note Calls pinocchio::computeGeneralizedGravity
+   * @see https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/devel/doxygen-html/namespacepinocchio.html#ab92fc9acc9c2366729b13ddb594f5cc4
    */
   Eigen::VectorXd getGravityVector(const Eigen::VectorXd& joint_positions) const override;
 
@@ -76,12 +71,16 @@ public:
 
   /**
    * @brief Refer to the superclass documentation
-   * @throw std::runtime_error if the KDL solver fails to compute Jacobian
+   *
+   * @note Calls pinocchio::computeJointJacobians before pinocchio::getFrameJacobian
+   * @see https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/namespacepinocchio.html#ae13e2fae5dd6f8845ef31b32d9868a0d
    */
   Eigen::MatrixXd getJacobian(const Eigen::VectorXd& joint_positions) const override;
 
   /**
    * @brief Refer to the superclass documentation
+   * @note Calls pinocchio::rnea
+   * @see https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/devel/doxygen-html/namespacepinocchio.html#a4cdcd1eb63d3a12d29f6df7639899bb6
    */
   Eigen::VectorXd getTorques(const Eigen::VectorXd& joint_positions, const Eigen::VectorXd& joint_velocities,
                              const Eigen::VectorXd& joint_accelerations,
@@ -100,22 +99,17 @@ private:
    */
   void parseFrictionFromURDF_(const std::string& robot_description);
 
-  bool initialized_ = false;
+  std::string tip_;
+  std::shared_ptr<pinocchio::Data> data_;
+  pinocchio::Model model_;
   unsigned int number_of_joints_;
-  KDL::Chain chain_;
-  std::unique_ptr<KDL::ChainDynParam> solver_;
-  std::unique_ptr<KDL::ChainJntToJacSolver> jacobian_solver_;
+  bool initialized_ = false;
 
-  // Kinematic/dynamic variables are allocated in the `initialize` method for real-time safeness; they are declared with smart pointers because all
-  // the methods in this class are `const`, and this would not allow changing their values if they were not declared with pointers
-  std::unique_ptr<KDL::JntArray> kdl_joint_positions_;
-  std::unique_ptr<KDL::JntArray> kdl_joint_velocities_;
-  std::unique_ptr<KDL::Jacobian> jacobian_;
-  std::unique_ptr<KDL::JntSpaceInertiaMatrix> M_;
-  std::unique_ptr<KDL::JntArray> c_;
-  std::unique_ptr<KDL::JntArray> g_;
+  // This variables avoid dynamic allocation and ensure real-time safeness
+  pinocchio::Data::Matrix6x jacobian_;
   Eigen::VectorXd friction_;  // coulomb friction [Nm]
   Eigen::VectorXd damping_;   // viscous friction [Nm/(rad/s)]
+  Eigen::VectorXd zero_;
 };
 
-}  // namespace kdl_inverse_dynamics_solver
+}  // namespace pinocchio_inverse_dynamics_solver

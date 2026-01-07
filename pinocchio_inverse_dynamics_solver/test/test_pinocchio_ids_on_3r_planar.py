@@ -35,11 +35,11 @@ def generate_test_description():
     DEFAULT_GRAVITY = [0, 0, -9.81]
     parameters = {
         "robot_description": robot_description,
-        "inverse_dynamics_solver_plugin_name": "kdl_inverse_dynamics_solver/InverseDynamicsSolverKDL",
+        "inverse_dynamics_solver_plugin_name": "pinocchio_inverse_dynamics_solver/InverseDynamicsSolverPinocchio",
         "link_lengths": [a1, a2, a3],
-        "kdl.root": "base_link",
-        "kdl.tip": "flange",
-        "kdl.gravity": DEFAULT_GRAVITY,
+        "ids.root": "base_link",
+        "ids.tip": "flange",
+        "ids.gravity": DEFAULT_GRAVITY,
         "empty_root.root": "",
         "empty_root.tip": "flange",
         "empty_root.gravity": DEFAULT_GRAVITY,
@@ -49,10 +49,10 @@ def generate_test_description():
     }
 
     # The node to test
-    test_kdl_ids_on_3r_planar_node = Node(
-        package="kdl_inverse_dynamics_solver",
-        executable="kdl_ids_on_3r_planar_test",
-        name="test_kdl_ids_on_3r_planar_node",
+    test_pinocchio_ids_on_3r_planar_node = Node(
+        package="pinocchio_inverse_dynamics_solver",
+        executable="pinocchio_ids_on_3r_planar_test",
+        name="test_pinocchio_ids_on_3r_planar_node",
         parameters=[parameters],
         output="screen",
     )
@@ -61,19 +61,19 @@ def generate_test_description():
     return (
         LaunchDescription(
             [
-                test_kdl_ids_on_3r_planar_node,
+                test_pinocchio_ids_on_3r_planar_node,
                 KeepAliveProc(),
                 ReadyToTest(),
             ]
         ),
-        {"test_kdl_ids_on_3r_planar_node": test_kdl_ids_on_3r_planar_node},
+        {"test_pinocchio_ids_on_3r_planar_node": test_pinocchio_ids_on_3r_planar_node},
     )
 
 
 class TestTerminatingProcessStops(TestCase):
-    def test_gtest_run_complete(self, proc_info, test_kdl_ids_on_3r_planar_node):
+    def test_gtest_run_complete(self, proc_info, test_pinocchio_ids_on_3r_planar_node):
         proc_info.assertWaitForShutdown(
-            process=test_kdl_ids_on_3r_planar_node, timeout=4000.0
+            process=test_pinocchio_ids_on_3r_planar_node, timeout=4000.0
         )
 
 
