@@ -1,4 +1,4 @@
-# Inverse dynamics solver
+# Inverse dynamics interface
 
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-red.svg?style=plastic)](https://opensource.org/licenses/BSD-3-Clause)
 [![Build Status](https://build.ros2.org/buildStatus/icon?job=Hdev__inverse_dynamics_solver__ubuntu_jammy_amd64&style=plastic)](https://build.ros2.org/job/Hdev__inverse_dynamics_solver__ubuntu_jammy_amd64/)
@@ -10,15 +10,17 @@ This is the accompanying code of the paper
 
 This repository provides a library to solve the inverse dynamics problem for serial manipulators, i.e., it returns torques or dynamic matrices given input joint positions, velocities and accelerations.
 
-The library is implemented in the [`inverse_dynamics_solver` package](./inverse_dynamics_solver/README.md).
+The library is implemented in the [`inverse_dynamics_interface` package](./inverse_dynamics_interface/README.md).
 The library is inherited by three concrete classes, i.e.,
 
-- A KDL-based solver for simulated robots, based on their robot description defined via Unified Robot Description Format (URDF)
-    - You can find it in the [`kdl_inverse_dynamics_solver` package](./kdl_inverse_dynamics_solver/README.md)
-- A solver for the real UR10 robot
-    - You can find it in the [`ur10_inverse_dynamics_solver` package](./ur10_inverse_dynamics_solver/README.md)
-- A solver for the real Franka Emika Robot (FER, aka Panda)
-    - You can find it in the [`franka_inria_inverse_dynamics_solver` package](./franka_inria_inverse_dynamics_solver/README.md)
+- A KDL-based implementation for simulated robots, based on their robot description defined via Unified Robot Description Format (URDF)
+    - You can find it in the [`inverse_dynamics_interface_kdl` package](./inverse_dynamics_interface_kdl/README.md)
+- A Pinocchio-based implementation with the same scope
+    - You can find it in the [`inverse_dynamics_interface_pinocchio` package](./inverse_dynamics_interface_pinocchio/README.md)
+- An implementation for the real UR10 robot
+    - You can find it in the [`inverse_dynamics_interface_ur10` package](./inverse_dynamics_interface_ur10/README.md)
+- An implementation for the real Franka Emika Robot (FER, aka Panda)
+    - You can find it in the [`inverse_dynamics_interface_franka_inria` package](./inverse_dynamics_interface_franka_inria/README.md)
 
 ## Dependencies
 
