@@ -24,6 +24,7 @@
 
 // Inverse Dynamics Solver
 #include <inverse_dynamics_solver/inverse_dynamics_solver.hpp>
+#include <inverse_dynamics_solver/exceptions.hpp>
 
 // This class shares parameters and data across all tests
 class SharedData
@@ -143,6 +144,59 @@ TEST_F(InverseDynamicsSolverKDLTest, TestInitializationFromNodeParametersInterfa
 }
 
 // Test 3
+/**
+ * @brief verifies that the solver can be initialized when the root link is undefined
+ */
+TEST_F(InverseDynamicsSolverKDLTest, TestInitializationWithNoRoot)
+{
+  std::string tip = node->get_parameter("no_root.tip").as_string();
+  RCLCPP_INFO_STREAM(node->get_logger(), "Initializing " << inverse_dynamics_solver_plugin_name << " with default root and tip '" << tip << "'.");
+  ASSERT_NO_THROW(inverse_dynamics_solver->initialize(node->get_node_parameters_interface(), "no_root"));
+  RCLCPP_INFO_STREAM(node->get_logger(), inverse_dynamics_solver_plugin_name << " initialized.");
+}
+
+// Test 4
+/**
+ * @brief verifies that the solver can not be initialized when the root link is empty
+ */
+TEST_F(InverseDynamicsSolverKDLTest, FailedInitializationWithEmptyRoot)
+{
+  std::string root = node->get_parameter("empty_root.root").as_string();
+  std::string tip = node->get_parameter("empty_root.tip").as_string();
+  RCLCPP_INFO_STREAM(node->get_logger(),
+                     "Initializing " << inverse_dynamics_solver_plugin_name << " with root '" << root << "' and tip '" << tip << "'.");
+  ASSERT_THROW(inverse_dynamics_solver->initialize(node->get_node_parameters_interface(), "empty_root"),
+               inverse_dynamics_solver::InvalidParameterValueException);
+  RCLCPP_ERROR_STREAM(node->get_logger(), inverse_dynamics_solver_plugin_name << " not initialized.");
+}
+
+// Test 5
+/**
+ * @brief verifies that the solver can not be initialized when the tip link is undefined
+ */
+TEST_F(InverseDynamicsSolverKDLTest, TestInitializationWithNoTip)
+{
+  std::string root = node->get_parameter("no_tip.root").as_string();
+  RCLCPP_INFO_STREAM(node->get_logger(), "Initializing " << inverse_dynamics_solver_plugin_name << " with root '" << root << "' and no tip.");
+  ASSERT_THROW(inverse_dynamics_solver->initialize(node->get_node_parameters_interface(), "no_tip"),
+               inverse_dynamics_solver::ParameterUninitializedException);
+  RCLCPP_INFO_STREAM(node->get_logger(), inverse_dynamics_solver_plugin_name << " initialized.");
+}
+
+// Test 6
+/**
+ * @brief verifies that the solver can not be initialized when the tip link is empty
+ */
+TEST_F(InverseDynamicsSolverKDLTest, FailedInitializationWithEmptyTip)
+{
+  std::string tip = node->get_parameter("empty_tip.tip").as_string();
+  RCLCPP_INFO_STREAM(node->get_logger(), "Initializing " + inverse_dynamics_solver_plugin_name << " with default root and tip '" << tip << "'.");
+  ASSERT_THROW(inverse_dynamics_solver->initialize(node->get_node_parameters_interface(), "empty_tip"),
+               inverse_dynamics_solver::InvalidParameterValueException);
+  RCLCPP_ERROR_STREAM(node->get_logger(), inverse_dynamics_solver_plugin_name << " not initialized.");
+}
+
+// Test 7
 /**
  * @brief verifies that method getDynamicParameters returns the expected values
  */
