@@ -2,6 +2,11 @@
 Changelog for package ur10_inverse_dynamics_solver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'main' into bugfix/empty_tip_root
+* Contributors: Vincenzo Petrone
+
 6.0.1 (2025-12-18)
 ------------------
 * Merge pull request `#11 <https://github.com/unisa-acg/inverse-dynamics-solver/issues/11>`_ from unisa-acg/feature/update_dependencies_exporting

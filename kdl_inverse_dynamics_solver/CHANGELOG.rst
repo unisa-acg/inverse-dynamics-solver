@@ -2,6 +2,23 @@
 Changelog for package kdl_inverse_dynamics_solver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'main' into rolling
+* Merge pull request `#13 <https://github.com/unisa-acg/inverse-dynamics-solver/issues/13>`_ from unisa-acg/bugfix/empty_tip_root
+  bugfix/empty_tip_root
+* [REF] Use param_namespace instead of ns in warning/error messages to print the namespace without a trailing dot
+  - [DOC] Fix Doxygen and inline documentation to comply to the last implementation and fix typos
+* [REF] Manages missing/empty root/tip parameters with different logics
+  - [TST] Add related tests
+* [REF] Reorder dependencies alphabetically
+* Merge branch 'main' into bugfix/empty_tip_root
+* [FIX] Handle empty root and tip parameters
+  - [ADD] With empty root, defaults to chain root
+  - [ADD] With empty tip, raises an exception
+  - [TST] Add two test fixtures to test the two scenarios above
+* Contributors: Enrico Ferrentino, Vincenzo Petrone
+
 6.0.1 (2025-12-18)
 ------------------
 * Merge pull request `#11 <https://github.com/unisa-acg/inverse-dynamics-solver/issues/11>`_ from unisa-acg/feature/update_dependencies_exporting
