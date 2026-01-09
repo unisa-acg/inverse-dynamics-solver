@@ -2,8 +2,8 @@
 Changelog for package kdl_inverse_dynamics_solver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.3 (2026-01-09)
+------------------
 * Merge branch 'main' into humble
 * Merge pull request `#13 <https://github.com/unisa-acg/inverse-dynamics-solver/issues/13>`_ from unisa-acg/bugfix/empty_tip_root
   bugfix/empty_tip_root

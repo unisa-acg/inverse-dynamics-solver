@@ -2,8 +2,8 @@
 Changelog for package inverse_dynamics_solver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.3 (2026-01-09)
+------------------
 * [FIX] Correct header after backporting
 * Merge branch 'main' into humble
 * Merge branch 'main' into bugfix/empty_tip_root
