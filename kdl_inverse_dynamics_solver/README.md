@@ -2,11 +2,11 @@
 
 ## Contents
 
-This is an implementation of [`InverseDynamicsSolver`](../inverse_dynamics_solver/README.md) using the general-purpose KDL dynamics solver based on [pluginlib](https://docs.ros.org/en/humble/Tutorials/Beginner-Client-Libraries/Pluginlib.html).
+This is an implementation of [`InverseDynamicsSolver`](../inverse_dynamics_solver/README.md) using the general-purpose KDL dynamics solver based on [pluginlib](https://docs.ros.org/en/jazzy/Tutorials/Beginner-Client-Libraries/Pluginlib.html).
 
-It uses the [KDL parser](https://github.com/ros/kdl_parser/tree/humble) to read a robot description from a parameter spawned by [xacro](https://github.com/ros/xacro/tree/ros2).
+It uses the [KDL parser](https://github.com/ros/kdl_parser/tree/jazzy) to read a robot description from a parameter spawned by [xacro](https://github.com/ros/xacro/tree/ros2).
 So, in order to use this library, this parameter must be passed via launch files.
-Please refer to the [test section](#how-to-test), specifically to the [test launch file](./test/test_kdl_inverse_dynamics_solver.py), for an example, and to [the official guide](https://docs.ros.org/en/humble/Tutorials/Intermediate/Launch/Launch-Main.html) to know how to pass parameters.
+Please refer to the [test section](#how-to-test), specifically to the [test launch file](./test/test_kdl_inverse_dynamics_solver.py), for an example, and to [the official guide](https://docs.ros.org/en/jazzy/Tutorials/Intermediate/Launch/Launch-Main.html) to know how to pass parameters.
 
 ## How to build
 
@@ -44,7 +44,7 @@ Please refer to [the parent class documentation](../inverse_dynamics_solver/READ
 ## How to test
 
 This library is tested against a simulated UR10 robot.
-The kinematic description is taken from UR's official package, [ur_description](https://github.com/UniversalRobots/Universal_Robots_ROS2_Description/tree/humble).
+The kinematic description is taken from UR's official package, [ur_description](https://github.com/UniversalRobots/Universal_Robots_ROS2_Description/tree/jazzy).
 
 The tests consist in checking that, given a fixed joint position and velocity state, the KDL solver returns the expected values for the dynamic components.
 

@@ -1,7 +1,7 @@
 # Inverse dynamics solver
 
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-red.svg?style=plastic)](https://opensource.org/licenses/BSD-3-Clause)
-[![Build Status](https://build.ros2.org/buildStatus/icon?job=Hdev__inverse_dynamics_solver__ubuntu_jammy_amd64&style=plastic)](https://build.ros2.org/job/Hdev__inverse_dynamics_solver__ubuntu_jammy_amd64/)
+[![Build Status](https://build.ros2.org/buildStatus/icon?job=Jdev__inverse_dynamics_solver__ubuntu_noble_amd64&style=plastic)](https://build.ros2.org/view/Jdev/job/Jdev__inverse_dynamics_solver__ubuntu_noble_amd64/)
 [![Static Badge](https://img.shields.io/badge/Open_in-Code_Ocean-blue?style=plastic)](https://doi.org/10.24433/CO.2265930.v1)
 
 This is the accompanying code of the paper
