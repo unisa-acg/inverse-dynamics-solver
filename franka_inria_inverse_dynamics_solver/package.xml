@@ -15,8 +15,6 @@
   <depend>inverse_dynamics_solver</depend>
   <depend>pluginlib</depend>
 
-  <exec_depend>franka_description</exec_depend>
-
   <export>
     <build_type>ament_cmake</build_type>
   </export>

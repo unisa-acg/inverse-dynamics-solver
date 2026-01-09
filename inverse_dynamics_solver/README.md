@@ -35,7 +35,7 @@ Demos and tests are available with concrete implementations of this library: ple
 ### Evaluate the solver
 
 You can evaluate the solver computing the torques corresponding to a sequence of `sensor_msgs/msg/JointState` messages by launching the [`evaluate_solver`](./launch/evaluate_solver.launch.py) demo.
-Please refer to the launch files in [`kdl_inverse_dynamics_solver`](../kdl_inverse_dynamics_solver/README.md#demo) (available for both the [UR10](../kdl_inverse_dynamics_solver/launch/evaluate_solver_kdl_ur10.launch.py) and [Franka Emika Panda (FER)](../kdl_inverse_dynamics_solver/launch/evaluate_solver_kdl_panda.launch.py) robots), [`ur10_inverse_dynamics_solver`](../ur10_inverse_dynamics_solver/launch/evaluate_solver_ur10.launch.py) or [`franka_inria_inverse_dynamics_solver`](../franka_inria_inverse_dynamics_solver/launch/evaluate_solver_franka.launch.py) to see how this demo can be configured with different plugins.
+Please refer to the launch files in [`kdl_inverse_dynamics_solver`](../kdl_inverse_dynamics_solver/launch/evaluate_solver_kdl_ur10.launch.py), [`ur10_inverse_dynamics_solver`](../ur10_inverse_dynamics_solver/launch/evaluate_solver_ur10.launch.py) or [`franka_inria_inverse_dynamics_solver`](../franka_inria_inverse_dynamics_solver/launch/evaluate_solver_franka.launch.py) to see how this demo can be configured with different plugins.
 
 #### Visualize the results
 
