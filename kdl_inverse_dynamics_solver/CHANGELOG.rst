@@ -2,8 +2,8 @@
 Changelog for package kdl_inverse_dynamics_solver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.1 (2026-01-09)
+------------------
 * Merge branch 'main' into jazzy
 * Merge branch 'jazzy' of github.com:unisa-acg/inverse-dynamics-solver into jazzy
 * Merge pull request `#13 <https://github.com/unisa-acg/inverse-dynamics-solver/issues/13>`_ from unisa-acg/bugfix/empty_tip_root

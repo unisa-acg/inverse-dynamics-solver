@@ -2,8 +2,8 @@
 Changelog for package inverse_dynamics_solver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.1 (2026-01-09)
+------------------
 * Merge branch 'jazzy' of github.com:unisa-acg/inverse-dynamics-solver into jazzy
 * Merge branch 'main' into bugfix/empty_tip_root
 * 2.0.0
