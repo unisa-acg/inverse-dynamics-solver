@@ -18,6 +18,8 @@
 #include <vector>
 
 // ROS
+#include <rclcpp/logger.hpp>
+#include <rclcpp/logging.hpp>
 #include <rclcpp/parameter.hpp>
 
 // KDL
@@ -65,34 +67,43 @@ void InverseDynamicsSolverKDL::initialize(rclcpp::node_interfaces::NodeParameter
 
   // Get root name
   rclcpp::Parameter root_param = rclcpp::Parameter();
-  std::string root;
-  if (parameters_interface->has_parameter(ns + "root"))
+  std::string root = robot_tree.getRootSegment()->first;
+  if (!parameters_interface->has_parameter(ns + "root"))
   {
-    parameters_interface->get_parameter(ns + "root", root_param);
-    root = root_param.as_string();
+    RCLCPP_WARN(rclcpp::get_logger("kdl_inverse_dynamics_solver"), "Parameter 'root' not found under namespace '%s'. Will default to '%s'.",
+                param_namespace.c_str(), root.c_str());
   }
   else
   {
-    root = robot_tree.getRootSegment()->first;
+    parameters_interface->get_parameter(ns + "root", root_param);
+    root = root_param.as_string();
+    if (root.empty())
+    {
+      throw inverse_dynamics_solver::InvalidParameterValueException("Empty 'root' found under namespace '" + param_namespace +
+                                                                    "'. Please change configuration.");
+    }
   }
 
   // Get tip name
   rclcpp::Parameter tip_param = rclcpp::Parameter();
   std::string tip;
-  if (parameters_interface->has_parameter(ns + "tip"))
+  if (!parameters_interface->has_parameter(ns + "tip"))
   {
-    parameters_interface->get_parameter(ns + "tip", tip_param);
-    tip = tip_param.as_string();
+    throw inverse_dynamics_solver::ParameterUninitializedException("Failed to find parameter 'tip' under namespace '" + param_namespace + "'.");
   }
-  else
+  parameters_interface->get_parameter(ns + "tip", tip_param);
+  tip = tip_param.as_string();
+  if (tip.empty())
   {
-    throw inverse_dynamics_solver::ParameterUninitializedException("Failed to find parameter 'tip'.");
+    throw inverse_dynamics_solver::InvalidParameterValueException("Empty 'tip' found under namespace '" + param_namespace +
+                                                                  "'. Please change configuration.");
   }
 
   // Get kinematic chain
   if (!robot_tree.getChain(root, tip, chain_))
   {
-    throw inverse_dynamics_solver::InvalidParameterValueException("Failed to find chain from robot root " + root + " to end-effector " + tip + ".");
+    throw inverse_dynamics_solver::InvalidParameterValueException("Failed to find chain from robot root '" + root + "' to end-effector '" + tip +
+                                                                  "'.");
   }
 
   // Get gravity vector
