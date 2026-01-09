@@ -2,6 +2,15 @@
 Changelog for package ur10_inverse_dynamics_solver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'main' into humble
+* Merge branch 'main' into bugfix/empty_tip_root
+* 1.0.2
+* [MAK] Update changelogs
+* [DOC] Remove superfluous instructions in documentation about ros bag files conversion
+* Contributors: Vincenzo Petrone
+
 1.0.2 (2025-09-16)
 ------------------
 * [DOC] Remove superfluous instructions in documentation about ros bag files conversion
