@@ -2,8 +2,8 @@
 Changelog for package franka_inria_inverse_dynamics_solver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+6.0.2 (2026-01-09)
+------------------
 * Merge branch 'main' into bugfix/empty_tip_root
 * Contributors: Vincenzo Petrone
 
