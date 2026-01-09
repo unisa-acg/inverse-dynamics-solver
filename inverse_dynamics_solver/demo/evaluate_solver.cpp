@@ -26,7 +26,7 @@
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <pluginlib/class_loader.hpp>
 #include <eigen3/Eigen/Core>
-#include <urdf/model.hpp>
+#include <urdf/model.h>
 #include "inverse_dynamics_solver/inverse_dynamics_solver.hpp"
 
 class EvaluateSolverNode : public rclcpp::Node
