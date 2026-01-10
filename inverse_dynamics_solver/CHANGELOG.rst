@@ -2,6 +2,11 @@
 Changelog for package inverse_dynamics_solver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.0.2 (2026-01-10)
+------------------
+* [FIX] Fix header after backporting
+* Contributors: Vincenzo Petrone
+
 2.0.1 (2026-01-09)
 ------------------
 * Merge branch 'jazzy' of github.com:unisa-acg/inverse-dynamics-solver into jazzy
