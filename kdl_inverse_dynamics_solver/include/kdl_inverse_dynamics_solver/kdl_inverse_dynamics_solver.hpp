@@ -83,13 +83,13 @@ private:
   KDL::Chain chain_;
   std::unique_ptr<KDL::ChainDynParam> solver_;
 
-  // Kinematic/dynamic variables are allocated in the `initialize` method for real-time safeness; they are declared with smart pointers because all
-  // the methods in this class are `const`, and this would not allow changing their values if they were not declared with pointers
-  std::unique_ptr<KDL::JntArray> kdl_joint_positions_;
-  std::unique_ptr<KDL::JntArray> kdl_joint_velocities_;
-  std::unique_ptr<KDL::JntSpaceInertiaMatrix> H_;
-  std::unique_ptr<KDL::JntArray> c_;
-  std::unique_ptr<KDL::JntArray> g_;
+  // These variables are stack-allocated in the initialize method for real-time safeness: they are declared as mutable as they are either a wrapper
+  // for input variables, or output variables
+  mutable KDL::JntArray kdl_joint_positions_;
+  mutable KDL::JntArray kdl_joint_velocities_;
+  mutable KDL::JntSpaceInertiaMatrix H_;
+  mutable KDL::JntArray c_;
+  mutable KDL::JntArray g_;
   Eigen::VectorXd zero_;
 };
 
