@@ -114,15 +114,15 @@ public:
       Eigen::VectorXd torques = solver_->getTorques(positions, velocities, accelerations[i]);
       const std::chrono::steady_clock::time_point t_end = std::chrono::steady_clock::now();
       const double elapsed_ms = std::chrono::duration<double, std::milli>(t_end - t_start).count();
-      avg_time_ms += (elapsed_ms - avg_time_ms) / ++sample_count;
-      max_time_ms = std::max(max_time_ms, elapsed_ms);
+      avg_time_ms_ += (elapsed_ms - avg_time_ms_) / ++sample_count_;
+      max_time_ms_ = std::max(max_time_ms_, elapsed_ms);
 
       writer.write(joint_states[i], topic + "_gt", timestamps[i]);
       sensor_msgs::msg::JointState output_msg = joint_states[i];
       output_msg.effort.assign(torques.data(), torques.data() + torques.size());
       writer.write(output_msg, topic, timestamps[i]);
     }
-    RCLCPP_INFO(this->get_logger(), "getTorques execution time: avg = %.6f, max = %.6f (%zu samples) [ms]", avg_time_ms, max_time_ms, sample_count);
+    RCLCPP_INFO(this->get_logger(), "getTorques execution time: avg = %.6f, max = %.6f (%zu samples) [ms]", avg_time_ms_, max_time_ms_, sample_count_);
   }
 
 private:
@@ -250,9 +250,9 @@ private:
     }
   }
 
-  double avg_time_ms{ 0.0 };
-  double max_time_ms{ 0.0 };
-  std::size_t sample_count{ 0 };
+  double avg_time_ms_{ 0.0 };
+  double max_time_ms_{ 0.0 };
+  std::size_t sample_count_{ 0 };
   std::unique_ptr<InverseDynamicsSolverLoader> solver_loader_;
   std::shared_ptr<inverse_dynamics_solver::InverseDynamicsSolver> solver_;
   std::vector<std::string> ordered_joint_names_;
