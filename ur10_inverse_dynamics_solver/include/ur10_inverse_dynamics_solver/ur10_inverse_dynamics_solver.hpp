@@ -84,7 +84,7 @@ private:
    */
   Vector6d getFrictionCurrents_(const Vector6d& joint_velocities) const;
 
-  // Kinematic/dynamic variables are stack-allocated for real-time safeness: they are declared as mutable as they are output variables
+  // These variables are stack-allocated for real-time safeness: they are declared as mutable as they are output variables
   mutable Matrix6d H_;
   mutable Vector6d c_;
   mutable Vector6d g_;
