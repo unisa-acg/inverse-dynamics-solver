@@ -14,7 +14,6 @@
  */
 
 // Standard library
-#include <string>
 #include <vector>
 
 // ROS
@@ -23,8 +22,6 @@
 #include <rclcpp/parameter.hpp>
 
 // KDL
-#include <kdl/jntarray.hpp>
-#include <kdl/jntspaceinertiamatrix.hpp>
 #include <kdl/tree.hpp>
 #include <kdl_parser/kdl_parser.hpp>
 
@@ -32,8 +29,8 @@
 #include <inverse_dynamics_solver/exceptions.hpp>
 #include "kdl_inverse_dynamics_solver/kdl_inverse_dynamics_solver.hpp"
 
-using namespace kdl_inverse_dynamics_solver;
-
+namespace kdl_inverse_dynamics_solver
+{
 void InverseDynamicsSolverKDL::initialize(rclcpp::node_interfaces::NodeParametersInterface::ConstSharedPtr parameters_interface,
                                           const std::string& param_namespace, const std::string& robot_description)
 {
@@ -126,54 +123,43 @@ void InverseDynamicsSolverKDL::initialize(rclcpp::node_interfaces::NodeParameter
 
   // Instantiate the solver
   number_of_joints_ = chain_.getNrOfJoints();
-  solver_ = std::make_shared<KDL::ChainDynParam>(chain_, KDL::Vector(gravity[0], gravity[1], gravity[2]));
+  solver_ = std::make_unique<KDL::ChainDynParam>(chain_, KDL::Vector(gravity[0], gravity[1], gravity[2]));
 
   // Track plugin initialization
   initialized_ = true;
+
+  // Allocate kinematic/dynamic variables once for real-time safeness
+  kdl_joint_positions_ = KDL::JntArray(number_of_joints_);
+  kdl_joint_velocities_ = KDL::JntArray(number_of_joints_);
+  H_ = KDL::JntSpaceInertiaMatrix(number_of_joints_);
+  c_ = KDL::JntArray(number_of_joints_);
+  g_ = KDL::JntArray(number_of_joints_);
+  zero_ = Eigen::VectorXd::Zero(number_of_joints_);
 }
 
 Eigen::MatrixXd InverseDynamicsSolverKDL::getInertiaMatrix(const Eigen::VectorXd& joint_positions) const
 {
   verifyInitialization_();
-
-  KDL::JntArray kdl_joint_positions(number_of_joints_);
-  KDL::JntSpaceInertiaMatrix H(number_of_joints_);
-
-  kdl_joint_positions.data = joint_positions;
-
-  solver_->JntToMass(kdl_joint_positions, H);
-
-  return H.data;
+  kdl_joint_positions_.data = joint_positions;
+  solver_->JntToMass(kdl_joint_positions_, H_);
+  return H_.data;
 }
 
 Eigen::VectorXd InverseDynamicsSolverKDL::getCoriolisVector(const Eigen::VectorXd& joint_positions, const Eigen::VectorXd& joint_velocities) const
 {
   verifyInitialization_();
-
-  KDL::JntArray kdl_joint_positions(number_of_joints_);
-  KDL::JntArray kdl_joint_velocities(number_of_joints_);
-  KDL::JntArray C(number_of_joints_);
-
-  kdl_joint_positions.data = joint_positions;
-  kdl_joint_velocities.data = joint_velocities;
-
-  solver_->JntToCoriolis(kdl_joint_positions, kdl_joint_velocities, C);
-
-  return C.data;
+  kdl_joint_positions_.data = joint_positions;
+  kdl_joint_velocities_.data = joint_velocities;
+  solver_->JntToCoriolis(kdl_joint_positions_, kdl_joint_velocities_, c_);
+  return c_.data;
 }
 
 Eigen::VectorXd InverseDynamicsSolverKDL::getGravityVector(const Eigen::VectorXd& joint_positions) const
 {
   verifyInitialization_();
-
-  KDL::JntArray kdl_joint_positions(number_of_joints_);
-  KDL::JntArray g(number_of_joints_);
-
-  kdl_joint_positions.data = joint_positions;
-
-  solver_->JntToGravity(kdl_joint_positions, g);
-
-  return g.data;
+  kdl_joint_positions_.data = joint_positions;
+  solver_->JntToGravity(kdl_joint_positions_, g_);
+  return g_.data;
 }
 
 Eigen::VectorXd InverseDynamicsSolverKDL::getFrictionVector(const Eigen::VectorXd&) const
@@ -182,7 +168,7 @@ Eigen::VectorXd InverseDynamicsSolverKDL::getFrictionVector(const Eigen::VectorX
   // associated with joint frictions. In the future, this function could be implemented by
   // reading the friction coefficients present in the URDF.
   verifyInitialization_();
-  return Eigen::VectorXd::Zero(number_of_joints_);
+  return zero_;
 }
 
 void InverseDynamicsSolverKDL::verifyInitialization_() const
@@ -192,6 +178,7 @@ void InverseDynamicsSolverKDL::verifyInitialization_() const
     throw inverse_dynamics_solver::UninitializedException();
   }
 }
+}  // namespace kdl_inverse_dynamics_solver
 
 #include <pluginlib/class_list_macros.hpp>
 PLUGINLIB_EXPORT_CLASS(kdl_inverse_dynamics_solver::InverseDynamicsSolverKDL, inverse_dynamics_solver::InverseDynamicsSolver)
