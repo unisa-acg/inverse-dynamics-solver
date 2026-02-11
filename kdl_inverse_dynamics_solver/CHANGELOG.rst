@@ -2,6 +2,23 @@
 Changelog for package kdl_inverse_dynamics_solver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'main' into rolling
+* Merge pull request `#15 <https://github.com/unisa-acg/inverse-dynamics-solver/issues/15>`_ from unisa-acg/bugfix/realtime_safeness
+  bugfix/realtime_safeness
+* [REF] Use mutable instead of pointers
+* Merge branch 'main' into bugfix/realtime_safeness
+* [FIX] Deallocate variables
+  - [REF] Use new instead of malloc
+  - [ADD] Initialize pointers
+  - [ADD] Measure performance in terms of computation time
+* Merge branch 'main' into bugfix/realtime_safeness
+* [FIX] Fix allocation of zero-vector
+* [FIX] Avoid dynamic allocation when returning a zero-vector
+* [FIX] Enforce real-time safeness by avoiding dynamic allocations of vectors
+* Contributors: Enrico Ferrentino, Vincenzo Petrone
+
 6.0.2 (2026-01-09)
 ------------------
 * Merge branch 'main' into rolling

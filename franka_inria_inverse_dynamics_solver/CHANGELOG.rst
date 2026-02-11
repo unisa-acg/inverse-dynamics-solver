@@ -2,6 +2,16 @@
 Changelog for package franka_inria_inverse_dynamics_solver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'main' into rolling
+* Merge pull request `#15 <https://github.com/unisa-acg/inverse-dynamics-solver/issues/15>`_ from unisa-acg/bugfix/realtime_safeness
+  bugfix/realtime_safeness
+* Merge branch 'main' into bugfix/realtime_safeness
+* [REF] Optimizes code for computation time performance
+* [FIX] Enforce real-time safeness by avoiding dynamic allocations of vectors
+* Contributors: Enrico Ferrentino, Vincenzo Petrone
+
 6.0.2 (2026-01-09)
 ------------------
 * Merge branch 'main' into bugfix/empty_tip_root
