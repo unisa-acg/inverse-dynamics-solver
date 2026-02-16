@@ -47,6 +47,7 @@ target_link_libraries(
   PUBLIC kdl_parser::kdl_parser
          pluginlib::pluginlib
          urdf::urdf
+         rclcpp::rclcpp
          inverse_dynamics_solver::inverse_dynamics_solver
 )
 
