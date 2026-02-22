@@ -136,6 +136,7 @@ void InverseDynamicsSolverKDL::initialize(rclcpp::node_interfaces::NodeParameter
   H_ = KDL::JntSpaceInertiaMatrix(number_of_joints_);
   c_ = KDL::JntArray(number_of_joints_);
   g_ = KDL::JntArray(number_of_joints_);
+  initialized_ = true;
 }
 
 Eigen::MatrixXd InverseDynamicsSolverKDL::getInertiaMatrix(const Eigen::VectorXd& joint_positions) const
