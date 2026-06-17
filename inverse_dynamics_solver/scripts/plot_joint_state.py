@@ -45,7 +45,7 @@ def read_ros2_bag(bag_file, topic):
 
     messages = []
     while reader.has_next():
-        (topic_name, data, t) = reader.read_next()
+        (topic_name, data, _, _) = reader.read_next_ext()
         if topic_name == topic:
             msg = deserialize_message(data, JointState)
             messages.append(msg)
