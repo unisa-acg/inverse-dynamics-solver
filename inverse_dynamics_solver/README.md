@@ -42,7 +42,7 @@ Please refer to the launch files in [`kdl_inverse_dynamics_solver`](../kdl_inver
 Run the [plot_joint_state](./scripts/plot_joint_state.py) Python script to assess the performance of the solver, i.e. the comparison between ground truth (GT) and computed torques, where the GT torques are retrieved from the measured joint states, as mentioned above:
 
 ```bash
-ros2 run inverse_dynamics_solver plot_joint_state.py -b BAG_FILES [BAG_FILES ...] -o OUTPUT_DIR
+ros2 run inverse_dynamics_solver plot_joint_state.py -b BAG_FILES [BAG_FILES ...] -d OUTPUT_DIR
 ```
 
 For additional information, run

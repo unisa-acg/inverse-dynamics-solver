@@ -70,11 +70,17 @@ def main():
         "-b", "--bag_files", nargs="+", required=True, help="List of ROS2 bag files."
     )
     parser.add_argument(
-        "-o",
+        "-d",
         "--output_dir",
         type=str,
         required=True,
         help="Output directory for plots.",
+    )
+    parser.add_argument(
+        "-o",
+        "--overlay",
+        action="store_true",
+        help="Plot measured torques from first bag and computed torques from all bags on the same axes.",
     )
     args = parser.parse_args()
 
@@ -83,61 +89,169 @@ def main():
 
     # Process each bag file
     topic = "/torques"
-    for bag_file in args.bag_files:
+    mae_dict = {}  # {joint_name: {bag_name: mae_value}}
+    mae_tables = []  # store all MAE tables entries
+    headers = []  # store all MAE tables headers
+    bag_names = []  # maintain bag order
+    computed_data = []  # store computed signals for overlay
+    first_measured = {}  # measured signals from first bag only
+
+    for idx, bag_file in enumerate(args.bag_files):
+        bag_name = os.path.basename(bag_file).split(".")[0]
+        bag_names.append(bag_name)
+
         # Read messages
         input_msgs = read_ros2_bag(bag_file, topic + "_gt")
         output_msgs = read_ros2_bag(bag_file, topic)
 
-        # Extract timestamps and torques
+        # Extract data
         input_timestamps, input_efforts_mat = extract_data(input_msgs)
         output_timestamps, output_efforts_mat = extract_data(output_msgs)
 
-        # Number of joints
         n_joints = input_efforts_mat.shape[1]
+        joint_names = input_msgs[0].name
 
-        # Plot results
-        name = os.path.basename(bag_file).split(".")[0]
+        # Store the first bag's measured data if overlaying
+        if args.overlay and idx == 0:
+            first_measured["timestamps"] = input_timestamps
+            first_measured["efforts"] = input_efforts_mat
+
+        # Always store computed data
+        if args.overlay:
+            computed_data.append(
+                {
+                    "bag_name": bag_name,
+                    "timestamps": output_timestamps,
+                    "efforts": output_efforts_mat,
+                }
+            )
+
+        # Compute MAE for the table
+        mae_values = np.mean(np.abs(output_efforts_mat - input_efforts_mat), axis=0)
+        for joint_name, mae_value in zip(joint_names, mae_values):
+            if joint_name not in mae_dict:
+                mae_dict[joint_name] = {}
+            mae_dict[joint_name][bag_name] = mae_value
+
+        # Plotting
+        if not args.overlay:
+            # Normal mode: separate figure for each bag
+            fig, axes = plt.subplots(
+                nrows=int(np.ceil(n_joints / 2)), ncols=2, figsize=(20, 12)
+            )
+            fig.set_tight_layout(True)
+            fig.patch.set_alpha(0)
+            axes = axes.flatten()
+
+            for jj in range(n_joints):
+                ax = axes[jj]
+                ax.plot(
+                    output_timestamps,
+                    output_efforts_mat[:, jj],
+                    "r",
+                    linewidth=LW,
+                    label="Computed",
+                )
+                ax.plot(
+                    input_timestamps,
+                    input_efforts_mat[:, jj],
+                    "k--",
+                    linewidth=LW,
+                    label="Measured",
+                )
+                ax.set_xlabel("Time [s]", fontsize=FS)
+                ax.set_ylabel(r"$\tau_{{{}}}$ [Nm]".format(jj + 1), fontsize=FS)
+                ax.grid(True)
+                ax.set_xlim([0, input_timestamps[-1]])
+                ax.tick_params(axis="both", labelsize=FS)
+            fig.legend(["Computed", "Measured"], loc="lower right", fontsize=FS)
+
+            # Save figure
+            pdf_path = os.path.join(args.output_dir, f"{bag_name}.pdf")
+            plt.savefig(pdf_path, format="pdf", bbox_inches="tight")
+            plt.close(fig)
+            print(f"Figure saved: {pdf_path}")
+
+            # Compute table
+            mae_tables.append(
+                [
+                    [joint, f"{error:.4f}"]
+                    for joint, error in zip(joint_names, mae_values)
+                ]
+            )
+            headers.append(["Joint", bag_name])
+
+    # Overlay mode: plot one figure with all computed signals
+    if args.overlay:
+        n_joints = first_measured["efforts"].shape[1]
+
         fig, axes = plt.subplots(
             nrows=int(np.ceil(n_joints / 2)), ncols=2, figsize=(20, 12)
         )
         fig.set_tight_layout(True)
-        fig.patch.set_alpha(0)  # Transparent background
+        fig.patch.set_alpha(0)
         axes = axes.flatten()
 
+        # For each joint, overlay measured + all computed
         for jj in range(n_joints):
             ax = axes[jj]
+
+            # Measured (from first bag)
             ax.plot(
-                output_timestamps,
-                output_efforts_mat[:, jj],
-                "r",
-                linewidth=LW,
-                label="Computed",
-            )
-            ax.plot(
-                input_timestamps,
-                input_efforts_mat[:, jj],
+                first_measured["timestamps"],
+                first_measured["efforts"][:, jj],
                 "k--",
                 linewidth=LW,
                 label="Measured",
             )
+
+            # Computed signals from all bags
+            for comp in computed_data:
+                ax.plot(
+                    comp["timestamps"],
+                    comp["efforts"][:, jj],
+                    linewidth=LW,
+                    label=comp["bag_name"],
+                )
+
             ax.set_xlabel("Time [s]", fontsize=FS)
             ax.set_ylabel(r"$\tau_{{{}}}$ [Nm]".format(jj + 1), fontsize=FS)
             ax.grid(True)
-            ax.set_xlim([0, input_timestamps[-1]])
+            ax.set_xlim([0, first_measured["timestamps"][-1]])
             ax.tick_params(axis="both", labelsize=FS)
+        fig.legend(
+            ["Measured"] + [comp["bag_name"] for comp in computed_data],
+            loc="lower right",
+            fontsize=FS,
+        )
 
-        # Save figure as PDF
-        pdf_path = os.path.join(args.output_dir, f"{name}.pdf")
-        plt.savefig(pdf_path, format="pdf", bbox_inches="tight")
-        plt.close(fig)  # Close figure to avoid displaying
-        print(f"Figure saved: {pdf_path}")
+        # Save combined figure
+        out_path = os.path.join(args.output_dir, "overlay_plot.pdf")
+        plt.savefig(out_path, format="pdf", bbox_inches="tight")
+        plt.close(fig)
+        print(f"Overlay figure saved: {out_path}")
 
-        # Compute and display MAE
-        mae = np.mean(np.abs(output_efforts_mat - input_efforts_mat), axis=0)
-        joint_names = input_msgs[0].name
-        mae_table = [[joint, f"{error:.4f}"] for joint, error in zip(joint_names, mae)]
-        print("\nMAE per Joint:")
-        print(tabulate(mae_table, headers=["Joint", "MAE [Nm]"], tablefmt="grid"))
+        # Compute MAE table
+        mae_tables = [
+            [
+                [joint]
+                + [f"{mae_dict[joint].get(b, float('nan')):.4f}" for b in bag_names]
+                for joint in mae_dict
+            ]
+            + [
+                ["Average"]
+                + [
+                    f"{np.mean([mae_dict[j][b] for j in joint_names if b in mae_dict[j]]):.4f}"
+                    for b in bag_names
+                ]
+            ]
+        ]
+        headers = [["Joint"] + bag_names]
+
+    # Display MAE
+    print("\nMAE per Joint:")
+    for mae_table, header in zip(mae_tables, headers):
+        print(tabulate(mae_table, headers=header, tablefmt="grid"))
 
 
 if __name__ == "__main__":
