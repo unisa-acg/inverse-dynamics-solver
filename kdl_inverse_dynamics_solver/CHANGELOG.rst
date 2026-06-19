@@ -2,6 +2,14 @@
 Changelog for package kdl_inverse_dynamics_solver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge remote-tracking branch 'origin/main' into HEAD
+* Merge pull request `#20 <https://github.com/unisa-acg/inverse-dynamics-solver/issues/20>`_ from wentasah/argparse-dep
+  Don't depend on Python 2 argparse
+* [FIX] Fix deprecation warnings
+* Contributors: Vincenzo Petrone
+
 6.0.3 (2026-02-11)
 ------------------
 * Merge branch 'main' into rolling
