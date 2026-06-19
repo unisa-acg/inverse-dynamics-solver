@@ -2,8 +2,8 @@
 Changelog for package kdl_inverse_dynamics_solver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.0.0 (2026-06-19)
+------------------
 * Merge pull request `#20 <https://github.com/unisa-acg/inverse-dynamics-solver/issues/20>`_ from wentasah/argparse-dep
   Don't depend on Python 2 argparse
 * [FIX] Fix deprecation warnings
