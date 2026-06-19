@@ -2,6 +2,27 @@
 Changelog for package inverse_dynamics_solver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#20 <https://github.com/unisa-acg/inverse-dynamics-solver/issues/20>`_ from wentasah/argparse-dep
+  Don't depend on Python 2 argparse
+* [FIX] Fix deprecation warnings
+* Don't depend Python 2 argparse
+  It's rosdep entry is going to be removed.
+  See https://github.com/ros/rosdistro/issues/51715.
+  argparse is in Python 3 standard library so it doesn't need to be
+  referenced explicitly.
+* Merge pull request `#15 <https://github.com/unisa-acg/inverse-dynamics-solver/issues/15>`_ from unisa-acg/bugfix/realtime_safeness
+  bugfix/realtime_safeness
+* [MAK] Add trailing underscore to private member attributes
+* [FIX] Deallocate variables
+  - [REF] Use new instead of malloc
+  - [ADD] Initialize pointers
+  - [ADD] Measure performance in terms of computation time
+* Merge branch 'main' into bugfix/realtime_safeness
+* Merge branch 'main' into bugfix/empty_tip_root
+* Contributors: Enrico Ferrentino, Michal Sojka, Vincenzo Petrone
+
 6.0.1 (2025-12-18)
 ------------------
 * Merge pull request `#11 <https://github.com/unisa-acg/inverse-dynamics-solver/issues/11>`_ from unisa-acg/feature/update_dependencies_exporting

@@ -2,6 +2,19 @@
 Changelog for package franka_inria_inverse_dynamics_solver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#20 <https://github.com/unisa-acg/inverse-dynamics-solver/issues/20>`_ from wentasah/argparse-dep
+  Don't depend on Python 2 argparse
+* [FIX] Fix deprecation warnings
+* Merge pull request `#15 <https://github.com/unisa-acg/inverse-dynamics-solver/issues/15>`_ from unisa-acg/bugfix/realtime_safeness
+  bugfix/realtime_safeness
+* Merge branch 'main' into bugfix/realtime_safeness
+* Merge branch 'main' into bugfix/empty_tip_root
+* [REF] Optimizes code for computation time performance
+* [FIX] Enforce real-time safeness by avoiding dynamic allocations of vectors
+* Contributors: Enrico Ferrentino, Vincenzo Petrone
+
 6.0.1 (2025-12-18)
 ------------------
 * Merge pull request `#11 <https://github.com/unisa-acg/inverse-dynamics-solver/issues/11>`_ from unisa-acg/feature/update_dependencies_exporting

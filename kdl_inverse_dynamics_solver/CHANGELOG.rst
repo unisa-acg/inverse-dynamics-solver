@@ -2,6 +2,37 @@
 Changelog for package kdl_inverse_dynamics_solver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#20 <https://github.com/unisa-acg/inverse-dynamics-solver/issues/20>`_ from wentasah/argparse-dep
+  Don't depend on Python 2 argparse
+* [FIX] Fix deprecation warnings
+* Merge pull request `#15 <https://github.com/unisa-acg/inverse-dynamics-solver/issues/15>`_ from unisa-acg/bugfix/realtime_safeness
+  bugfix/realtime_safeness
+* [REF] Use mutable instead of pointers
+* Merge branch 'main' into bugfix/realtime_safeness
+* Merge pull request `#13 <https://github.com/unisa-acg/inverse-dynamics-solver/issues/13>`_ from unisa-acg/bugfix/empty_tip_root
+  bugfix/empty_tip_root
+* [REF] Use param_namespace instead of ns in warning/error messages to print the namespace without a trailing dot
+  - [DOC] Fix Doxygen and inline documentation to comply to the last implementation and fix typos
+* [FIX] Deallocate variables
+  - [REF] Use new instead of malloc
+  - [ADD] Initialize pointers
+  - [ADD] Measure performance in terms of computation time
+* [REF] Manages missing/empty root/tip parameters with different logics
+  - [TST] Add related tests
+* [REF] Reorder dependencies alphabetically
+* Merge branch 'main' into bugfix/realtime_safeness
+* Merge branch 'main' into bugfix/empty_tip_root
+* [FIX] Fix allocation of zero-vector
+* [FIX] Avoid dynamic allocation when returning a zero-vector
+* [FIX] Enforce real-time safeness by avoiding dynamic allocations of vectors
+* [FIX] Handle empty root and tip parameters
+  - [ADD] With empty root, defaults to chain root
+  - [ADD] With empty tip, raises an exception
+  - [TST] Add two test fixtures to test the two scenarios above
+* Contributors: Enrico Ferrentino, Vincenzo Petrone
+
 6.0.1 (2025-12-18)
 ------------------
 * Merge pull request `#11 <https://github.com/unisa-acg/inverse-dynamics-solver/issues/11>`_ from unisa-acg/feature/update_dependencies_exporting
